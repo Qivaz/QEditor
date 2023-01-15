@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UIGotoLineDialog</class>
+ <widget class="QDialog" name="UIGotoLineDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>219</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Goto Line</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color: lightGray;background-color: rgb(54, 54, 54); 
+font: 10pt;</string>
+  </property>
+  <widget class="QLabel" name="labelGotoLine">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>30</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
+   </property>
+   <property name="text">
+    <string>Line:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditGotoLine">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>30</y>
+     <width>113</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid gray</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonOk">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>30</y>
+     <width>80</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+   </property>
+   <property name="text">
+    <string>Goto</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonCacel">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>80</y>
+     <width>80</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: black; }</string>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

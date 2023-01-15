@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UISearchDialog</class>
+ <widget class="QDialog" name="UISearchDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>540</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Find &amp; Replace</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color: lightGray; background-color: black; font: 11pt;</string>
+  </property>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>521</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTabBar::tab { color: gray; } QTabBar::tab:selected { color: lightGray; }</string>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tabFind">
+    <attribute name="title">
+     <string>    Find    </string>
+    </attribute>
+    <widget class="QLineEdit" name="lineEditFindFindWhat">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>231</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonFindFindNext">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>10</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Find Next</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonFindCount">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>50</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Count</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonFindFindAllInCurrent">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>90</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Find all</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonFindCancel">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>130</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelFindFindWhat">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: transparent;</string>
+     </property>
+     <property name="text">
+      <string>Find what:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabReplace">
+    <attribute name="title">
+     <string>Replace</string>
+    </attribute>
+    <widget class="QLabel" name="labelReplaceFindWhat">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: transparent;</string>
+     </property>
+     <property name="text">
+      <string>Find what:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditReplaceFindWhat">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>231</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray;</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditReplaceReplaceWith">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>40</y>
+       <width>231</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonReplaceReplace">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>50</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Replace</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonReplaceFindNext">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>10</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Find Next</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelReplaceReplaceWith">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: transparent;</string>
+     </property>
+     <property name="text">
+      <string>Replace with:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonReplaceReplaceAll">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>90</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Replace all</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonReplaceCancel">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>130</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+     </property>
+     <property name="text">
+      <string>Calcel</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="labelInfo">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>230</y>
+     <width>521</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxFind">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>110</y>
+     <width>191</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Search mode</string>
+   </property>
+   <widget class="QRadioButton" name="radioButtonFindNormal">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>151</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Normal</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButtonFindExtended">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>171</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extended(\n, \r, \t, ...)</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButtonFindRe">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>151</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Regular Expression</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxFindWholeWord">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>140</y>
+     <width>111</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Whole word</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxFindBackward">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>120</y>
+     <width>111</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Backward</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxFindMatchCase">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>160</y>
+     <width>111</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Match case</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxFindWrapAround">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>180</y>
+     <width>111</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Wrap around</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEditFindFindWhat</tabstop>
+  <tabstop>pushButtonFindFindNext</tabstop>
+  <tabstop>pushButtonFindCount</tabstop>
+  <tabstop>pushButtonFindFindAllInCurrent</tabstop>
+  <tabstop>pushButtonFindCancel</tabstop>
+  <tabstop>checkBoxFindBackward</tabstop>
+  <tabstop>checkBoxFindWholeWord</tabstop>
+  <tabstop>checkBoxFindMatchCase</tabstop>
+  <tabstop>checkBoxFindWrapAround</tabstop>
+  <tabstop>lineEditReplaceFindWhat</tabstop>
+  <tabstop>lineEditReplaceReplaceWith</tabstop>
+  <tabstop>pushButtonReplaceFindNext</tabstop>
+  <tabstop>pushButtonReplaceReplace</tabstop>
+  <tabstop>pushButtonReplaceReplaceAll</tabstop>
+  <tabstop>pushButtonReplaceCancel</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

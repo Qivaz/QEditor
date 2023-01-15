@@ -1,0 +1,45 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/copy.svg</file>
+        <file>images/cut.svg</file>
+        <file>images/file.svg</file>
+        <file>images/folder-open.svg</file>
+        <file>images/paste.svg</file>
+        <file>images/save.svg</file>
+        <file>images/search.svg</file>
+        <file>images/zoom-in.svg</file>
+        <file>images/zoom-out.svg</file>
+        <file>images/paint.svg</file>
+        <file>images/action-redo.svg</file>
+        <file>images/action-undo.svg</file>
+        <file>images/highlighter.svg</file>
+        <file>images/eraser.svg</file>
+        <file>images/arrow-thick-to-left.svg</file>
+        <file>images/arrow-thick-to-right.svg</file>
+        <file>images/x-circle.svg</file>
+        <file>images/x.svg</file>
+        <file>images/asterisk_blue.svg</file>
+        <file>images/pencil.svg</file>
+        <file>images/wrap-text.svg</file>
+        <file>images/goto-line.svg</file>
+        <file>images/replace.svg</file>
+        <file>images/select-all.svg</file>
+        <file>images/show-all-chars.svg</file>
+        <file>images/chevron-down.svg</file>
+        <file>images/QEditorIcon.svg</file>
+        <file>images/function.svg</file>
+        <file>images/down-outlined.svg</file>
+        <file>images/right-outlined.svg</file>
+        <file>images/file-type-c2.svg</file>
+        <file>images/file-type-cpp2.svg</file>
+        <file>images/file-type-moleculer.svg</file>
+        <file>images/file-type-pipeline.svg</file>
+        <file>images/file-type-python.svg</file>
+        <file>images/file-type-text.svg</file>
+        <file>images/folder.svg</file>
+        <file>images/brackets-contain.svg</file>
+        <file>images/QEditor.svg</file>
+        <file>images/QEditorIcon.webp</file>
+        <file>images/sitemap.svg</file>
+    </qresource>
+</RCC>

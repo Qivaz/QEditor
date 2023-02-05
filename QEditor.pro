@@ -88,7 +88,7 @@ INCLUDEPATH += \
     ./include/view/ \
     ./include/diff/diff_match_patch/ \
 
-VERSION = "0.0.1 (V22R10 alpha)"
+VERSION = "0.0.1"
 QMAKE_TARGET_PRODUCT = "QEditor"
 QMAKE_TARGET_COMPANY = "Q"
 QMAKE_TARGET_DESCRIPTION = "QEditor"

@@ -44,9 +44,6 @@ MainWindow::MainWindow()
     setAcceptDrops(true);
     setWindowOpacity(opa);
 
-//    setStyleSheet("QMainWindow::separator{ background: rgb(68, 68, 68);"
-//                " width: 1px; height: 1px;}");
-
     setStyleSheet("background: rgb(68, 68, 68); border: 5px, solid, rgb(255, 0, 0);");
     setCentralWidget(tabView_);
 
@@ -59,6 +56,9 @@ MainWindow::MainWindow()
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &MainWindow::HandleCommitData);
 #endif
+
+    // Delay to show the window.
+    connect(this, &MainWindow::Show, this, [](){ QTimer::singleShot(500, []() { MainWindow::Instance().show(); }); }, Qt::QueuedConnection);
 
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -413,29 +413,6 @@ bool MainWindow::Replace()
     return true;
 }
 
-bool MainWindow::Test()
-{
-    qDebug() << "MainWindow::test()";
-    QTextCursor cursor = editView()->textCursor();
-//    cursor.setPosition(cursor.position(), QTextCursor::MoveAnchor);
-    cursor.setPosition(cursor.position()/* + 10*/, QTextCursor::KeepAnchor);
-//    cursor.select(QTextCursor::WordUnderCursor);
-//    cursor.select(QTextCursor::Document);
-//    cursor.select(QTextCursor::BlockUnderCursor);
-    cursor.select(QTextCursor::LineUnderCursor);
-    QTextCharFormat fmt;
-    fmt.setForeground(Qt::green);
-    fmt.setBackground(Qt::blue);
-    cursor.mergeCharFormat(fmt);
-    cursor.clearSelection();
-
-
-//    auto tc = editView()->textCursor();
-//    tc.select(QTextCursor::WordUnderCursor);
-//    qDebug() << "selectedText: " << tc.selectedText();
-    return true;
-}
-
 bool MainWindow::MarkUnmarkCursorText()
 {
     const auto &text = editView()->GetCursorText();
@@ -523,7 +500,7 @@ void MainWindow::About()
 {
    QMessageBox::about(this, tr("About ") + Constants::kAppName,
                       tr("<font color=\"lightgray\"><b>") + Constants::kAppName +
-                      tr("<br/>Version: V22R10") + tr("</b><br/>") +
+                      tr("<br/>Version: ") + Constants::kVersionStr + tr("</b><br/>") +
                       tr("----------<br/>The <b>") + Constants::kAppName +
                       "</b> is a compact text editor "
                       "with common functions, such as search, replace, "

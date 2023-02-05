@@ -17,6 +17,12 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#if defined(Q_OS_LINUX)
+#include <unistd.h>
+#endif
+#include <thread>
+#include <sstream>
+
 #include <QDebug>
 #include <QDateTime>
 #include <QDir>
@@ -64,6 +70,26 @@ static inline QString GetLogsPath()
 }
 #endif
 
+static std::string GetProcName() {
+#if defined(__APPLE__) || defined(__FreeBSD__)
+  const std::string appname = getprogname();
+#elif defined(_GNU_SOURCE)
+  const std::string appname = program_invocation_name;
+#else
+  const std::string appname = "?";
+#endif
+  // Sometimes, the app name is an absolute path, it is too long
+  std::string app_name(appname);
+  std::size_t pos = app_name.rfind("/");
+  if (pos == std::string::npos) {
+    return app_name;
+  }
+  if (pos + 1 >= app_name.size()) {
+    return app_name;
+  }
+  return app_name.substr(pos + 1);
+}
+
 static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QTextStream cin(stdin, QIODevice::ReadOnly);
@@ -71,26 +97,35 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext 
     QTextStream cerr(stderr, QIODevice::WriteOnly);
     QString text;
     QByteArray localMsg = msg.toLocal8Bit();
+    std::stringstream ss;
+#if defined(Q_OS_LINUX)
+    ss << "(" << getpid() << ":" << std::this_thread::get_id() << "," << GetProcName() << ")";
+#else
+    ss << "(" << std::this_thread::get_id() << "," << GetProcName() << ")";
+#endif
+    QString pidInfo = QString::fromStdString(ss.str());
     const auto &currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     switch (type) {
     case QtDebugMsg:
-        text = QString("[DEBUG] %1: [%2:%3@%4] %5\n").arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
+        return;
+        text = QString("[DEBUG] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cout << text;
         break;
     case QtInfoMsg:
-        text = QString("[INFO] %1: [%2:%3@%4] %5\n").arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
+        return;
+        text = QString("[INFO] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cout << text;
         break;
     case QtWarningMsg:
-        text = QString("[WARNING] %1: [%2:%3@%4] %5\n").arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
+        text = QString("[WARNING] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cout << text;
         break;
     case QtCriticalMsg:
-        text = QString("[CRITIAL] %1: [%2:%3@%4] %5\n").arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
+        text = QString("[CRITIAL] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cerr << text;
         break;
     case QtFatalMsg:
-        text = QString("[FATAL] %1: [%2:%3@%4] %5\n").arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
+        text = QString("[FATAL] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cerr << text;
         break;
     default:

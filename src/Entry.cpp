@@ -32,14 +32,14 @@ int main(int argc, char *argv[])
     Constants::kAppInternalPath = Constants::kAppPath + "/" + Constants::kAppInternalRelativePath;
     qDebug() << "Constants::kAppInternalPath: " << Constants::kAppInternalPath;
     (void)Utils::mkdir(Constants::kAppInternalPath);
-    Q_INIT_RESOURCE(application);
+    Q_INIT_RESOURCE(QEditor);
 #ifdef OUTPUT_LOG
     qInstallMessageHandler(OutputMessageOutput);
 #endif
 
-    QCoreApplication::setOrganizationName("Zh.QH");
-    QCoreApplication::setApplicationName("QEditor");
-    QCoreApplication::setApplicationVersion(QT_VERSION_STR);
+    QCoreApplication::setOrganizationName(Constants::kOrgName);
+    QCoreApplication::setApplicationName(Constants::kAppName);
+    QCoreApplication::setApplicationVersion(Constants::kVersionStr);
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();

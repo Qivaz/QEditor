@@ -18,10 +18,12 @@
 
 #include <QAbstractButton>
 #include <QApplication>
+#include <QClipboard>
 #include <QCursor>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QProcess>
 #include <QStatusBar>
 #include <QTabBar>
 #include <QTextCodec>
@@ -134,20 +136,65 @@ void TabView::HandleTabBarClicked(int index)
     if (QApplication::mouseButtons() == Qt::RightButton) {
         qDebug() << "TabView::barClicked(RightButton), index: " << index;
         menu_->clear();
-        QAction *closeAction = new QAction("Close  (Click close button)");
+        QAction *closeAction = new QAction("Close  (Click Close Button)");
         menu_->addAction(closeAction);
         connect(closeAction, &QAction::triggered, this, &TabView::TabCloseMaybeSave);
         menu_->popup(QCursor::pos());
 
-        QAction *forceCloseAction = new QAction("Force close  (Double click)");
+        QAction *forceCloseAction = new QAction("Force Close  (Double Click)");
         menu_->addAction(forceCloseAction);
         connect(forceCloseAction, &QAction::triggered, this, &TabView::TabForceClose);
         menu_->popup(QCursor::pos());
 
-        QAction *closeAllAction = new QAction("Force close all");
+        QAction *closeAllAction = new QAction("Force Close All");
         menu_->addAction(closeAllAction);
         connect(closeAllAction, &QAction::triggered, this, [&]() {
             clear();
+        });
+        menu_->popup(QCursor::pos());
+
+        menu_->addSeparator();
+
+        auto filePath = GetEditView(index)->filePath();
+        QAction *copyPathAction = new QAction("Copy Full Path");
+        menu_->addAction(copyPathAction);
+        connect(copyPathAction, &QAction::triggered, this, [filePath]() {
+            QClipboard *clipboard = QGuiApplication::clipboard();
+            clipboard->setText(filePath);
+        });
+        menu_->popup(QCursor::pos());
+
+        auto fileName = GetEditView(index)->fileName();
+        QAction *copyNameAction = new QAction("Copy File Name");
+        menu_->addAction(copyNameAction);
+        connect(copyNameAction, &QAction::triggered, this, [fileName]() {
+            QClipboard *clipboard = QGuiApplication::clipboard();
+            clipboard->setText(fileName);
+        });
+        menu_->popup(QCursor::pos());
+
+        menu_->addSeparator();
+
+        auto folderPath = QFileInfo(filePath).canonicalPath();
+#if defined(Q_OS_WIN)
+        QAction *openExplorerAction = new QAction("Reveal in File Explorer");
+#else
+        QAction *openExplorerAction = new QAction("Open Containing Folder");
+#endif
+        menu_->addAction(openExplorerAction);
+        connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {
+#if defined(Q_OS_WIN)
+            QString cmd = QDir::toNativeSeparators(filePath);
+            // Have to add \ before all spaces. Using quotes does not work.
+            cmd.replace(QString(" "), QString("\ "));
+            QProcess::startDetached("explorer /select," + cmd);
+#elif defined(Q_OS_LINUX)
+            // If use 'QProcess::startDetached("xdg-open", QStringList(QDir::toNativeSeparators(folderPath)))', can't show the browser with the file selected.
+            QString cmd = "dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://%1\" string:\"\"";
+            QProcess::startDetached(cmd.arg(filePath));
+#else  // Q_OS_OSX
+            QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
+#endif
         });
         menu_->popup(QCursor::pos());
     }
@@ -304,7 +351,7 @@ bool TabView::AutoLoad()
         } else {  // Open file.
             QFileInfo qFileInfo = QFileInfo(fileInfo.path_);
             fileName = qFileInfo.fileName();
-            filePathTip = qFileInfo.filePath();
+            filePathTip = qFileInfo.canonicalFilePath();
 
             // Don't open file not exist anymore.
             QFile file(filePathTip);
@@ -389,11 +436,17 @@ void TabView::OpenFile(const QString &filePath)
     QFileInfo fileInfo = QFileInfo(filePath);
 
     // Don't open file multiple times.
-    if (openFiles_.contains(fileInfo.filePath())) {
-        Toast::Instance().Show(Toast::kWarning, fileInfo.filePath() + " already opened.");
+    if (openFiles_.contains(fileInfo.canonicalFilePath())) {
+        // Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + " already opened.");
+        auto index = FindEditViewIndex(fileInfo.canonicalFilePath());
+        if (index == -1) {
+            Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + " already opened, but not found!");
+        } else {
+            setCurrentIndex(index);
+        }
         return;
     }
-    openFiles_.insert(fileInfo.filePath());
+    openFiles_.insert(fileInfo.canonicalFilePath());
 
     auto editView = new EditView(fileInfo, this);
     editView->setNewFileNum(0);  // Set new file number as 0 for open file.
@@ -482,7 +535,7 @@ void TabView::ChangeTabDescription(const QFileInfo &fileInfo, int index)
         index = currentIndex();
     }
     setTabText(index, fileInfo.fileName());
-    setTabToolTip(index, fileInfo.filePath());
+    setTabToolTip(index, fileInfo.canonicalFilePath());
 }
 
 void TabView::ApplyWrapTextState(int index)

@@ -41,6 +41,7 @@ public:
 
     void HandleIndexClick(const QModelIndex &index);
     void HandleExpanded(const QModelIndex &index);
+    void HandleIndexPress(const QModelIndex &index);
     void HandleDirLoaded(const QString &path);
 
     void GotoPathPosition(const QString &path);
@@ -56,6 +57,7 @@ private:
 
     QFileSystemModel *model_;
     CustSortFilterProxyModel *proxyModel_;
+    QMenu *menu_;
     QString gotoDir_;
     QString gotoPath_;
     QString rootPath_;

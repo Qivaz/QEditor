@@ -58,14 +58,14 @@ public:
         return (EditView*)widget(index);
     }
 
-    EditView *FindEditView(const QString &filePath)
+    int FindEditViewIndex(const QString &filePath)
     {
         for (int i = 0; i < count(); ++i) {
             if (GetEditView(i)->filePath() == filePath) {
-                return GetEditView(i);
+                return i;
             }
         }
-        return nullptr;
+        return -1;
     }
 
     void NewFile();

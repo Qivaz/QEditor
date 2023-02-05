@@ -26,7 +26,7 @@ IrParser::IrParser(EditView *editView, QObject *parent) : IParser(parent), editV
 void IrParser::ParseFuncGraph(){
     auto funcStartCursor = editView_->textCursor();
     if (funcStartCursor.isNull()) {
-        qCritical() << "textCursor is invalid.";
+        qDebug() << "textCursor is invalid.";
         return;
     }
     funcStartCursor.setPosition(0, QTextCursor::MoveAnchor);
@@ -36,11 +36,11 @@ void IrParser::ParseFuncGraph(){
     constexpr auto entryStart = "@";
     auto entryStartPos = entryBlockText.indexOf(entryStart);
     if (entryStartPos == -1) {
-        qCritical() << "Invalid ir file.";
+        qDebug() << "Invalid ir file.";
         return;
     }
     auto entryFuncName = entryBlockText.mid(entryStartPos + 1);
-    qCritical() << "entryFuncName: " << entryFuncName;
+    qDebug() << "entryFuncName: " << entryFuncName;
     entryFunc_ = entryFuncName;
 
     while (true) {
@@ -81,7 +81,7 @@ void IrParser::ParseFuncGraph(){
             break;
         }
         auto returnVariable = returnLineText.mid(returnVariableStart, returnVariableEnd - returnVariableStart);
-        qCritical() << "returnVariable: " << returnVariable;
+        qDebug() << "returnVariable: " << returnVariable;
 
         // Return value
         auto returnValueStartCursor = editView_->document()->find(kSubGraphReturnValueStart, returnStartCursor);
@@ -138,7 +138,7 @@ void IrParser::ParseFuncGraph(){
                     constexpr auto argsSeparator = ", ";
                     QStringList args = switchCalleeArgs.split(argsSeparator);
                     if (args.size() != 3) {
-                        qCritical() << "Switch call argument size should be 3, but got " << startBlockText;
+                        qDebug() << "Switch call argument size should be 3, but got " << startBlockText;
                         continue;
                     }
                     if (args[1].startsWith("@")) {
@@ -174,7 +174,7 @@ void IrParser::ParseFuncGraph(){
                     constexpr auto argsSeparator = ", ";
                     QStringList args = cnodeUnionCalleeArgs.split(argsSeparator);
                     if (args.size() != 2) {
-                        qCritical() << "Union call argument size should be 2, but got " << startBlockText;
+                        qDebug() << "Union call argument size should be 2, but got " << startBlockText;
                         continue;
                     }
                     if (args[0].startsWith("@")) {
@@ -307,12 +307,12 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
     nodesMap_.clear();
     const FuncGraphInfo &funcGraphInfo = GetFuncGraphInfo(funcName);
     if (funcGraphInfo.pos_ == -1) {
-        qCritical() << "FuncGraphInfo is invalid, " << funcGraphInfo.name_;
+        qDebug() << "FuncGraphInfo is invalid, " << funcGraphInfo.name_;
         return nodesMap_;
     }
     auto endCursor = editView_->textCursor();
     if (endCursor.isNull()) {
-        qCritical() << "textCursor is invalid, " << funcGraphInfo.name_;
+        qDebug() << "textCursor is invalid, " << funcGraphInfo.name_;
         return nodesMap_;
     }
     endCursor.setPosition(funcGraphInfo.end_ - 1, QTextCursor::MoveAnchor);
@@ -334,7 +334,7 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 continue;
             }
             auto variableName = startBlockText.mid(variableDefStart, variableDefEnd - variableDefStart);
-            qCritical() << "variableName: " << variableName;
+            qDebug() << "variableName: " << variableName;
 
             auto assignOperationPos = startBlockText.indexOf(assignOperation, variableDefEnd + 1);
             if (assignOperationPos == -1) {
@@ -348,7 +348,7 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 continue;
             }
             // Ignore "$(".
-            qCritical() << "startBlockText.at(opEnd - 1): " << startBlockText.at(opEnd - 1);
+            qDebug() << "startBlockText.at(opEnd - 1): " << startBlockText.at(opEnd - 1);
             if (startBlockText.at(opEnd - 1) == '$') {
                 opEnd = startBlockText.indexOf("(", opEnd + 1);
                 if (opEnd == -1) {
@@ -357,7 +357,7 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 }
             }
             auto opName = startBlockText.mid(opStart, opEnd - opStart);
-            qCritical() << "opName: " << opName;
+            qDebug() << "opName: " << opName;
 
             QVector<QString> inputs;
             if (opName.startsWith("%")) {
@@ -384,19 +384,19 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
 
                 auto argumentsStr = cursor.selectedText();
                 argumentsStr = argumentsStr.mid(1, argumentsStr.length() - 2);  // Remove start '(' and end ')'.
-                qCritical() << "argumentsStr: " << argumentsStr;
+                qDebug() << "argumentsStr: " << argumentsStr;
                 constexpr auto argsSeparator = ", ";
                 QStringList args = argumentsStr.split(argsSeparator);
                 bool hasConstantInput = false;
                 for (const auto &arg : args) {
                     if (arg.startsWith("%")) {
                         const auto &argName = arg.mid(1);
-                        qCritical() << "argName: " << argName;
+                        qDebug() << "argName: " << argName;
                         inputs.push_back(argName);
                     } else {
                         hasConstantInput = true;
                     }
-                    qCritical() << "arg: " << arg;
+                    qDebug() << "arg: " << arg;
                 }
                 auto pos = startBlock.position() + variableDefStart;
                 NodeInfo nodeInfo({variableName, opName, pos, inputs, hasConstantInput});

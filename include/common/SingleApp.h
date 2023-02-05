@@ -17,9 +17,11 @@
 #ifndef SINGLEAPP_H
 #define SINGLEAPP_H
 
+#include <QApplication>
 #include <QFile>
 #include <QLocalSocket>
 #include <QLocalServer>
+#include <QWindow>
 
 #include "Constants.h"
 #include "MainWindow.h"
@@ -69,6 +71,31 @@ public slots:
         connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
     }
 
+    void ShowWindow() {
+#if defined(Q_OS_WIN)
+        // https://stackoverflow.com/questions/6087887/bring-window-to-front-raise-show-activatewindow-don-t-work
+        // I don't know why have to use two steps.
+        // Step 1:
+        auto eFlags = MainWindow::Instance().windowFlags();
+        MainWindow::Instance().setWindowFlags(eFlags|Qt::WindowStaysOnTopHint);
+        MainWindow::Instance().show();
+        MainWindow::Instance().setWindowFlags(eFlags);
+        MainWindow::Instance().show();
+        // Step 2:
+        for ( QWindow* appWindow : QGuiApplication::allWindows() )
+        {
+          appWindow->show(); // Bring window to top on OSX
+          appWindow->raise(); // Bring window from minimized state on OSX
+
+          appWindow->requestActivate(); // Bring window to front/unminimize on windows.
+        }
+#else // defined(Q_OS_LINUX) or defined(Q_OS_OSX)
+        // Not work in Windows, only blink on taskbar.
+         MainWindow::Instance().raise();  // Mac OS
+         MainWindow::Instance().activateWindow(); // Linux OS
+#endif
+    }
+
     void HandleReadyRead()
     {
         QLocalSocket* socket = static_cast<QLocalSocket*>(sender());
@@ -81,12 +108,16 @@ public slots:
         qDebug() << "Read data from client: " << text;
         QFileInfo fileInfo(text);
         if (fileInfo.isFile()) {
-            qDebug() << "Open file: " << fileInfo.filePath();
-            MainWindow::Instance().show();
-            MainWindow::Instance().tabView()->OpenFile(fileInfo.filePath());
+            qDebug() << "Open file: " << fileInfo.canonicalFilePath();
+            ShowWindow();
+
+            MainWindow::Instance().tabView()->OpenFile(fileInfo.canonicalFilePath());
         } else {
-            qDebug() << "Fail to open file: " << fileInfo.filePath();
-            Toast::Instance().Show(Toast::kError, QString("Can't open %1").arg(fileInfo.filePath()));
+            qDebug() << "Fail to open file: " << fileInfo.canonicalFilePath();
+            ShowWindow();
+
+            // Toast::Instance().Show(Toast::kError, QString("Can't open %1").arg(fileInfo.canonicalFilePath()));
+            Toast::Instance().Show(Toast::kError, QString("Can't open multiple window."));
         }
 
         QString response = "FIN";

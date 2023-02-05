@@ -42,7 +42,7 @@ QVector<bool> NewFileNum::numbers_use_status_;
 EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
     : tabView_((TabView*)parent),
       fileName_(fileInfo.fileName()),
-      filePath_(fileInfo.filePath()),
+      filePath_(fileInfo.canonicalFilePath()),
       fileType_(filePath_)
 {
     if (!fileType_.IsUnknown()) {
@@ -69,6 +69,7 @@ EditView::EditView(QWidget *parent)
 void EditView::Init()
 {
     setBackgroundVisible(false);
+    setCenterOnScroll(true);
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"

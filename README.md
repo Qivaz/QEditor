@@ -1,6 +1,6 @@
 ## What Is QEditor
 
-QEditor(Abbreviation for "**Editor** powered  by **Q**t") is a compact text editor with common functions, such as search, replace, mark, and simple syntax highlighting. You can compile it freely and run it in Linux, Windows, or Mac.
+QEditor(Abbreviation for "Text **Editor** powered  by **Q**t") is a compact text editor with common functions, such as search, replace, mark, and simple syntax highlighting. You can compile it freely and run it in Linux, Windows, or Mac.
 
 ## Installation
 

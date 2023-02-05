@@ -172,9 +172,6 @@ private:
     const QString kAppInternalPath_ = Constants::kAppInternalPath;
     const QString kAppInternalAutoSaveDirName_ = Constants::kAppInternalAutoSaveDirName;
     const QString kAppInternalFilesInfoFileName_ = Constants::kAppInternalFilesInfoFileName;
-
-signals:
-
 };
 
 #endif // FILERECORD_H

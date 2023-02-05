@@ -134,6 +134,8 @@ public:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
+    void RequestShow() { emit Show(); }
+
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
@@ -149,7 +151,6 @@ private slots:
 
     bool Find();
     bool Replace();
-    bool Test();
 
     bool MarkUnmarkCursorText();
     bool UnmarkAll();
@@ -167,6 +168,9 @@ private slots:
 
     bool StepBack();
     bool StepForward();
+
+signals:
+    void Show();
 
 private:
     void CreateActions();

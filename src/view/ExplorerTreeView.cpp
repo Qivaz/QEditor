@@ -16,6 +16,10 @@
 
 #include "ExplorerTreeView.h"
 
+#include <QApplication>
+#include <QClipboard>
+#include <QDesktopServices>
+#include <QProcess>
 #include <QScreen>
 #include <QScrollBar>
 #include <QStandardItemModel>
@@ -25,7 +29,7 @@
 #include "MainWindow.h"
 #include "Logger.h"
 
-ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath)
+ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu())
 {
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"
@@ -72,64 +76,25 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
                                               background: none; \
                                           }");
 
-//    QStandardItemModel *model = new QStandardItemModel(this);
-//    model->setHorizontalHeaderLabels(QStringList()<<"姓名"<<"性别"<<"年龄");
-//    setModel(model);
-
-//    QStandardItem *item1 = new QStandardItem("四年级");
-
-//    model->setItem(0,0,item1);
-//    QStandardItem *item00 = new QStandardItem("张三");
-//    QStandardItem *item10 = new QStandardItem("张四");
-//    QStandardItem *item20 = new QStandardItem("张五");
-
-//    QStandardItem *item01 = new QStandardItem("男");
-//    QStandardItem *item11 = new QStandardItem("女");
-//    QStandardItem *item21 = new QStandardItem("男");
-
-//    QStandardItem *item02 = new QStandardItem("15");
-//    QStandardItem *item12 = new QStandardItem("14");
-//    QStandardItem *item22 = new QStandardItem("16");
-
-//    model->item(0,0)->setChild(0,0,item00);
-//    model->item(0,0)->setChild(1,0,item10);
-//    model->item(0,0)->setChild(2,0,item20);
-
-//    model->item(0,0)->setChild(0,1,item01);
-//    model->item(0,0)->setChild(1,1,item11);
-//    model->item(0,0)->setChild(2,1,item21);
-
-//    model->item(0,0)->setChild(0,2,item02);
-//    model->item(0,0)->setChild(1,2,item12);
-//    model->item(0,0)->setChild(2,2,item22);
-
-//    QStandardItem *item2 = new QStandardItem("五年级");
-//    model->setItem(1,0,item2);
-
-//    QStandardItem *item200 = new QStandardItem("李三");
-//    QStandardItem *item210 = new QStandardItem("李四");
-//    QStandardItem *item220 = new QStandardItem("李五");
-
-//    QStandardItem *item201 = new QStandardItem("男");
-//    QStandardItem *item211 = new QStandardItem("女");
-//    QStandardItem *item221 = new QStandardItem("男");
-
-//    QStandardItem *item202 = new QStandardItem("15");
-//    QStandardItem *item212 = new QStandardItem("14");
-//    QStandardItem *item222 = new QStandardItem("16");
-
-//    model->item(1,0)->setChild(0,0,item200);
-//    model->item(1,0)->setChild(1,0,item210);
-//    model->item(1,0)->setChild(2,0,item220);
-
-//    model->item(1,0)->setChild(0,1,item201);
-//    model->item(1,0)->setChild(1,1,item211);
-//    model->item(1,0)->setChild(2,1,item221);
-
-//    model->item(1,0)->setChild(0,2,item202);
-//    model->item(1,0)->setChild(1,2,item212);
-//    model->item(1,0)->setChild(2,2,item222);
-
+    menu_->setStyleSheet(
+                       "\
+                       QMenu {\
+                           background-color: rgb(28, 28, 28);\
+                           margin: 2px 2px;\
+                       }\
+                       QMenu::item {\
+                           color: rgb(225, 225, 225);\
+                           background-color: rgb(28, 28, 28);\
+                           padding: 5px 5px;\
+                       }\
+                       QMenu::item:selected {\
+                           background-color: rgb(0, 122, 204);\
+                       }\
+                       QMenu::item:pressed {\
+                           border: 1px solid rgb(60, 60, 60); \
+                           background-color: lightGray; \
+                       }\
+                      ");
 
     model_ = new QFileSystemModel(this);
     model_->setRootPath("");
@@ -165,6 +130,7 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
     hideColumn(3);
 
     connect(this, &QAbstractItemView::clicked, this, &ExplorerTreeView::HandleIndexClick);
+    connect(this, &QAbstractItemView::pressed, this, &ExplorerTreeView::HandleIndexPress);
     connect(this, &QTreeView::expanded, this, &ExplorerTreeView::HandleExpanded);
     connect(model_, &QFileSystemModel::directoryLoaded, this, &ExplorerTreeView::HandleDirLoaded);
 }
@@ -178,13 +144,69 @@ void ExplorerTreeView::HandleExpanded(const QModelIndex &index)
                 << modelIndex.data().toString();
 }
 
+void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
+{
+    if (QApplication::mouseButtons() != Qt::RightButton) {
+        return;
+    }
+
+    qCritical() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+    QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
+    qCritical() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
+                << modelIndex.data().toString();
+    menu_->clear();
+
+    const auto &fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
+    auto filePath = fileInfo.canonicalFilePath();
+    QAction *copyPathAction = new QAction("Copy Full Path");
+    menu_->addAction(copyPathAction);
+    connect(copyPathAction, &QAction::triggered, this, [filePath]() {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(filePath);
+    });
+    menu_->popup(QCursor::pos());
+
+    auto fileName = fileInfo.fileName();
+    QAction *copyNameAction = new QAction("Copy File Name");
+    menu_->addAction(copyNameAction);
+    connect(copyNameAction, &QAction::triggered, this, [fileName]() {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(fileName);
+    });
+    menu_->popup(QCursor::pos());
+
+    menu_->addSeparator();
+
+    auto folderPath = fileInfo.canonicalPath();
+#if defined(Q_OS_WIN)
+    QAction *openExplorerAction = new QAction("Reveal in File Explorer");
+#else
+    QAction *openExplorerAction = new QAction("Open Containing Folder");
+#endif
+    menu_->addAction(openExplorerAction);
+    connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {
+#if defined(Q_OS_WIN)
+        QString cmd = QDir::toNativeSeparators(filePath);
+        // Have to add \ before all spaces. Using quotes does not work.
+        cmd.replace(QString(" "), QString("\ "));
+        QProcess::startDetached("explorer /select," + cmd);
+#elif defined(Q_OS_LINUX)
+        // If use 'QProcess::startDetached("xdg-open", QStringList(QDir::toNativeSeparators(folderPath)))', can't show the browser with the file selected.
+        QString cmd = "dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://%1\" string:\"\"";
+        QProcess::startDetached(cmd.arg(filePath));
+#else  // Q_OS_OSX
+        QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
+#endif
+    });
+    menu_->popup(QCursor::pos());
+}
+
 void ExplorerTreeView::HandleIndexClick(const QModelIndex &index)
 {
     qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
-
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
-                << modelIndex.data().toString();
+             << modelIndex.data().toString();
     const auto &fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
     if (fileInfo.isDir()) {
         if (isExpanded(index)) {
@@ -194,9 +216,9 @@ void ExplorerTreeView::HandleIndexClick(const QModelIndex &index)
         }
         return;
     }
-    FileType fileType(fileInfo.filePath());
+    FileType fileType(fileInfo.canonicalFilePath());
     if (!fileType.IsUnknown()) {
-        MainWindow::Instance().tabView()->OpenFile(fileInfo.filePath());
+        MainWindow::Instance().tabView()->OpenFile(fileInfo.canonicalFilePath());
     }
 }
 
@@ -280,7 +302,7 @@ QIcon FileIconProvider::icon(const QFileInfo &info) const
         res.addFile(":/images/down-outlined.svg", QSize(), QIcon::Mode::Normal, QIcon::State::On);
         return res;
     }
-    FileType fileType(info.filePath());
+    FileType fileType(info.canonicalFilePath());
     if (fileType.IsIr()) {
         return QIcon(":/images/file-type-pipeline.svg");
     } else if (fileType.IsPython()) {

@@ -21,6 +21,9 @@
 
 namespace Constants {
 constexpr auto kAppName = "QEditor";
+constexpr auto kVersionStr = "0.0.1 (V22R10 alpha)";
+constexpr auto kOrgName = "Q";
+
 constexpr auto kAppInternalRelativePath = ".Q/data/internal/.files/";
 constexpr auto kAppInternalAutoSaveDirName = ".auto_save";
 constexpr auto kAppInternalFilesInfoFileName = "files_info";

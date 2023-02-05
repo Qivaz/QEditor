@@ -1,13 +1,9 @@
 QT += widgets network
-#CONFIG += console
 CONFIG += c++17
 DEFINES += QT_MESSAGELOGCONTEXT
 requires(qtConfig(filedialog))
 
 RC_ICONS = QEditorIcon.ico
-
-#DEFINES += QT_NO_WARNING_OUTPUT
-#DEFINES += QT_NO_DEBUG_OUTPUT
 
 HEADERS       = \
     include/common/Constants.h \
@@ -77,11 +73,7 @@ SOURCES       = \
     src/view/TextHighlighter.cpp \
     src/view/Toast.cpp
 
-RESOURCES = application.qrc
-
-# install
-target.path = $$[QT_INSTALL_EXAMPLES]/widgets/mainwindows/application
-INSTALLS += target
+RESOURCES = QEditor.qrc
 
 FORMS += \
     form/GotoLineDialog.ui \
@@ -96,9 +88,8 @@ INCLUDEPATH += \
     ./include/view/ \
     ./include/diff/diff_match_patch/ \
 
-
-#VERSION = "0.1"
-#QMAKE_TARGET_PRODUCT = "QEditor"
-#QMAKE_TARGET_COMPANY = "Q Zhang"
-#QMAKE_TARGET_DESCRIPTION = "QEditor"
-#QMAKE_TARGET_COPYRIGHT = copyright(2022)
+VERSION = "0.0.1 (V22R10 alpha)"
+QMAKE_TARGET_PRODUCT = "QEditor"
+QMAKE_TARGET_COMPANY = "Q"
+QMAKE_TARGET_DESCRIPTION = "QEditor"
+QMAKE_TARGET_COPYRIGHT = Copyright(2022)

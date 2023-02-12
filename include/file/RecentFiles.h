@@ -14,38 +14,35 @@
  * limitations under the License.
  */
 
-#ifndef GOTOLINEDIALOG_H
-#define GOTOLINEDIALOG_H
+#ifndef RECENTFILES_H
+#define RECENTFILES_H
 
-#include <QDialog>
-#include "EditView.h"
-#include "MainTabView.h"
+#include <QObject>
+#include <QDataStream>
 
-namespace Ui {
-class UIGotoLineDialog;
-}
+#include "Constants.h"
 
 namespace QEditor {
-class GotoLineDialog : public QDialog
+class RecentFiles : public QObject
 {
     Q_OBJECT
 public:
-    explicit GotoLineDialog(QWidget *parent = nullptr);
-    ~GotoLineDialog();
+    static void UpdateFiles(const QString &filePath);
+    static void Clear();
 
-    EditView* editView();
-    TabView* tabView();
+    static void StoreFiles();
+    static void LoadFiles();
 
-    void showEvent(QShowEvent *) override;
-
-private slots:
-    void on_pushButtonOk_clicked();
-
-    void on_pushButtonCacel_clicked();
+    static const QStringList& files() { return files_; }
 
 private:
-    Ui::UIGotoLineDialog *ui_;
+    static QStringList files_;
+
+    static const QString kAppInternalRecentFilesDirName_;
+    static const QString kAppInternalRecentFilesFileName_;
+
+    static const int kMaxRecentFilesNum_ = 100;
 };
 }  // namespace QEditor
 
-#endif // GOTOLINEDIALOG_H
+#endif // RECENTFILES_H

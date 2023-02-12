@@ -25,6 +25,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 
+namespace QEditor {
 NodeItem::NodeItem(const QString &name, const QColor &color, NodeType nodeType, QMenu *contextMenu, QGraphicsItem *parent)
     : QGraphicsPolygonItem(parent), name_(name), nodeType_(nodeType)
     , contextMenu_(contextMenu)
@@ -57,6 +58,8 @@ NodeItem::NodeItem(const QString &name, const QColor &color, NodeType nodeType, 
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+
+//    setOpacity(0.8);
 }
 
 void NodeItem::removeArrow(Arrow *arrow)
@@ -112,3 +115,4 @@ QVariant NodeItem::itemChange(GraphicsItemChange change, const QVariant &value)
 
     return value;
 }
+}  // namespace QEditor

@@ -30,6 +30,7 @@ class QMenu;
 class QPolygonF;
 QT_END_NAMESPACE
 
+namespace QEditor {
 class Arrow;
 
 class AnfNodeItem : public NodeItem
@@ -44,4 +45,6 @@ protected:
 private:
     NodeInfo nodeInfo_;
 };
+}  // namespace QEditor
+
 #endif // ANFNODEITEM_H

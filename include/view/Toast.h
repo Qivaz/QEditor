@@ -24,9 +24,11 @@
 #include <QLabel>
 #include <QEvent>
 
+namespace QEditor {
 class ToastDialog;
 class Toast : public QObject
 {
+    Q_OBJECT
 public:
     static Toast &Instance();
     enum Level
@@ -48,6 +50,7 @@ private:
 #define FRAME_RADIUS
 class ToastDialog: public QDialog
 {
+    Q_OBJECT
 public:
     ToastDialog()
     {
@@ -125,5 +128,6 @@ private:
     QFrame *frame_;
 #endif
 };
+}  // namespace QEditor
 
 #endif // TOAST_H

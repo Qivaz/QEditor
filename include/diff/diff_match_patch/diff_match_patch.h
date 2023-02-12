@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
+#include <QtCore>
+#include <QString>
+#include <QList>
+#include <QMap>
+#include <QVariant>
+
 #ifndef DIFF_MATCH_PATCH_H
 #define DIFF_MATCH_PATCH_H
 

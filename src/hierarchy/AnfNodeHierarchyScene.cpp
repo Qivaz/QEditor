@@ -25,6 +25,7 @@
 #include "AnfNodeHierarchy.h"
 #include "Toast.h"
 
+namespace QEditor {
 AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *parser, QMenu *itemMenu, QObject *parent)
     : HierarchyScene(itemMenu, parent), parser_(parser)
 {
@@ -65,7 +66,6 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
     constexpr auto distanceX = 250;
     int maxX = 0;
     int maxY = 0;
-    qCritical() << "nodeName: " << nodeName;
     const auto &info = nodesMap.value(nodeName);
     if (info.pos_ == -1) {
         return {maxX, maxY};
@@ -76,13 +76,13 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
     maxX = std::max(maxX, startX) + distanceX;
     maxY = std::max(maxY, startY) + distanceY;
 
-    qCritical() << "nodeName: " << nodeName << ", info.varInputs_.size: " << info.varInputs_.size();
+    qDebug() << "nodeName: " << nodeName << ", info.varInputs_: " << info.varInputs_;
     for (int i = 0; i < info.varInputs_.size(); ++i) {
         const auto &input = info.varInputs_[i];
-        qCritical() << "input: " << input << ", x: " << (startX + distanceX * i) << ", y: " << (startY + distanceY);
         const auto &inputInfo = nodesMap.value(input);
+        qDebug() << "input: " << input << ", pos: " << inputInfo.pos_ << ", x: " << (startX + distanceX * i) << ", y: " << (startY + distanceY);
         if (inputInfo.pos_ == -1) {
-            return {maxX, maxY};
+            continue;
         }
         auto [endNode, exist] = GetNode(input, inputInfo);
         if (!exist) {
@@ -111,3 +111,4 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
     }
     return {maxX, maxY};
 }
+}  // namespace QEditor

@@ -30,13 +30,14 @@ extern void SetDarkTitleBar(HWND hwnd);
 }
 #endif
 
+namespace QEditor {
 GotoLineDialog::GotoLineDialog(QWidget *parent) :
     QDialog(parent),
     ui_(new Ui::UIGotoLineDialog)
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
-    qreal opa = Settings().Get("window", "opacity").toDouble();
+    qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 }
 
@@ -81,3 +82,4 @@ void GotoLineDialog::on_pushButtonCacel_clicked()
 {
     hide();
 }
+}  // namespace QEditor

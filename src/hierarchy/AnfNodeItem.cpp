@@ -25,6 +25,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 
+namespace QEditor {
 AnfNodeItem::AnfNodeItem(const QString &name, const NodeInfo &info, NodeType nodeType, QMenu *contextMenu, QGraphicsItem *parent)
     : NodeItem(name, QColor(Qt::white), nodeType, contextMenu, parent), nodeInfo_(info) {}
 
@@ -39,4 +40,4 @@ void AnfNodeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     editView->GotoCursor(cursor);
     QGraphicsItem::mouseDoubleClickEvent(event);
 }
-
+}  // namespace QEditor

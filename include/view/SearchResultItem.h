@@ -20,6 +20,7 @@
 #include <QTreeWidgetItem>
 #include "EditView.h"
 
+namespace QEditor {
 class SearchResultItem : public QTreeWidgetItem
 {
 public:
@@ -42,5 +43,6 @@ private:
     int position_{0};
     int len_{0};
 };
+}  // namespace QEditor
 
 #endif // SEARCHRESULTITEM_H

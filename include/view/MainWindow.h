@@ -28,6 +28,7 @@
 #include "GotoLineDialog.h"
 #include "MainTabView.h"
 #include "OutlineList.h"
+#include "RichEditView.h"
 #include "SearchDialog.h"
 #include "DockView.h"
 
@@ -35,6 +36,7 @@ QT_BEGIN_NAMESPACE
 class QSessionManager;
 QT_END_NAMESPACE
 
+namespace QEditor {
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -69,7 +71,20 @@ public:
 
     void HandleCurrentTabChanged(int index);
 
-    EditView* editView() { return (EditView*)(tabView_->currentWidget()); }
+    EditView* editView() {
+        auto editView = qobject_cast<EditView*>(tabView_->currentWidget());
+        if (editView == nullptr) {
+            return nullptr;
+        }
+        return editView;
+    }
+    RichEditView* richEditView() {
+        auto richEditView = qobject_cast<RichEditView*>(tabView_->currentWidget());
+        if (richEditView == nullptr) {
+            return nullptr;
+        }
+        return richEditView;
+    }
     TabView* tabView() { return tabView_; }
 
     void ShowSearchDockView();
@@ -136,12 +151,16 @@ public:
 
     void RequestShow() { emit Show(); }
 
+    void UpdateRecentFilesMenu();
+
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
+    void OpenRecentFile();
+
     void NewFile();
     void Open();
     void OpenWith(const QString &filePath);
@@ -220,6 +239,10 @@ private:
     // So we distinguish them with this flag:
     // True for Init&Sync, otherwise user click.
     bool statusBarComboNonUserClick_{false};
+
+    QMenu *recentFilesMenu_{nullptr};
+    QList<QAction*> recentFileActions_;
 };
+}  // namespace QEditor
 
 #endif

@@ -21,10 +21,10 @@
 #include <QObject>
 #include <QSet>
 
+namespace QEditor {
 class FileType : public QObject
 {
     Q_OBJECT
-
 public:
     FileType() {
         fileType_ = kTypeNone;
@@ -84,5 +84,6 @@ private:
     const QSet<QString> irSuffix_ = {"ir", "dat"};
     const QSet<QString> txtSuffix_ = {"txt"};
 };
+}  // namespace QEditor
 
 #endif // FILETYPE_H

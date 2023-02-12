@@ -1,5 +1,6 @@
 QT += widgets network
 CONFIG += c++17
+CONFIG += resources_big
 DEFINES += QT_MESSAGELOGCONTEXT
 requires(qtConfig(filedialog))
 
@@ -13,9 +14,11 @@ HEADERS       = \
     include/common/SingleApp.h \
     include/common/Utils.h \
     include/diff/diff_match_patch/diff_match_patch.h \
+    include/diff/Diff.h \
     include/file/FileEncoding.h \
     include/file/FileRecorder.h \
     include/file/FileType.h \
+    include/file/RecentFiles.h \
     include/hierarchy/AnfNodeHierarchy.h \
     include/hierarchy/AnfNodeHierarchyScene.h \
     include/hierarchy/AnfNodeItem.h \
@@ -35,20 +38,23 @@ HEADERS       = \
     include/view/MainTabView.h \
     include/view/MainWindow.h \
     include/view/OutlineList.h \
+    include/view/RichEditView.h \
     include/view/SearchDialog.h \
     include/view/SearchResultItem.h \
     include/view/SearchResultList.h \
     include/view/TextHighlighter.h \
     include/view/Toast.h \
-    include/win/WinTheme.h \
+    include/win/WinTheme.h
 
 SOURCES       = \
     src/Entry.cpp \
     src/common/Constants.cpp \
     src/common/Settings.cpp \
     src/diff/diff_match_patch/diff_match_patch.cpp \
+    src/diff/Diff.cpp \
     src/file/FileEncoding.cpp \
     src/file/FileRecorder.cpp \
+    src/file/RecentFiles.cpp \
     src/hierarchy/AnfNodeHierarchy.cpp \
     src/hierarchy/AnfNodeHierarchyScene.cpp \
     src/hierarchy/AnfNodeItem.cpp \
@@ -67,6 +73,7 @@ SOURCES       = \
     src/view/MainTabView.cpp \
     src/view/MainWindow.cpp \
     src/view/OutlineList.cpp \
+    src/view/RichEditView.cpp \
     src/view/SearchDialog.cpp \
     src/view/SearchResultItem.cpp \
     src/view/SearchResultList.cpp \
@@ -86,9 +93,10 @@ INCLUDEPATH += \
     ./include/hierarchy/ \
     ./include/parser/ \
     ./include/view/ \
+    ./include/diff/ \
     ./include/diff/diff_match_patch/ \
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"
 QMAKE_TARGET_COMPANY = "Q"
 QMAKE_TARGET_DESCRIPTION = "QEditor"

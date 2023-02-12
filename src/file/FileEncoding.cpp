@@ -16,6 +16,7 @@
 
 #include "FileEncoding.h"
 
+namespace QEditor {
 const QMap<int, QPair<QString, QString>> encodings = {
     // {MIB number, {name, description}
     // {4,     {"ISO-8859-1",  "Latin1"}},
@@ -78,3 +79,4 @@ int FileEncoding::GetMibByDescription(const QString &name)
     // Not found preset mibenum, use utf-8.
     return 106;
 }
+}  // namespace QEditor

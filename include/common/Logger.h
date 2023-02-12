@@ -104,7 +104,7 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext 
     ss << "(" << std::this_thread::get_id() << "," << GetProcName() << ")";
 #endif
     QString pidInfo = QString::fromStdString(ss.str());
-    const auto &currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    const auto &currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
     switch (type) {
     case QtDebugMsg:
         return;
@@ -117,10 +117,12 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext 
         cout << text;
         break;
     case QtWarningMsg:
+        return;
         text = QString("[WARNING] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cout << text;
         break;
     case QtCriticalMsg:
+        return;
         text = QString("[CRITIAL] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cerr << text;
         break;

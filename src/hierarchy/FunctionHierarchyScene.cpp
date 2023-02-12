@@ -25,6 +25,7 @@
 #include "FunctionHierarchy.h"
 #include "Toast.h"
 
+namespace QEditor {
 FunctionHierarchyScene::FunctionHierarchyScene(IParser *parser, QMenu *itemMenu, QObject *parent)
     : HierarchyScene(itemMenu, parent), parser_(parser)
 {
@@ -155,3 +156,4 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &fu
     }
     return {maxX, maxY};
 }
+}  // namespace QEditor

@@ -26,10 +26,10 @@ namespace Ui {
 class UISearchDialog;
 }
 
+namespace QEditor {
 class SearchDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit SearchDialog(QWidget *parent = nullptr, int index = 0);
     ~SearchDialog();
@@ -86,5 +86,6 @@ private:
     SearchResultList *searchResultList_{nullptr};
     int sessionCount_{0};
 };
+}  // namespace QEditor
 
 #endif // DIALOG_H

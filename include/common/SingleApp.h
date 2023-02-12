@@ -27,6 +27,7 @@
 #include "MainWindow.h"
 #include "Toast.h"
 
+namespace QEditor {
 class SingleAppServer : public QObject
 {
     Q_OBJECT
@@ -221,5 +222,6 @@ private:
     SingleAppClient client_;
     SingleAppServer server_;
 };
+}  // namespace QEditor
 
 #endif // SINGLEAPP_H

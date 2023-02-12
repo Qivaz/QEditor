@@ -28,6 +28,7 @@
 #include "TextHighlighter.h"
 #include "Logger.h"
 
+namespace QEditor {
 class TabView;
 class IParser;
 class OutlineList;
@@ -35,6 +36,7 @@ class FunctionHierarchy;
 
 class NewFileNum : public QObject
 {
+    Q_OBJECT
 public:
     // Starts from 1.
     static int GetNumber()
@@ -185,6 +187,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 
 private slots:
     void HandleBlockCountChanged(int newBlockCount);
@@ -256,10 +259,13 @@ private:
     int hoverPos_;
     bool jumpAvailable_{false};
     FuncGraphInfo funcGraphInfo_;
+
+    int timerId_{0};
 };
 
 class LineNumberArea : public QWidget
 {
+    Q_OBJECT
 public:
     LineNumberArea(EditView *editView) : QWidget(editView), editView_(editView) {}
 
@@ -273,4 +279,6 @@ protected:
 private:
     EditView *editView_{nullptr};
 };
+}  // namespace QEditor
+
 #endif // EDITVIEW_H

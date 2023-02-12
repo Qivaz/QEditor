@@ -24,6 +24,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 // Check Byte Order Mark.
 // BOM Encoding:
 //    EF BB BF      UTF-8
@@ -132,4 +133,6 @@ private:
     int mibEnum_{106};
     QString description_;
 };
+}  // namespace QEditor
+
 #endif // FILEENCODING_H

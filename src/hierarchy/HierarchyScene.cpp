@@ -24,6 +24,7 @@
 #include "NodeItem.h"
 #include "Toast.h"
 
+namespace QEditor {
 HierarchyScene::HierarchyScene(QMenu *itemMenu, QObject *parent) : QGraphicsScene(parent)
 {
     itemMenu_ = itemMenu;
@@ -135,3 +136,4 @@ bool HierarchyScene::ItemChanged(int type) const
     const auto cb = [type](const QGraphicsItem *item) { return item->type() == type; };
     return std::find_if(items.begin(), items.end(), cb) != items.end();
 }
+}  // namespace QEditor

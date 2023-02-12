@@ -22,6 +22,7 @@
 #include "MainTabView.h"
 #include "Logger.h"
 
+namespace QEditor {
 class SearchResultList : public QTreeWidget
 {
 public:
@@ -51,5 +52,6 @@ private:
     TabView *tabView_{nullptr};
     QTreeWidgetItem *topItem_{nullptr};
 };
+}  // namespace QEditor
 
 #endif // SEARCHRESULTLIST_H

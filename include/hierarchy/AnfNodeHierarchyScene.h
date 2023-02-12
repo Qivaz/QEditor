@@ -21,10 +21,10 @@
 #include "IParser.h"
 #include "AnfNodeItem.h"
 
+namespace QEditor {
 class AnfNodeHierarchyScene : public HierarchyScene
 {
     Q_OBJECT
-
 public:
     explicit AnfNodeHierarchyScene(const QString &funcName, IParser *parser, QMenu *itemMenu, QObject *parent = nullptr);
 
@@ -55,4 +55,6 @@ private:
     IParser *parser_{nullptr};
     QMap<QString, AnfNodeItem*> nodes_;
 };
+}  // namespace QEditor
+
 #endif // NODEHIERARCHYSCENE_H

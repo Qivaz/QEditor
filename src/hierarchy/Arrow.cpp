@@ -22,6 +22,7 @@
 
 #include "NodeItem.h"
 
+namespace QEditor {
 Arrow::Arrow(NodeItem *startItem, NodeItem *endItem, QGraphicsItem *parent)
     : QGraphicsLineItem(parent), startNode_(startItem), endNode_(endItem)
 {
@@ -101,3 +102,4 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->drawLine(arrowLine);
     }
 }
+}  // namespace QEditor

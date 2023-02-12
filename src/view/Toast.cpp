@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QEvent>
 
+namespace QEditor {
 Toast::Toast()
 {
     dialog_ = new ToastDialog();
@@ -55,3 +56,4 @@ void Toast::timerEvent(QTimerEvent *event)
     dialog_->accept();  // Hidden.
     //dialog_->hide();
 }
+}  // namespace QEditor

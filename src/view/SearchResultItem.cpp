@@ -17,4 +17,6 @@
 #include "SearchResultItem.h"
 #include "Logger.h"
 
+namespace QEditor {
 SearchResultItem::SearchResultItem(EditView *editView) : editView_(editView) {}
+}  // namespace QEditor

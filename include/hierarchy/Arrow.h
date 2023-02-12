@@ -19,6 +19,7 @@
 
 #include <QGraphicsLineItem>
 
+namespace QEditor {
 class NodeItem;
 
 class Arrow : public QGraphicsLineItem
@@ -48,4 +49,6 @@ private:
     QPolygonF arrowPolygon_;
     QColor lineColor_ = Qt::blue;
 };
+}  // namespace QEditor
+
 #endif // ARROW_H

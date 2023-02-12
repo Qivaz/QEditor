@@ -21,6 +21,7 @@
 
 #include "IParser.h"
 
+namespace QEditor {
 class OverviewItem : public QTreeWidgetItem
 {
 public:
@@ -43,5 +44,6 @@ public:
 private:
     IParser *parser_{nullptr};
 };
+}  // namespace QEditor
 
 #endif // OUTLINELIST_H

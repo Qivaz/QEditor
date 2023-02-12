@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QSet>
 
+namespace QEditor {
 struct FuncGraphInfo
 {
     QString name_;
@@ -55,5 +56,6 @@ public:
 
     virtual const QMap<QString, NodeInfo> &ParseNodes(const QString &funcName) = 0;
 };
+}  // namespace QEditor
 
 #endif // IPARSER_H

@@ -18,8 +18,9 @@
 
 #include <QString>
 
+namespace QEditor {
 namespace Constants {
 QString kAppPath;           // Should initialize once when startup.
 QString kAppInternalPath;   // Should initialize once when startup.
 }
-
+}  // namespace QEditor

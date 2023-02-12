@@ -23,6 +23,7 @@
 #include "Constants.h"
 #include "EditView.h"
 
+namespace QEditor {
 class FileRecorder : public QObject
 {
     Q_OBJECT
@@ -173,5 +174,6 @@ private:
     const QString kAppInternalAutoSaveDirName_ = Constants::kAppInternalAutoSaveDirName;
     const QString kAppInternalFilesInfoFileName_ = Constants::kAppInternalFilesInfoFileName;
 };
+}  // namespace QEditor
 
 #endif // FILERECORD_H

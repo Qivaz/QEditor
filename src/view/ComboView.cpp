@@ -21,6 +21,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fixed)
 {
     auto qss = "QComboBox {\
@@ -113,3 +114,4 @@ void ComboView::hidePopup()
     ShrinkForChosen();
     QComboBox::hidePopup();
 }
+}  // namespace QEditor

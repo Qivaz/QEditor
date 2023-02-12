@@ -32,10 +32,10 @@ class QGraphicsTextItem;
 class QColor;
 QT_END_NAMESPACE
 
+namespace QEditor {
 class HierarchyScene : public QGraphicsScene
 {
     Q_OBJECT
-
 public:
     enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
 
@@ -70,4 +70,6 @@ protected:
     QColor lineColor_;
     QVector<int> xPos_;
 };
+}  // namespace QEditor
+
 #endif // HIERARCHYSCENE_H

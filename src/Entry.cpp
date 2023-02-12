@@ -28,18 +28,18 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    Constants::kAppPath = QApplication::applicationDirPath();
-    Constants::kAppInternalPath = Constants::kAppPath + "/" + Constants::kAppInternalRelativePath;
-    qDebug() << "Constants::kAppInternalPath: " << Constants::kAppInternalPath;
-    (void)Utils::mkdir(Constants::kAppInternalPath);
+    QEditor::Constants::kAppPath = QApplication::applicationDirPath();
+    QEditor::Constants::kAppInternalPath = QEditor::Constants::kAppPath + "/" + QEditor::Constants::kAppInternalRelativePath;
+    qDebug() << "Constants::kAppInternalPath: " << QEditor::Constants::kAppInternalPath;
+    (void)QEditor::Utils::mkdir(QEditor::Constants::kAppInternalPath);
     Q_INIT_RESOURCE(QEditor);
 #ifdef OUTPUT_LOG
     qInstallMessageHandler(OutputMessageOutput);
 #endif
 
-    QCoreApplication::setOrganizationName(Constants::kOrgName);
-    QCoreApplication::setApplicationName(Constants::kAppName);
-    QCoreApplication::setApplicationVersion(Constants::kVersionStr);
+    QCoreApplication::setOrganizationName(QEditor::Constants::kOrgName);
+    QCoreApplication::setApplicationName(QEditor::Constants::kAppName);
+    QCoreApplication::setApplicationVersion(QEditor::Constants::kVersionStr);
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
@@ -53,19 +53,19 @@ int main(int argc, char *argv[])
     }
 
     // Single run check.
-    SingleApp singleApp;
+    QEditor::SingleApp singleApp;
     if (!singleApp.TryRun(filePath)) {
         qDebug() << "Already run.";
         return 0;
     }
 
     // Double single run check with lock file.
-    QString singleRunFilePath(Constants::kAppInternalPath);
-    singleRunFilePath.append(Constants::kAppInternalSingleRunFile);
+    QString singleRunFilePath(QEditor::Constants::kAppInternalPath);
+    singleRunFilePath.append(QEditor::Constants::kAppInternalSingleRunFile);
     QLockFile singleRunLockFile(singleRunFilePath);
     if (!singleRunLockFile.tryLock(1000)) {
         qCritical() << "Already run, lock error: " << singleRunLockFile.error();
-        QMessageBox::warning(nullptr, QString(Constants::kAppName),
+        QMessageBox::warning(nullptr, QString(QEditor::Constants::kAppName),
                              QString("Cannot read file %1:\n%2.")
                              .arg(QDir::toNativeSeparators(singleRunFilePath), singleRunLockFile.error()));
         return 0;
@@ -73,11 +73,11 @@ int main(int argc, char *argv[])
     qDebug() << "start running";
 
     if (!filePath.isEmpty() && QFileInfo(filePath).isFile()) {
-        MainWindow::Instance().tabView()->OpenFile(filePath);
+        QEditor::MainWindow::Instance().tabView()->OpenFile(filePath);
     }
 
-    MainWindow::Instance().setWindowIcon(QIcon(":/images/QEditorIcon.webp"));
+    QEditor::MainWindow::Instance().setWindowIcon(QIcon(":/images/QEditorIcon.webp"));
     // MainWindow::Instance().show();
-    MainWindow::Instance().showMaximized();
+    QEditor::MainWindow::Instance().showMaximized();
     return app.exec();
 }

@@ -18,6 +18,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 TextHighlighter::TextHighlighter(const FileType &fileType, QTextDocument *parent,
                                  const QString &focused_str, const QVector<QString> markUpText)
     : QSyntaxHighlighter(parent){
@@ -270,3 +271,4 @@ void TextHighlighter::highlightBlock(const QString &text){
         }
     }
 }
+}  // namespace QEditor

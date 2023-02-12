@@ -22,10 +22,14 @@
 #include <QAction>
 
 #include "EditView.h"
+#include "Diff.h"
+
 #include "Logger.h"
 
+namespace QEditor {
 class TabView : public QTabWidget
 {
+    Q_OBJECT
 public:
     TabView(QWidget *parent = nullptr);
 
@@ -49,25 +53,38 @@ public:
     EditView *CurrentEditView()
     {
         // The tab widget is definitely a EditView.
-        return ((EditView*)currentWidget());
+        auto editView = qobject_cast<EditView*>(currentWidget());
+        if (editView == nullptr) {
+            return nullptr;
+        }
+        return editView;
     }
 
     EditView *GetEditView(int index)
     {
         // The tab widget is definitely a EditView.
-        return (EditView*)widget(index);
+        auto editView = qobject_cast<EditView*>(widget(index));
+        if (editView == nullptr) {
+            return nullptr;
+        }
+        return editView;
     }
 
     int FindEditViewIndex(const QString &filePath)
     {
         for (int i = 0; i < count(); ++i) {
-            if (GetEditView(i)->filePath() == filePath) {
+            auto editView = GetEditView(i);
+            if (editView == nullptr) {
+                continue;
+            }
+            if (editView->filePath() == filePath) {
                 return i;
             }
         }
         return -1;
     }
 
+    void ViewDiff(const EditView *before, const EditView *after, const QString &html);
     void NewFile();
     void OpenFile();
     void OpenFile(const QString &filePath);
@@ -102,6 +119,7 @@ public:
     }
 
 protected:
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
     void tabInserted(int index) override;
     void tabRemoved(int index) override;
 
@@ -112,6 +130,10 @@ private:
     bool stepRunning_{false};
     QList<QPair<EditView*, int>> backwardSteps_;
     QList<QPair<EditView*, int>> forwardSteps_;
+
+    EditView *diffPreviousEditView_{nullptr};
+    Diff diff_;
 };
+}  // namespace QEditor
 
 #endif // TABVIEW_H

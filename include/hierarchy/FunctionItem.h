@@ -29,6 +29,7 @@ class QMenu;
 class QPolygonF;
 QT_END_NAMESPACE
 
+namespace QEditor {
 class Arrow;
 class IParser;
 
@@ -44,4 +45,6 @@ protected:
 private:
     IParser *parser_{nullptr};
 };
+}  // namespace QEditor
+
 #endif // FUNCTIONITEM_H

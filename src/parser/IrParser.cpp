@@ -18,6 +18,7 @@
 
 #include "Toast.h"
 
+namespace QEditor {
 IrParser::IrParser(EditView *editView, QObject *parent) : IParser(parent), editView_(editView)
 {
     ParseFuncGraph();
@@ -366,7 +367,6 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
             }
 
             constexpr auto argumentsStartStr = "(";
-            constexpr auto argumentsStartLen = 1;
             auto argumentsStart = startBlockText.indexOf(argumentsStartStr, opEnd);
             if (argumentsStart == -1) {
                 startBlock = startBlock.next();
@@ -399,6 +399,7 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                     qDebug() << "arg: " << arg;
                 }
                 auto pos = startBlock.position() + variableDefStart;
+                qDebug() << variableName << opName << inputs;
                 NodeInfo nodeInfo({variableName, opName, pos, inputs, hasConstantInput});
                 nodesMap_.insert(variableName, std::move(nodeInfo));
             }
@@ -408,3 +409,4 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
     } while (startBlock != endBlock);
     return nodesMap_;
 }
+}  // namespace QEditor

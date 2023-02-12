@@ -32,13 +32,14 @@ extern void SetDarkTitleBar(HWND hwnd);
 }
 #endif
 
+namespace QEditor {
 SearchDialog::SearchDialog(QWidget *parent, int index) :
     QDialog(parent),
     ui_(new Ui::UISearchDialog)
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
-    qreal opa = Settings().Get("window", "opacity").toDouble();
+    qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
     ui_->tabWidget->setCurrentIndex(index);
@@ -450,3 +451,4 @@ void SearchDialog::on_lineEditReplaceFindWhat_textChanged(const QString &)
 {
     ui_->labelInfo->clear();
 }
+}  // namespace QEditor

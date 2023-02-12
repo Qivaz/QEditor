@@ -29,10 +29,11 @@
 #include "MainWindow.h"
 #include "Logger.h"
 
+namespace QEditor {
 ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu())
 {
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
-                  "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"
+                  "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
 //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
@@ -55,7 +56,11 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
                   QTreeView::branch:open:has-children:has-siblings {\
                           border-image: none;\
                           image: none;\
-                  }");
+                  }\
+                  QTreeView::item:selected{\
+                          background: rgb(9, 71, 113);\
+                  }\
+                  ");
 
     verticalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
                                        "QScrollBar::add-line:vertical { \
@@ -79,21 +84,24 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
     menu_->setStyleSheet(
                        "\
                        QMenu {\
-                           background-color: rgb(28, 28, 28);\
+                           color: lightGray;\
+                           background-color: rgb(40, 40, 40);\
                            margin: 2px 2px;\
+                           border: none;\
                        }\
                        QMenu::item {\
                            color: rgb(225, 225, 225);\
-                           background-color: rgb(28, 28, 28);\
+                           background-color: rgb(40, 40, 40);\
                            padding: 5px 5px;\
                        }\
                        QMenu::item:selected {\
-                           background-color: rgb(0, 122, 204);\
+                           background-color: rgb(9, 71, 113);\
                        }\
                        QMenu::item:pressed {\
                            border: 1px solid rgb(60, 60, 60); \
-                           background-color: lightGray; \
+                           background-color: rgb(29, 91, 133); \
                        }\
+                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
                       ");
 
     model_ = new QFileSystemModel(this);
@@ -150,9 +158,9 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
         return;
     }
 
-    qCritical() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
-    qCritical() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
+    qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
                 << modelIndex.data().toString();
     menu_->clear();
 
@@ -314,3 +322,4 @@ QIcon FileIconProvider::icon(const QFileInfo &info) const
     }
     return QFileIconProvider::icon(info);
 }
+}  // namespace QEditor

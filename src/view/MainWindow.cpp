@@ -24,6 +24,7 @@
 
 #include "ExplorerTreeView.h"
 #include "ComboView.h"
+#include "RecentFiles.h"
 #include "SearchDialog.h"
 #include "SearchResultList.h"
 #include "Settings.h"
@@ -31,15 +32,16 @@
 #include "win/WinTheme.h"
 #include "Logger.h"
 
+namespace QEditor {
 MainWindow::MainWindow()
     : tabView_(new TabView(this))
 {
     auto settings = Settings();
-    shouldWrapText_ = settings.Get("view", "wraptext").toBool();
-    specialCharsVisible_ = settings.Get("view", "allcharsvisible").toBool();
-    explorerVisible_ = settings.Get("view", "explorervisible").toBool();
-    outlineVisible_ = settings.Get("view", "outlinevisible").toBool();
-    qreal opa = settings.Get("window", "opacity").toDouble();
+    shouldWrapText_ = settings.Get("view", "wraptext", true).toBool();
+    specialCharsVisible_ = settings.Get("view", "allcharsvisible", false).toBool();
+    explorerVisible_ = settings.Get("view", "explorervisible", true).toBool();
+    outlineVisible_ = settings.Get("view", "outlinevisible", true).toBool();
+    qreal opa = settings.Get("window", "opacity", 1).toDouble();
 
     setAcceptDrops(true);
     setWindowOpacity(opa);
@@ -348,6 +350,7 @@ void MainWindow::showEvent(QShowEvent *event)
     QMainWindow::showEvent(event);
     if (!init_) {
         init_ = true;
+        RecentFiles::LoadFiles();
         (void)tabView_->AutoLoad();
         auto ev = editView();
         if (ev != nullptr) {
@@ -366,11 +369,19 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     const auto editView = this->editView();
     if (event->type() == QEvent::HoverMove && editView != nullptr) {
         QHoverEvent *hoverEvent = static_cast<QHoverEvent*>(event);
+        qDebug() << "hover: " << hoverEvent;
         auto pos = editView->viewport()->mapFrom(this, hoverEvent->pos());
         auto cursor = editView->cursorForPosition(pos);
         editView->Hover(cursor);
     }
     return QObject::eventFilter(obj, event);
+}
+
+void MainWindow::OpenRecentFile() {
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (action != nullptr) {
+        OpenWith(action->data().toString());
+    }
 }
 
 void MainWindow::NewFile()
@@ -415,19 +426,27 @@ bool MainWindow::Replace()
 
 bool MainWindow::MarkUnmarkCursorText()
 {
-    const auto &text = editView()->GetCursorText();
-    if (!editView()->RemoveMarkText(text)) {
-        editView()->AddMarkText(text);
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        const auto &text = editView->GetCursorText();
+        if (!editView->RemoveMarkText(text)) {
+            editView->AddMarkText(text);
+        }
+        editView->HighlightFocus();
+        return true;
     }
-    editView()->HighlightMarkTexts();
-    return true;
+    return false;
 }
 
 bool MainWindow::UnmarkAll()
 {
-    editView()->ClearMarkTexts();
-    editView()->HighlightFocus();
-    return true;
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->ClearMarkTexts();
+        editView->HighlightFocus();
+        return true;
+    }
+    return false;
 }
 
 bool MainWindow::StepBack()
@@ -476,14 +495,32 @@ bool MainWindow::StepForward()
 
 bool MainWindow::ZoomIn()
 {
-    editView()->ZoomIn();
-    return true;
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->ZoomIn();
+        return true;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->ZoomIn();
+        return true;
+    }
+    return false;
 }
 
 bool MainWindow::ZoomOut()
 {
-    editView()->ZoomOut();
-    return true;
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->ZoomOut();
+        return true;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->ZoomOut();
+        return true;
+    }
+    return false;
 }
 
 bool MainWindow::SaveAll()
@@ -555,20 +592,55 @@ QString GetToolBarQss(const QString &image_default, const QString &image_enable)
     return qss.join("");
 }
 
+void MainWindow::UpdateRecentFilesMenu() {
+    recentFileActions_.clear();
+    recentFilesMenu_->clear();
+
+    auto recentFilesNum = RecentFiles::files().size();
+    if (recentFilesNum > 0) {
+        recentFilesMenu_->setEnabled(true);
+    } else {
+        recentFilesMenu_->setEnabled(false);
+    }
+    qDebug() << "recentFilesNum: " << recentFilesNum;
+    for (auto i = 0; i < recentFilesNum; ++i) {
+        auto recentFile = RecentFiles::files()[i];
+        qDebug() << "recentFile: " << recentFile;
+        auto recentFileAction = new QAction(this);
+        recentFileAction->setVisible(true);
+        recentFileAction->setText(QString::number(i + 1) + ": " + recentFile);
+        recentFileAction->setData(recentFile);
+        connect(recentFileAction, &QAction::triggered, this, &MainWindow::OpenRecentFile);
+        recentFilesMenu_->addAction(recentFileAction);
+        recentFileActions_.append(recentFileAction);
+    }
+
+    recentFilesMenu_->addSeparator();
+
+    auto clearRecentFilesAction = new QAction(this);
+    clearRecentFilesAction->setText("Clear Recently Opened");
+    connect(clearRecentFilesAction, &QAction::triggered, this, [this](){
+        recentFileActions_.clear();
+        recentFilesMenu_->clear();
+        recentFilesMenu_->setEnabled(false);
+        RecentFiles::Clear();
+    });
+    recentFilesMenu_->addAction(clearRecentFilesAction);
+    recentFileActions_.append(clearRecentFilesAction);
+}
+
 void MainWindow::CreateActions()
 {
-    // TODO:
-    // QMenu{ and QMenu::separator not work.
-    menuBar()->setStyleSheet("color: lightGray; selection-background-color: DodgerBlue; background-color: rgb(28, 28, 28); border: none;\
-                             QMenu{color: green; background-color: rgb(255, 28, 28);}\
-                             QMenu::separator {height: 1px; background: rgb(255, 0, 0);}");
+    menuBar()->setStyleSheet("QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
+                             QMenu{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(40, 40, 40); border: none;}\
+                             QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
 
     auto toolBarStyle = "QToolBar { color: lightGray;" "background-color: rgb(28, 28, 28); }"\
                         "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
-                        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(60, 60, 90); }"
-                        "QToolBar QToolButton:enabled { border: 2px solid rgb(80, 80, 100); }"
-                        "QToolBar QToolButton:pressed { border: 2px solid rgb(23, 105, 170); background-color: rgb(28, 28, 28);}"
-                        "QToolBar QToolButton:checked { border: 2px solid rgb(23, 105, 170); background-color: rgb(28, 28, 28);}";
+                        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
+                        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
+                        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
+                        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
     // File menu.
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
@@ -591,6 +663,9 @@ void MainWindow::CreateActions()
     connect(openAct, &QAction::triggered, this, &MainWindow::Open);
     fileMenu->addAction(openAct);
     fileToolBar->addAction(openAct);
+
+    recentFilesMenu_ = fileMenu->addMenu(tr("Open Recent"));
+    UpdateRecentFilesMenu();
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.svg"));
     QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
@@ -845,7 +920,15 @@ void MainWindow::CreateActions()
 
 void MainWindow::SelectAll()
 {
-    editView()->selectAll();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->selectAll();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->selectAll();
+    }
 }
 
 void MainWindow::GotoLine()
@@ -865,7 +948,11 @@ void MainWindow::SyncWrapTextState()
         mode = QPlainTextEdit::LineWrapMode::NoWrap;
     }
     for (int i = 0; i < tabView()->count(); ++i) {
-        tabView()->GetEditView(i)->setLineWrapMode(mode);
+        auto textView = tabView()->GetEditView(i);
+        if (textView == nullptr) {
+            continue;
+        }
+        textView->setLineWrapMode(mode);
     }
 }
 
@@ -888,8 +975,12 @@ void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow)
         textOption.setFlags(0);
     }
     for (int i = 0; i < tabView()->count(); ++i) {
-        tabView()->GetEditView(i)->document()->setDefaultTextOption(textOption);
-        tabView()->GetEditView(i)->ApplyTabCharNum();
+        auto textView = tabView()->GetEditView(i);
+        if (textView == nullptr) {
+            continue;
+        }
+        textView->document()->setDefaultTextOption(textOption);
+        textView->ApplyTabCharNum();
     }
 }
 
@@ -963,17 +1054,41 @@ void MainWindow::SwitchHierarchyWindowVisible()
 
 void MainWindow::Copy()
 {
-    editView()->copy();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->copy();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->copy();
+    }
 }
 
 void MainWindow::Cut()
 {
-    editView()->cut();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->cut();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->cut();
+    }
 }
 
 void MainWindow::Paste()
 {
-    editView()->paste();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->paste();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->paste();
+    }
 }
 
 void MainWindow::SetCopyAvailable(bool avail)
@@ -984,12 +1099,28 @@ void MainWindow::SetCopyAvailable(bool avail)
 
 void MainWindow::Undo()
 {
-    editView()->undo();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->undo();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->undo();
+    }
 }
 
 void MainWindow::Redo()
 {
-    editView()->redo();
+    auto editView = this->editView();
+    if (editView != nullptr) {
+        editView->redo();
+        return;
+    }
+    auto richEditView = this->richEditView();
+    if (richEditView != nullptr) {
+        richEditView->redo();
+    }
 }
 
 void MainWindow::SetUndoAvailable(bool avail)
@@ -1107,18 +1238,23 @@ void MainWindow::HandleEncodingChanged(int index)
         qDebug() << "Non user click, return.";
         return;
     }
-    if (editView()->ShouldSave()) {
+    auto editView = this->editView();
+    if (editView == nullptr) {
+        return;
+    }
+    if (editView->ShouldSave()) {
         Toast::Instance().Show(Toast::kError, "Can't convert the encoding since the text is modified.");
         return;
     }
-    auto mib = editView()->fileEncoding().GetMibByDescription(encoding_->currentText());
+    auto mib = editView->fileEncoding().GetMibByDescription(encoding_->currentText());
     auto fileEncoding = FileEncoding(mib);
     qDebug() << "currentText: " << encoding_->currentText() << ", itemText: " << encoding_->itemText(index)
              << ", new mib: " << fileEncoding.hasBom() << fileEncoding.mibEnum()
-             << ", current mib: " << editView()->fileEncoding().hasBom() << editView()->fileEncoding().mibEnum();
-    if (fileEncoding.hasBom() == editView()->fileEncoding().hasBom() &&
-        fileEncoding.mibEnum() == editView()->fileEncoding().mibEnum()) {
+             << ", current mib: " << editView->fileEncoding().hasBom() << editView->fileEncoding().mibEnum();
+    if (fileEncoding.hasBom() == editView->fileEncoding().hasBom() &&
+        fileEncoding.mibEnum() == editView->fileEncoding().mibEnum()) {
         return;
     }
-    editView()->ChangeFileEncoding(std::move(fileEncoding));
+    editView->ChangeFileEncoding(std::move(fileEncoding));
 }
+}  // namespace QEditor

@@ -22,6 +22,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 template <typename T>
 class Range
 {
@@ -85,4 +86,6 @@ void test() {
     qDebug() << "number: " << posToLine.at(499);
 }
 #endif
+}  // namespace QEditor
+
 #endif // RANGEMAP_H

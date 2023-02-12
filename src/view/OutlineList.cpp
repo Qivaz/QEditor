@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Logger.h"
 
+namespace QEditor {
 OutlineList::OutlineList(IParser *parser) : parser_(parser)
 {
     verticalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
@@ -91,3 +92,4 @@ int OutlineList::GetIndexByCursorPos(int cursorPos)
     }
     return parser_->GetIndexByCursorPosition(cursorPos);
 }
+}  // namespace QEditor

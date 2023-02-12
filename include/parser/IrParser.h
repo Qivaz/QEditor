@@ -21,8 +21,10 @@
 #include "EditView.h"
 #include "RangeMap.h"
 
+namespace QEditor {
 class DummyParser : public IParser
 {
+    Q_OBJECT
 public:
     explicit DummyParser(QObject *parent = nullptr) : IParser(parent) {}
     virtual ~DummyParser() = default;
@@ -43,6 +45,7 @@ private:
 
 class IrParser : public IParser
 {
+    Q_OBJECT
 public:
     explicit IrParser(EditView *editView, QObject *parent = nullptr);
     virtual ~IrParser() = default;
@@ -85,4 +88,6 @@ private:
     QString entryFunc_;
     QMap<QString, NodeInfo> nodesMap_;
 };
+}  // namespace QEditor
+
 #endif // IRPARSER_H

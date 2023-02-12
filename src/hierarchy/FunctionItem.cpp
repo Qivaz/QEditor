@@ -25,6 +25,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 
+namespace QEditor {
 FunctionItem::FunctionItem(const QString &name, IParser *parser, NodeType nodeType, QMenu *contextMenu, QGraphicsItem *parent)
     : NodeItem(name, QColor(Qt::white), nodeType, contextMenu, parent), parser_(parser) {}
 
@@ -46,3 +47,4 @@ void FunctionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
     QGraphicsItem::mouseDoubleClickEvent(event);
 }
+}  // namespace QEditor

@@ -27,6 +27,7 @@
 #include "MainTabView.h"
 #include "Logger.h"
 
+namespace QEditor {
 SearchResultList::SearchResultList(TabView *tabView) : tabView_(tabView)
 {
 //    setHeaderLabel("Result...");
@@ -142,3 +143,4 @@ void SearchResultList::UpdateTopTitle(const QString &info)
     title->setFont(QFont("Consolas", 11));
     setItemWidget(topItem_, 0, title);
 }
+}  // namespace QEditor

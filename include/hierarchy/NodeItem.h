@@ -27,9 +27,9 @@ class QMenu;
 class QPolygonF;
 QT_END_NAMESPACE
 
+namespace QEditor {
 class Arrow;
 class IParser;
-
 class NodeItem : public QGraphicsPolygonItem
 {
 public:
@@ -61,4 +61,6 @@ private:
 
     QGraphicsTextItem *textItem_;
 };
+}  // namespace QEditor
+
 #endif // NODEITEM_H

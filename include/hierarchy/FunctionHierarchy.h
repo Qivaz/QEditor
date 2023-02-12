@@ -24,6 +24,7 @@
 
 #include "FunctionHierarchyScene.h"
 
+namespace QEditor {
 class FunctionHierarchy : public QGraphicsView
 {
 public:
@@ -32,5 +33,6 @@ public:
 private:
     FunctionHierarchyScene *scene_{nullptr};
 };
+}  // namespace QEditor
 
 #endif // FUNCTIONHIERARCHY_H

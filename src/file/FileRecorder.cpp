@@ -21,6 +21,7 @@
 #include "Utils.h"
 #include "Logger.h"
 
+namespace QEditor {
 FileRecorder::FileRecorder(QObject *parent) : QObject(parent) {}
 
 void FileRecorder::StoreFiles()
@@ -118,3 +119,4 @@ void FileRecorder::LoadFiles()
         mibEnums_.emplace_back(fileData.mibEnum_);
     }
 }
+}  // namespace QEditor

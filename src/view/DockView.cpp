@@ -19,6 +19,7 @@
 #include <QWidget>
 #include "Logger.h"
 
+namespace QEditor {
 DockView::DockView(QWidget *parent) : QDockWidget(parent)
 {
     QPalette pal;
@@ -40,3 +41,4 @@ void DockView::SetDockQss(QDockWidget *dockView, const QString &fontSize, const 
     qss.append(QString("QDockWidget::close-button:pressed, QDockWidget::float-button:pressed { padding: 1px -1px -1px 1px; }"));
     dockView->setStyleSheet(qss.join(""));
 }
+}  // namespace QEditor

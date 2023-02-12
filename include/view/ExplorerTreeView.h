@@ -25,6 +25,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 class CustSortFilterProxyModel : public QSortFilterProxyModel
 {
 protected:
@@ -69,5 +70,6 @@ class FileIconProvider : public QFileIconProvider
 public:
     QIcon icon(const QFileInfo &info) const override;
 };
+}  // namespace QEditor
 
 #endif // EXPLORERTREEVIEW_H

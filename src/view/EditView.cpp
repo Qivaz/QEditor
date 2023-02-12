@@ -20,6 +20,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPainter>
+#include <QTimer>
 #include <QSaveFile>
 #include <QScrollBar>
 #include <QStatusBar>
@@ -34,8 +35,8 @@
 #include "OutlineList.h"
 #include "Toast.h"
 #include "Logger.h"
-#include "diff_match_patch.h"
 
+namespace QEditor {
 QVector<bool> NewFileNum::numbers_use_status_;
 
 // Open file edit.
@@ -69,7 +70,7 @@ EditView::EditView(QWidget *parent)
 void EditView::Init()
 {
     setBackgroundVisible(false);
-    setCenterOnScroll(true);
+//    setCenterOnScroll(true);
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
@@ -475,8 +476,9 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
     QTextCursor visibleBottomCursor = cursorForPosition(bottomRight);
     int visibleBottomPos = visibleBottomCursor.position();
 
+    qDebug() << "text: " << text << ", visibleBottomPos: " << visibleBottomPos;
     auto block = firstVisibleBlock();
-#define BLOCK_POS_SEARCH
+
 #ifdef BLOCK_POS_SEARCH
     if (!block.isValid() || !block.isVisible()) {
         return;
@@ -496,6 +498,7 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
     while (startCursor.position() < visibleBottomPos) {
         qDebug() << "start: " << startCursor.position() << ", visibleBottomPos: " << visibleBottomPos
                  << ", block pos: " << block.position();
+
 #ifdef DEBUG_BLOCK_LINE
         qDebug() << "Line " << block.blockNumber() << ": block: " << block.text() << ", " << block.layout()->lineCount();
         for (int i = 0; i < block.layout()->lineCount(); ++i) {
@@ -517,13 +520,14 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
             return;
         }
         if (!HighlightChars(posInText, text.size(), foreground, background)) {
-            Toast::Instance().Show(Toast::kError,
-                                   QString("Hightlight selected text failed. The texts count to mark exceed %1").arg(
-                                       Constants::kMaxExtraSelectionsMarkCount));
+            auto error = QString("Hightlight selected text failed. The texts count to mark exceed %1").arg(
+                                 Constants::kMaxExtraSelectionsMarkCount);
+            qCritical() << error;
+            Toast::Instance().Show(Toast::kError, error);
             return;
         }
     }
-#else
+#else  // BLOCK_POS_SEARCH
     int start = 0;
     while (block.isValid() && block.isVisible() && block.position() < visibleBottomPos) {
         qDebug() << "visibleBottomPos: " << visibleBottomPos << ", pos: " << block.position();
@@ -545,9 +549,10 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
                 return;
             }
             if (!HighlightChars(posInText, text.size(), foreground, background)) {
-                Toast::Instance().Show(Toast::ERROR,
-                                       QString("Hightlight selected text failed. The texts count to mark exceed %1").arg(
-                                           Constants::kMaxExtraSelectionsMarkCount));
+                auto error = QString("Hightlight selected text failed. The texts count to mark exceed %1").arg(
+                                     Constants::kMaxExtraSelectionsMarkCount);
+                qCritical() << error;
+                Toast::Instance().Show(Toast::kError, error);
                 return;
             }
             start += text.size();
@@ -556,7 +561,7 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
         // Continue the next block.
         block = block.next();
     }
-#endif
+#endif  // BLOCK_POS_SEARCH
 }
 
 void EditView::UpdateStatusBarWithCursor()
@@ -876,7 +881,7 @@ void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCurso
 
 void EditView::HighlightFocus()
 {
-    // Must call MarkFocusNearBracket() after UnderpaintCurrentBlock() and other operations,
+    // Must call UnderpaintCurrentBlock() before other operations,
     // since the former clears ExtraSelections, and the latters reuses ExtraSelections.
     UnderpaintCurrentBlock();
     HighlightFocusNearBracket();
@@ -975,10 +980,6 @@ void EditView::HighlightFocusNearBracket()
 
 void EditView::UnderpaintCurrentBlock()
 {
-//    if (isReadOnly()) {
-//        return;
-//    }
-
     QPoint bottomRight(viewport()->width() -1, viewport()->height() - 1);
     QTextCursor visibleBottomCursor = cursorForPosition(bottomRight);
     int visibleBottomPos = visibleBottomCursor.position();
@@ -1093,7 +1094,6 @@ void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent *event)
 
 void EditView::paintEvent(QPaintEvent *event)
 {
-//    qDebug() << ", " << event->rect();
     QPlainTextEdit::paintEvent(event);
     if (highlighterInvalid()) {
         HighlightFocus();
@@ -1129,7 +1129,18 @@ void EditView::resizeEvent(QResizeEvent *event)
 }
 
 void EditView::wheelEvent(QWheelEvent *event) {
-    highlighterInvalid_ = true;
+    if (false && blockCount() > 10000) {
+        // Decrease highlight times for performance.
+        highlighterInvalid_ = false;
+        if (timerId_ != 0) {
+            killTimer(timerId_);
+            timerId_ = 0;
+        }
+        timerId_ = startTimer(500);
+        qCritical() << "Timeout, timerId_: " << timerId_;
+    } else {
+        highlighterInvalid_ = true;
+    }
 
     // If Ctrl-Key pressed.
     if (QApplication::keyboardModifiers() != Qt::ControlModifier) {
@@ -1143,21 +1154,6 @@ void EditView::wheelEvent(QWheelEvent *event) {
         ZoomIn();
     } else {
         ZoomOut();
-
-
-//        QString text1("不是\nabcdef\n123456\nhello, world\nyes.\n如果");
-//        QString text2("是的\nabcdefg\n0123456\nbye, world\nyes.\n假如");
-//        diff_match_patch dmp;
-//        auto diffs = dmp.diff_main(text1, text2, true);
-//        dmp.diff_cleanupSemantic(diffs);
-//        const auto html = dmp.diff_prettyHtml(diffs);
-//        QString res;
-//        for (const auto &diff : diffs) {
-//            qCritical() << diff.toString();
-//            res += diff.toString();
-//            res += "\n";
-//        }
-//        setPlainText(res + "\n\n" + html);
     }
 }
 
@@ -1198,6 +1194,16 @@ void EditView::mouseReleaseEvent(QMouseEvent *event)
     QPlainTextEdit::mouseReleaseEvent(event);
 }
 
+void EditView::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == timerId_) {
+        qDebug() << "event: " << event;
+        HighlightFocus();
+        killTimer(timerId_);
+        timerId_ = 0;
+    }
+}
+
 void LineNumberArea::paintEvent(QPaintEvent *event)
 {
     editView_->HandleLineNumberAreaPaintEvent(event);
@@ -1225,3 +1231,4 @@ void LineNumberArea::mouseReleaseEvent(QMouseEvent *event)
         editView_->SelectCurrentBlock(lineCount);
     }
 }
+}  // namespace QEditor

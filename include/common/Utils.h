@@ -21,6 +21,7 @@
 
 #include "Logger.h"
 
+namespace QEditor {
 namespace Utils {
 static inline QString mkdir(const QString &path)
 {
@@ -43,5 +44,6 @@ static inline QString mkdir(const QString &path)
     return path;
 }
 }  // namespace
+}  // namespace QEditor
 
 #endif // UTILS_H

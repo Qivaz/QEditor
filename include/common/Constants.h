@@ -19,14 +19,17 @@
 
 #include <QString>
 
+namespace QEditor {
 namespace Constants {
 constexpr auto kAppName = "QEditor";
-constexpr auto kVersionStr = "0.0.1 (V22R10 alpha)";
+constexpr auto kVersionStr = "0.0.2 (V22R10 alpha)";
 constexpr auto kOrgName = "Q";
 
 constexpr auto kAppInternalRelativePath = ".Q/data/internal/.files/";
 constexpr auto kAppInternalAutoSaveDirName = ".auto_save";
 constexpr auto kAppInternalFilesInfoFileName = "files_info";
+constexpr auto kAppInternalRecentFilesDirName = ".recent_files";
+constexpr auto kAppInternalRecentFilesFileName = "recent_files";
 constexpr auto kAppInternalSingleRunFile = ".single_lock";
 constexpr auto kConfigFile = ".config.ini";
 
@@ -57,6 +60,7 @@ constexpr auto kEncodingUtf32Le = "UTF-32 LE";
 
 extern QString kAppPath;           // Should initialize once when startup.
 extern QString kAppInternalPath;   // Should initialize once when startup.
-}
+}  // namespace
+}  // namespace QEditor
 
 #endif // CONSTANTS_H

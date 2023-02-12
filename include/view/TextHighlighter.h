@@ -22,9 +22,11 @@
 
 #include "FileType.h"
 
+namespace QEditor {
 class TextHighlighter : public QSyntaxHighlighter
 {
-    Q_OBJECT public:
+    Q_OBJECT
+public:
     TextHighlighter(const FileType &fileType, QTextDocument *parent = 0,
                     const QString &focused_str = "",
                     const QVector<QString> markUpText = QVector<QString>());
@@ -63,4 +65,6 @@ private:
         QColor(132, 112, 255)
     };
 };
+}  // namespace QEditor
+
 #endif // TEXTHIGHLIGHTER_H

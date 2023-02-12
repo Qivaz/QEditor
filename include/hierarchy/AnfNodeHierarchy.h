@@ -24,6 +24,7 @@
 
 #include "AnfNodeHierarchyScene.h"
 
+namespace QEditor {
 class AnfNodeHierarchy : public QGraphicsView
 {
 public:
@@ -35,5 +36,6 @@ private:
     AnfNodeHierarchyScene *scene_{nullptr};
     QString funcName_;
 };
+}  // namespace QEditor
 
 #endif // NODEHIERARCHY_H

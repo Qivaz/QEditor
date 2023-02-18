@@ -1,11 +1,27 @@
-#include "RichEditView.h"
+/**
+ * Copyright 2023 QEditor QH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "DiffView.h"
 
 #include <QApplication>
 #include <QScrollBar>
 #include <QWheelEvent>
 
 namespace QEditor {
-RichEditView::RichEditView(QWidget *parent) : QTextEdit(parent) {
+DiffView::DiffView(QWidget *parent) : QTextEdit(parent) {
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
@@ -36,7 +52,7 @@ RichEditView::RichEditView(QWidget *parent) : QTextEdit(parent) {
     currentFontSize_ = font().pointSize();
 }
 
-void RichEditView::wheelEvent(QWheelEvent *event) {
+void DiffView::wheelEvent(QWheelEvent *event) {
     // If Ctrl-Key pressed.
     if (QApplication::keyboardModifiers() != Qt::ControlModifier) {
         QTextEdit::wheelEvent(event);
@@ -50,7 +66,7 @@ void RichEditView::wheelEvent(QWheelEvent *event) {
     }
 }
 
-void RichEditView::ZoomIn()
+void DiffView::ZoomIn()
 {
     auto currentFont = font();
     currentFont.setPointSize(font().pointSize() + 1);
@@ -58,7 +74,7 @@ void RichEditView::ZoomIn()
     currentFontSize_ = currentFont.pointSize();
 }
 
-void RichEditView::ZoomOut()
+void DiffView::ZoomOut()
 {
     auto currentFont = font();
     currentFont.setPointSize(font().pointSize() - 1);

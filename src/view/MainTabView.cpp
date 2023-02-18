@@ -34,7 +34,6 @@
 #include "MainWindow.h"
 #include "RecentFiles.h"
 #include "Toast.h"
-#include "RichEditView.h"
 
 #include "Logger.h"
 
@@ -212,24 +211,31 @@ void TabView::HandleTabBarClicked(int index)
             menu_->addSeparator();
 
             static bool has_before_path = false;
-            QAction *viewDiffWithAction = new QAction("View diff between...");
+            QAction *viewDiffWithAction = new QAction("View Diff between...");
             menu_->addAction(viewDiffWithAction);
             connect(viewDiffWithAction, &QAction::triggered, this, [editView, this]() {
-                diffPreviousEditView_ = editView;
+                diffFormerEditView_ = editView;
                 has_before_path = true;
             });
-            if (has_before_path && diffPreviousEditView_ != nullptr) {
-                QAction *viewDiffWithPreviousAction = new QAction("View diff with \'" + diffPreviousEditView_->filePath() + "\'");
+            if (has_before_path) {
+                QAction *viewDiffWithPreviousAction = new QAction("View Diff with \'" + diffFormerEditView_->fileName() + "\'");
                 menu_->addAction(viewDiffWithPreviousAction);
                 connect(viewDiffWithPreviousAction, &QAction::triggered, this, [editView, this]() {
-                    diff_.Impose(diffPreviousEditView_->toPlainText(), editView->toPlainText());
-                    const QString html = diff_.ToHtml();
-                    ViewDiff(diffPreviousEditView_, editView, html);
-
-                    diffPreviousEditView_ = nullptr;
+                    ViewDiff(diffFormerEditView_, editView);
+                    diffFormerEditView_ = nullptr;
                     has_before_path = false;
                 });
                 menu_->popup(QCursor::pos());
+            }
+        } else {
+            auto diffView = GetDiffView(index);
+            if (diffView != nullptr && diffView->diffFormerEditView() != nullptr && diffView->diffLatterEditView() != nullptr) {
+                menu_->addSeparator();
+                QAction *swapDiffAction = new QAction("Swap Diff");
+                menu_->addAction(swapDiffAction);
+                connect(swapDiffAction, &QAction::triggered, this, [index, this]() {
+                    SwapDiff(index);
+                });
             }
         }
     }
@@ -483,20 +489,78 @@ void TabView::NewFile()
     editView->setFocus();
 }
 
-void TabView::ViewDiff(const EditView *before, const EditView *after, const QString &html)
+void TabView::ViewDiff(const QString &former, const QString &latter)
 {
-    QString diffName = before->fileName() + QString(" ==> ") + after->fileName();
-    auto richEditView = new RichEditView(this);
-    addTab(richEditView, diffName);
+    diff_.Impose(former, latter);
+    const QString html = diff_.ToLineHtml();
+    qDebug() << "html: " << html;
+    QString diffName = former.left(20) + "... ==> " + latter.left(20) + "...";
+    auto diffView = new DiffView(this);
+    addTab(diffView, diffName);
     setTabIcon(count() - 1, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
     setCurrentIndex(count() - 1);
-    QString diffTip = QString("Diff: ") + before->filePath() + QString(" ==> ") + after->filePath();
+    QString diffTip = QString("Diff: ") + diffName;
     setTabToolTip(count() - 1, diffTip);
-    richEditView->setReadOnly(true);
-    richEditView->setFocus();
-    richEditView->setFont(QFont("Consolas", 16));
-    richEditView->insertHtml(html);
-    qDebug() << ", html: " << richEditView->toHtml() << ", text: " << richEditView->toPlainText();
+    diffView->setReadOnly(true);
+    diffView->setFocus();
+    diffView->setFont(QFont("Consolas", 16));
+    diffView->insertHtml(html);
+    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
+}
+
+void TabView::ViewDiff(const EditView *former, const EditView *latter)
+{
+    diff_.Impose(former->toPlainText(), latter->toPlainText());
+    const QString html = diff_.ToLineHtml();
+    qDebug() << "html: " << html;
+    QString diffName = former->fileName() + QString(" ==> ") + latter->fileName();
+    auto diffView = new DiffView(this);
+    diffView->setDiffFormerEditView(former);
+    diffView->setDiffLatterEditView(latter);
+    addTab(diffView, diffName);
+    setTabIcon(count() - 1, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
+    setCurrentIndex(count() - 1);
+    auto beforeName = former->filePath().isEmpty() ? former->fileName() : former->filePath();
+    auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
+    QString diffTip = QString("Diff: ") + beforeName + QString(" ==> ") + afterName;
+    setTabToolTip(count() - 1, diffTip);
+    diffView->setReadOnly(true);
+    diffView->setFocus();
+    diffView->setFont(QFont("Consolas", 16));
+    diffView->insertHtml(html);
+    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
+}
+
+void TabView::SwapDiff(int index)
+{
+    auto diffView = GetDiffView(index);
+    if (diffView == nullptr) {
+        qFatal("diffView is null");
+    }
+    if (diffView->diffFormerEditView() == nullptr) {
+        return;
+    }
+    if (diffView->diffLatterEditView() == nullptr) {
+        return;
+    }
+    diffView->clear();
+    auto tmpDiffView = diffView->diffLatterEditView();
+    diffView->setDiffLatterEditView(diffView->diffFormerEditView());
+    diffView->setDiffFormerEditView(tmpDiffView);
+    auto former = diffView->diffFormerEditView();
+    auto latter = diffView->diffLatterEditView();
+    diff_.Impose(former->toPlainText(), latter->toPlainText());
+    const QString html = diff_.ToLineHtml();
+    qDebug() << "html: " << html;
+    QString diffName = former->fileName() + QString(" ==> ") + latter->fileName();
+    setTabText(index, diffName);
+    setTabIcon(index, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
+    auto beforeName = former->filePath().isEmpty() ? former->fileName() : former->filePath();
+    auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
+    QString diffTip = QString("Diff: ") + beforeName + QString(" ==> ") + afterName;
+    setTabToolTip(index, diffTip);
+    diffView->insertHtml(html);
+    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
 }
 
 void TabView::OpenFile()

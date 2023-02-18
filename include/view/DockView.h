@@ -29,6 +29,16 @@ public:
 
     void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
                     const QString &backColor, const QString &leftPadding, const QString &topPadding);
+
+    int savedMaxWidth() const { return savedMaxWidth_; }
+    void setSavedMaxWidth(int savedMaxWidth) {
+        if (savedMaxWidth > savedMaxWidth_) {
+            savedMaxWidth_ = savedMaxWidth;
+        }
+    }
+
+private:
+    int savedMaxWidth_{0};
 };
 }  // namespace QEditor
 

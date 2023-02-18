@@ -1,3 +1,5 @@
+copy ..\..\build-QEditor-Desktop_Qt_5_14_2_MinGW_64_bit-Release\release\QEditor.exe .\
+
 windeployqt .\QEditor.exe --dir .\QEditor_windows\
 
 copy .\QEditor.exe .\QEditor_windows\

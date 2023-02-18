@@ -140,8 +140,10 @@ void MainWindow::ShowExplorerDockView()
 {
     if (explorerDockView_ == nullptr) {
         auto dir = CreateExplorerDockView();
-        dir->setWidget(new ExplorerTreeView(this));
+        auto treeView = new ExplorerTreeView(this);
+        dir->setWidget(treeView);
     }
+
     explorerDockView_->show();
 }
 
@@ -149,7 +151,8 @@ void MainWindow::HideExplorerDockView()
 {
     if (explorerDockView_ == nullptr) {
         auto dir = CreateExplorerDockView();
-        dir->setWidget(new ExplorerTreeView(this));
+        auto treeView = new ExplorerTreeView(this);
+        dir->setWidget(treeView);
     }
     explorerDockView_->hide();
 }
@@ -158,6 +161,9 @@ DockView *MainWindow::CreateExplorerDockView()
 {
     if (explorerDockView_ == nullptr) {
         explorerDockView_ = new DockView(this);
+        explorerDockView_->setSavedMaxWidth(explorerDockView_->maximumWidth());
+        // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
+        explorerDockView_->setMinimumWidth(0);
     }
     explorerDockView_->setWindowTitle("EXPLORER");
 //    explorerDockView_->setFont(QFont("Consolas", 11));
@@ -229,6 +235,9 @@ DockView *MainWindow::CreateOutlineDockView()
 {
     if (outlineDockView_ == nullptr) {
         outlineDockView_ = new DockView();
+        outlineDockView_->setSavedMaxWidth(outlineDockView_->maximumWidth());
+        // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
+        outlineDockView_->setMinimumWidth(0);
     }
     outlineDockView_->setWindowTitle("OUTLINE");
 //    overviewDockView_->setFont(QFont("Consolas", 11));
@@ -272,6 +281,9 @@ DockView *MainWindow::CreateHierarchyDockView()
 {
     if (hierarchyDockView_ == nullptr) {
         hierarchyDockView_ = new DockView();
+        hierarchyDockView_->setSavedMaxWidth(hierarchyDockView_->maximumWidth());
+        // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
+        hierarchyDockView_->setMinimumWidth(0);
     }
     hierarchyDockView_->setWindowTitle("FUNCTION HIERARCHY");
     hierarchyDockView_->setFeatures(QDockWidget::DockWidgetMovable);
@@ -319,6 +331,9 @@ DockView *MainWindow::CreateNodeHierarchyDockView()
 {
     if (nodeHierarchyDockView_ == nullptr) {
         nodeHierarchyDockView_ = new DockView();
+        nodeHierarchyDockView_->setSavedMaxWidth(nodeHierarchyDockView_->maximumWidth());
+        // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
+        nodeHierarchyDockView_->setMinimumWidth(0);
     }
     nodeHierarchyDockView_->setWindowTitle("NODE HIERARCHY");
     nodeHierarchyDockView_->setFeatures(QDockWidget::DockWidgetMovable);
@@ -364,15 +379,69 @@ void MainWindow::closeEvent(QCloseEvent *event)
     tabView_->AutoStore();
 }
 
+bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
+    constexpr auto distance_threhold = 3;
+    return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
+}
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    qDebug() << "event: " << event->type() << ", obj: " << obj;
     const auto editView = this->editView();
-    if (event->type() == QEvent::HoverMove && editView != nullptr) {
+    if (event->type() == QEvent::HoverMove) {
         QHoverEvent *hoverEvent = static_cast<QHoverEvent*>(event);
-        qDebug() << "hover: " << hoverEvent;
-        auto pos = editView->viewport()->mapFrom(this, hoverEvent->pos());
-        auto cursor = editView->cursorForPosition(pos);
-        editView->Hover(cursor);
+        if (IsLeftOrRightSeparator(hoverEvent->pos())) {
+            setCursor(Qt::SplitHCursor);
+        } else {
+            unsetCursor();
+            if (editView != nullptr) {
+                auto pos = editView->viewport()->mapFrom(this, hoverEvent->pos());
+                auto cursor = editView->cursorForPosition(pos);
+                editView->Hover(cursor);
+            }
+        }
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if (IsLeftOrRightSeparator(mouseEvent->pos())) {
+            // Restore maxmum width to show the widget and separator.
+            if (explorerDockView_ != nullptr) {
+                explorerDockView_->setMaximumWidth(explorerDockView_->savedMaxWidth());
+            }
+            if (outlineDockView_ != nullptr) {
+                outlineDockView_->setMaximumWidth(outlineDockView_->savedMaxWidth());
+            }
+            if (hierarchyDockView_ != nullptr) {
+                hierarchyDockView_->setMaximumWidth(hierarchyDockView_->savedMaxWidth());
+            }
+            if (nodeHierarchyDockView_ != nullptr) {
+                nodeHierarchyDockView_->setMaximumWidth(nodeHierarchyDockView_->savedMaxWidth());
+            }
+        }
+        moveSeparatorToHide_ = isSeparator(mouseEvent->pos());
+    } else if (event->type() == QEvent::MouseButtonRelease) {
+        auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if (moveSeparatorToHide_) {
+            // Set both minimum and maxmum width to 0 to hide the widget.
+            if ((explorerDockView_ != nullptr && explorerDockView_->rect().contains(explorerDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                    (outlineDockView_ != nullptr && outlineDockView_->rect().contains(outlineDockView_->mapFrom(this, mouseEvent->pos())))) {
+                if (explorerDockView_ != nullptr) {
+                    explorerDockView_->setMaximumWidth(0);
+                }
+                if (outlineDockView_ != nullptr) {
+                    outlineDockView_->setMaximumWidth(0);
+                }
+            }
+            if ((hierarchyDockView_ != nullptr && hierarchyDockView_->rect().contains(hierarchyDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                    (nodeHierarchyDockView_ != nullptr && nodeHierarchyDockView_->rect().contains(nodeHierarchyDockView_->mapFrom(this, mouseEvent->pos())))) {
+                if (hierarchyDockView_ != nullptr) {
+                    hierarchyDockView_->setMaximumWidth(0);
+                }
+                if (nodeHierarchyDockView_ != nullptr) {
+                    nodeHierarchyDockView_->setMaximumWidth(0);
+                }
+            }
+        }
+        moveSeparatorToHide_ = false;
     }
     return QObject::eventFilter(obj, event);
 }
@@ -500,9 +569,9 @@ bool MainWindow::ZoomIn()
         editView->ZoomIn();
         return true;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->ZoomIn();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->ZoomIn();
         return true;
     }
     return false;
@@ -515,9 +584,9 @@ bool MainWindow::ZoomOut()
         editView->ZoomOut();
         return true;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->ZoomOut();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->ZoomOut();
         return true;
     }
     return false;
@@ -753,7 +822,7 @@ void MainWindow::CreateActions()
     searchToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon findIcon = QIcon::fromTheme("select-search", QIcon(":/images/search.svg"));
-    QAction *findAct = new QAction(findIcon, tr("&Find"), this);
+    QAction *findAct = new QAction(findIcon, tr("&Find..."), this);
     findAct->setShortcuts(QKeySequence::Find);
     findAct->setStatusTip(tr("Find"));
     connect(findAct, &QAction::triggered, this, &MainWindow::Find);
@@ -761,7 +830,7 @@ void MainWindow::CreateActions()
     searchToolBar->addAction(findAct);
 
     const QIcon replaceIcon = QIcon::fromTheme("select-replace", QIcon(":/images/replace.svg"));
-    QAction *replaceAct = new QAction(replaceIcon, tr("&Replace"), this);
+    QAction *replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);
     auto replaceKeySeq = QKeySequence(Qt::CTRL + Qt::Key_H);
     replaceAct->setShortcut(replaceKeySeq);  // QKeySequence::Replace
     replaceAct->setStatusTip(tr("Replace"));
@@ -772,7 +841,7 @@ void MainWindow::CreateActions()
     selectMenu->addSeparator();
 
     const QIcon gotoLineIcon = QIcon::fromTheme("select-got-line", QIcon(":/images/goto-line.svg"));
-    QAction *gotoLineAct = new QAction(gotoLineIcon, tr("&Goto line"), this);
+    QAction *gotoLineAct = new QAction(gotoLineIcon, tr("&Go to Line..."), this);
     auto gotoLineKeySeq = QKeySequence(Qt::CTRL + Qt::Key_G);  // QKeySequence(tr("F3, Ctrl+G"))
     gotoLineAct->setShortcut(gotoLineKeySeq);
     gotoLineAct->setStatusTip(tr("GotoLine"));
@@ -781,7 +850,7 @@ void MainWindow::CreateActions()
     searchToolBar->addAction(gotoLineAct);
 
     const QIcon selectAllIcon = QIcon::fromTheme("select-all-lines", QIcon(":/images/select-all.svg"));
-    QAction *selectAllAct = new QAction(selectAllIcon, tr("&Select all lines"), this);
+    QAction *selectAllAct = new QAction(selectAllIcon, tr("&Select All Lines"), this);
     selectAllAct->setShortcuts(QKeySequence::SelectAll);
     selectAllAct->setStatusTip(tr("SelectAll"));
     connect(selectAllAct, &QAction::triggered, this, &MainWindow::SelectAll);
@@ -794,7 +863,7 @@ void MainWindow::CreateActions()
     markToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon markIcon = QIcon::fromTheme("select-mark", QIcon(":/images/highlighter.svg"));
-    QAction *markAct = new QAction(markIcon, tr("&Mark or unmark"), this);
+    QAction *markAct = new QAction(markIcon, tr("&Mark or Unmark"), this);
     auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
     markAct->setShortcut(markKeySeq);
     markAct->setStatusTip(tr("Mark & Unmack"));
@@ -803,7 +872,7 @@ void MainWindow::CreateActions()
     markToolBar->addAction(markAct);
 
     const QIcon unmarkAllIcon = QIcon::fromTheme("select-unmark-all", QIcon(":/images/eraser.svg"));
-    QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark all"), this);
+    QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
     auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
     unmarkAllAct->setShortcut(unmarkAllKeySeq);
     unmarkAllAct->setStatusTip(tr("Mark"));
@@ -817,7 +886,7 @@ void MainWindow::CreateActions()
     stepToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon stepBackIcon = QIcon::fromTheme("step-back", QIcon(":/images/arrow-thick-to-left.svg"));
-    QAction *stepBackAct = new QAction(stepBackIcon, tr("&Step back"), this);
+    QAction *stepBackAct = new QAction(stepBackIcon, tr("&Step Back"), this);
     auto stepBackSeq = QKeySequence(Qt::ALT + Qt::Key_Left);
     stepBackAct->setShortcut(stepBackSeq);
     stepBackAct->setStatusTip(tr("Step back"));
@@ -826,7 +895,7 @@ void MainWindow::CreateActions()
     stepToolBar->addAction(stepBackAct);
 
     const QIcon stepForwardIcon = QIcon::fromTheme("step-forward", QIcon(":/images/arrow-thick-to-right.svg"));
-    QAction *stepForwardAct = new QAction(stepForwardIcon, tr("&Step forward"), this);
+    QAction *stepForwardAct = new QAction(stepForwardIcon, tr("&Step Forward"), this);
     auto stepForwardSeq = QKeySequence(Qt::ALT + Qt::Key_Right);
     stepForwardAct->setShortcut(stepForwardSeq);
     stepForwardAct->setStatusTip(tr("Step forward"));
@@ -840,14 +909,14 @@ void MainWindow::CreateActions()
     viewToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon zoomInIcon = QIcon::fromTheme("view-zoomin", QIcon(":/images/zoom-in.svg"));
-    QAction *zoomInAct = new QAction(zoomInIcon, tr("Zoom in"), this);
+    QAction *zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
     zoomInAct->setStatusTip(tr("ZoomIn"));
     connect(zoomInAct, &QAction::triggered, this, &MainWindow::ZoomIn);
     viewMenu->addAction(zoomInAct);
     viewToolBar->addAction(zoomInAct);
 
     const QIcon zoomOutIcon = QIcon::fromTheme("view-zoomout", QIcon(":/images/zoom-out.svg"));
-    QAction *zoomOutAct = new QAction(zoomOutIcon, tr("Zoom out"), this);
+    QAction *zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
     zoomOutAct->setStatusTip(tr("ZoomOut"));
     connect(zoomOutAct, &QAction::triggered, this, &MainWindow::ZoomOut);
     viewMenu->addAction(zoomOutAct);
@@ -856,7 +925,7 @@ void MainWindow::CreateActions()
     viewMenu->addSeparator();
 
     const QIcon wrapTextIcon = QIcon::fromTheme("view-wrap-text", QIcon(":/images/wrap-text.svg"));
-    QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap text"), this);
+    QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
     wrapTextAct->setStatusTip(tr("WrapText"));
     wrapTextAct->setCheckable(true);
     wrapTextAct->setChecked(shouldWrapText_);
@@ -865,7 +934,7 @@ void MainWindow::CreateActions()
     viewToolBar->addAction(wrapTextAct);
 
     const QIcon showAllCharsIcon = QIcon::fromTheme("view-show-chars", QIcon(":/images/show-all-chars.svg"));
-    QAction *showAllCharsAct = new QAction(showAllCharsIcon, tr("Show all chars"), this);
+    QAction *showAllCharsAct = new QAction(showAllCharsIcon, tr("Show All Chars"), this);
     showAllCharsAct->setStatusTip(tr("ShowSpecialChars"));
     showAllCharsAct->setCheckable(true);
     showAllCharsAct->setChecked(specialCharsVisible_);
@@ -879,7 +948,7 @@ void MainWindow::CreateActions()
     viewToolBar2->setStyleSheet(toolBarStyle);
 
     const QIcon showDirIcon = QIcon::fromTheme("view-show-dir", QIcon(":/images/folder.svg"));
-    QAction *showDirAct = new QAction(showDirIcon, tr("Show explorer window"), this);
+    QAction *showDirAct = new QAction(showDirIcon, tr("Show Explorer Window"), this);
     showDirAct->setStatusTip(tr("ShowExplorerWindow"));
     showDirAct->setCheckable(true);
     showDirAct->setChecked(explorerVisible_);
@@ -888,7 +957,7 @@ void MainWindow::CreateActions()
     viewToolBar2->addAction(showDirAct);
 
     const QIcon showOutlineIcon = QIcon::fromTheme("view-show-outline", QIcon(":/images/brackets-contain.svg"));
-    QAction *showOutlineAct = new QAction(showOutlineIcon, tr("Show outline window"), this);
+    QAction *showOutlineAct = new QAction(showOutlineIcon, tr("Show Outline Window"), this);
     showOutlineAct->setStatusTip(tr("ShowOutlineWindow"));
     showOutlineAct->setCheckable(true);
     showOutlineAct->setChecked(outlineVisible_);
@@ -897,7 +966,7 @@ void MainWindow::CreateActions()
     viewToolBar2->addAction(showOutlineAct);
 
     const QIcon showHierarchyIcon = QIcon::fromTheme("view-show-hierarchy", QIcon(":/images/sitemap.svg"));
-    QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show hierarchy window"), this);
+    QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
     showHierarchyAct->setStatusTip(tr("ShowHierarchyWindow"));
     showHierarchyAct->setCheckable(true);
     showHierarchyAct->setChecked(outlineVisible_);
@@ -925,9 +994,9 @@ void MainWindow::SelectAll()
         editView->selectAll();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->selectAll();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->selectAll();
     }
 }
 
@@ -1059,9 +1128,9 @@ void MainWindow::Copy()
         editView->copy();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->copy();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->copy();
     }
 }
 
@@ -1072,9 +1141,9 @@ void MainWindow::Cut()
         editView->cut();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->cut();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->cut();
     }
 }
 
@@ -1085,9 +1154,9 @@ void MainWindow::Paste()
         editView->paste();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->paste();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->paste();
     }
 }
 
@@ -1104,9 +1173,9 @@ void MainWindow::Undo()
         editView->undo();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->undo();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->undo();
     }
 }
 
@@ -1117,9 +1186,9 @@ void MainWindow::Redo()
         editView->redo();
         return;
     }
-    auto richEditView = this->richEditView();
-    if (richEditView != nullptr) {
-        richEditView->redo();
+    auto diffView = this->diffView();
+    if (diffView != nullptr) {
+        diffView->redo();
     }
 }
 

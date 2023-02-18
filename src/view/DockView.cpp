@@ -16,7 +16,10 @@
 
 #include "DockView.h"
 
+#include <QEvent>
+#include <QResizeEvent>
 #include <QWidget>
+
 #include "Logger.h"
 
 namespace QEditor {

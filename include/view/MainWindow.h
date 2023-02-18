@@ -28,7 +28,7 @@
 #include "GotoLineDialog.h"
 #include "MainTabView.h"
 #include "OutlineList.h"
-#include "RichEditView.h"
+#include "DiffView.h"
 #include "SearchDialog.h"
 #include "DockView.h"
 
@@ -78,12 +78,12 @@ public:
         }
         return editView;
     }
-    RichEditView* richEditView() {
-        auto richEditView = qobject_cast<RichEditView*>(tabView_->currentWidget());
-        if (richEditView == nullptr) {
+    DiffView* diffView() {
+        auto diffView = qobject_cast<DiffView*>(tabView_->currentWidget());
+        if (diffView == nullptr) {
             return nullptr;
         }
-        return richEditView;
+        return diffView;
     }
     TabView* tabView() { return tabView_; }
 
@@ -153,6 +153,13 @@ public:
 
     void UpdateRecentFilesMenu();
 
+public slots:
+    bool Find();
+    bool Replace();
+
+    bool MarkUnmarkCursorText();
+    bool UnmarkAll();
+
 protected:
     void showEvent(QShowEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
@@ -167,12 +174,6 @@ private slots:
     bool Save();
     bool SaveAll();
     bool SaveAs();
-
-    bool Find();
-    bool Replace();
-
-    bool MarkUnmarkCursorText();
-    bool UnmarkAll();
 
     bool ZoomIn();
     bool ZoomOut();
@@ -198,6 +199,8 @@ private:
     void WriteSettings();
     bool MaybeSave();
 
+    bool IsLeftOrRightSeparator(const QPoint &pos);
+
     bool init_{false};
     TabView *tabView_{nullptr};
     DockView *searchDockView_{nullptr};
@@ -209,6 +212,8 @@ private:
     DockView *hierarchyDockView_{nullptr};
     DockView *nodeHierarchyDockView_{nullptr};
     AnfNodeHierarchy *anfNodeHierarchy_{nullptr};
+
+    bool moveSeparatorToHide_{false};
 
     QAction *copyAct_{nullptr};
     QAction *cutAct_{nullptr};

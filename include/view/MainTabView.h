@@ -23,6 +23,7 @@
 
 #include "EditView.h"
 #include "Diff.h"
+#include "DiffView.h"
 
 #include "Logger.h"
 
@@ -70,6 +71,15 @@ public:
         return editView;
     }
 
+    DiffView *GetDiffView(int index)
+    {
+        auto diffView = qobject_cast<DiffView*>(widget(index));
+        if (diffView == nullptr) {
+            return nullptr;
+        }
+        return diffView;
+    }
+
     int FindEditViewIndex(const QString &filePath)
     {
         for (int i = 0; i < count(); ++i) {
@@ -84,7 +94,9 @@ public:
         return -1;
     }
 
-    void ViewDiff(const EditView *before, const EditView *after, const QString &html);
+    void ViewDiff(const QString &former, const QString &latter);
+    void ViewDiff(const EditView *former, const EditView *latter);
+    void SwapDiff(int index);
     void NewFile();
     void OpenFile();
     void OpenFile(const QString &filePath);
@@ -118,6 +130,9 @@ public:
         }
     }
 
+    const QString &formerDiffStr() { return formerDiffStr_; }
+    void setFormerDiffStr(const QString &formerDiffStr) { formerDiffStr_ = formerDiffStr; }
+
 protected:
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void tabInserted(int index) override;
@@ -131,8 +146,10 @@ private:
     QList<QPair<EditView*, int>> backwardSteps_;
     QList<QPair<EditView*, int>> forwardSteps_;
 
-    EditView *diffPreviousEditView_{nullptr};
+    EditView *diffFormerEditView_{nullptr};
     Diff diff_;
+
+    QString formerDiffStr_;
 };
 }  // namespace QEditor
 

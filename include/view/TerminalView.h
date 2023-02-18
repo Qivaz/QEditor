@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 QEditor QH
+ * Copyright 2023 QEditor QH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef RECENTFILES_H
-#define RECENTFILES_H
+#ifndef TERMINALVIEW_H
+#define TERMINALVIEW_H
 
-#include <QObject>
-#include <QDataStream>
-
-#include "Constants.h"
+#include "EditView.h"
 
 namespace QEditor {
-class RecentFiles : public QObject
+class TerminalView : public EditView
 {
     Q_OBJECT
 public:
-    static void UpdateFiles(const QString &filePath);
-    static void Clear();
-
-    static void StoreFiles();
-    static void LoadFiles();
-
-    static const QStringList& files() { return files_; }
-
-private:
-    static QStringList files_;
-
-    static const QString kAppInternalRecentFilesDirName_;
-    static const QString kAppInternalRecentFilesFileName_;
-
-    static const int kMaxRecentFilesNum_ = Constants::kMaxOpenRecentFilesNum;
+    TerminalView(QWidget *parent = nullptr);
+    TerminalView(const QString &fileName, QWidget *parent = nullptr);
+    TerminalView(const QFileInfo &fileInfo, QWidget *parent = nullptr);
+    ~TerminalView() {}
 };
 }  // namespace QEditor
 
-#endif // RECENTFILES_H
+#endif  // TERMINALVIEW_H

@@ -188,6 +188,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private slots:
     void HandleBlockCountChanged(int newBlockCount);
@@ -200,6 +201,12 @@ private slots:
     void HandleCopyAvailable(bool avail);
     void HandleUndoAvailable(bool avail);
     void HandleRedoAvailable(bool avail);
+
+    // Context menu operations.
+    bool Find();
+    bool Replace();
+    bool MarkUnmarkCursorText();
+    bool UnmarkAll();
 
 private:
     void UpdateLineNumberArea(const QRect &rect, int dy);

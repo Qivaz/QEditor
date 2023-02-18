@@ -42,6 +42,8 @@ constexpr auto kMaxExtraSelectionsMarkCount = 2000;
 constexpr auto kMaxCharsNumToPairBracket = 20000;
 constexpr auto kMaxRecursiveDepthToPairBracket = 10;
 
+constexpr auto kMaxOpenRecentFilesNum = 100;
+
 // File format: new line char.
 constexpr auto kFormatNewLineUnix = "Unix";
 constexpr auto kFormatNewLineDos = "Dos";

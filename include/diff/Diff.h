@@ -14,6 +14,7 @@ public:
     void Impose(const QString &before, const QString &after);
 
     QString ToHtml();
+    QString ToLineHtml();
 
 private:
     diff_match_patch diffMatchPatch_;

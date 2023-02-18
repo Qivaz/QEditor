@@ -38,10 +38,11 @@ HEADERS       = \
     include/view/MainTabView.h \
     include/view/MainWindow.h \
     include/view/OutlineList.h \
-    include/view/RichEditView.h \
+    include/view/DiffView.h \
     include/view/SearchDialog.h \
     include/view/SearchResultItem.h \
     include/view/SearchResultList.h \
+    include/view/TerminalView.h \
     include/view/TextHighlighter.h \
     include/view/Toast.h \
     include/win/WinTheme.h
@@ -73,10 +74,11 @@ SOURCES       = \
     src/view/MainTabView.cpp \
     src/view/MainWindow.cpp \
     src/view/OutlineList.cpp \
-    src/view/RichEditView.cpp \
+    src/view/DiffView.cpp \
     src/view/SearchDialog.cpp \
     src/view/SearchResultItem.cpp \
     src/view/SearchResultList.cpp \
+    src/view/TerminalView.cpp \
     src/view/TextHighlighter.cpp \
     src/view/Toast.cpp
 

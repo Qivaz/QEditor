@@ -122,7 +122,6 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext 
         cout << text;
         break;
     case QtCriticalMsg:
-        return;
         text = QString("[CRITIAL] %1:%2 [%3:%4@%5] %6\n").arg(pidInfo).arg(currentTime).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData());
         cerr << text;
         break;

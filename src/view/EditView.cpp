@@ -1204,6 +1204,105 @@ void EditView::timerEvent(QTimerEvent *event)
     }
 }
 
+bool EditView::Find()
+{
+    return MainWindow::Instance().Find();
+}
+
+bool EditView::Replace()
+{
+    return MainWindow::Instance().Replace();
+}
+
+bool EditView::MarkUnmarkCursorText()
+{
+    return MainWindow::Instance().MarkUnmarkCursorText();
+}
+
+bool EditView::UnmarkAll()
+{
+    return MainWindow::Instance().UnmarkAll();
+}
+
+void EditView::contextMenuEvent(QContextMenuEvent *event)
+{
+    auto menu = createStandardContextMenu();
+    menu->setStyleSheet("\
+                       QMenu {\
+                           color: lightGray;\
+                           background-color: rgb(40, 40, 40);\
+                           margin: 2px 2px;\
+                           border: none;\
+                       }\
+                       QMenu::item {\
+                           color: rgb(225, 225, 225);\
+                           background-color: rgb(40, 40, 40);\
+                           padding: 5px 5px;\
+                       }\
+                       QMenu::item:selected {\
+                           background-color: rgb(9, 71, 113);\
+                       }\
+                       QMenu::item:pressed {\
+                           border: 1px solid rgb(60, 60, 60); \
+                           background-color: rgb(29, 91, 133); \
+                       }\
+                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
+                      ");
+
+    if (!selectedText_.isEmpty()) {
+        QAction *findAction = new QAction("Find...");
+        connect(findAction, &QAction::triggered, this, &EditView::Find);
+        menu->insertAction(menu->actions()[0], findAction);
+        QAction *replaceAction = new QAction("Replace...");
+        connect(replaceAction, &QAction::triggered, this, &EditView::Replace);
+        menu->insertAction(menu->actions()[1], replaceAction);
+
+        menu->insertSeparator(menu->actions()[2]);
+        QAction *markUnmarkAction = new QAction("Mark or Unmark");
+        auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
+        markUnmarkAction->setShortcut(markKeySeq);
+        connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
+        menu->insertAction(menu->actions()[3], markUnmarkAction);
+        QAction *unmarkAllAction = new QAction("Unmark All");
+        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+        unmarkAllAction->setShortcut(unmarkAllKeySeq);
+        connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
+        menu->insertAction(menu->actions()[4], unmarkAllAction);
+
+        menu->insertSeparator(menu->actions()[5]);
+        QAction *selectTextToDiffAction = new QAction("Select Text for View Diff");
+        connect(selectTextToDiffAction, &QAction::triggered, this, [this]() {
+            tabView()->setFormerDiffStr(selectedText_);
+        });
+        menu->insertAction(menu->actions()[6], selectTextToDiffAction);
+        if (!tabView()->formerDiffStr().isEmpty()) {
+            QAction *diffWithPreviousAction = new QAction("View Diff with Previous Selection");
+            connect(diffWithPreviousAction, &QAction::triggered, this, [this]() {
+                tabView()->ViewDiff(tabView()->formerDiffStr(), selectedText_);
+                tabView()->setFormerDiffStr("");
+            });
+            menu->insertAction(menu->actions()[7], diffWithPreviousAction);
+            menu->insertSeparator(menu->actions()[8]);
+        } else {
+            menu->insertSeparator(menu->actions()[7]);
+        }
+    } else {
+        QAction *markUnmarkAction = new QAction("Mark or Unmark");
+        auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
+        markUnmarkAction->setShortcut(markKeySeq);
+        connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
+        menu->insertAction(menu->actions()[0], markUnmarkAction);
+        QAction *unmarkAllAction = new QAction("Unmark All");
+        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+        unmarkAllAction->setShortcut(unmarkAllKeySeq);
+        connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
+        menu->insertAction(menu->actions()[1], unmarkAllAction);
+        menu->insertSeparator(menu->actions()[2]);
+    }
+    menu->exec(event->globalPos());
+    delete menu;
+}
+
 void LineNumberArea::paintEvent(QPaintEvent *event)
 {
     editView_->HandleLineNumberAreaPaintEvent(event);

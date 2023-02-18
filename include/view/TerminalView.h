@@ -56,6 +56,7 @@ protected:
 
 private slots:
     void ConnectStateChanged(bool state, const QString &ip, int port);
+    void ShellConnected(const QString &ip, int port);
     void DataArrived(const QString &msg, const QString &ip, int port);
 
 signals:

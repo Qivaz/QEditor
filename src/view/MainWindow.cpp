@@ -984,8 +984,8 @@ void MainWindow::CreateActions()
     const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/terminal.svg"));
     QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
     openSshAct->setStatusTip(tr("Open SSH"));
-    connect(openSshAct, &QAction::triggered, this, [this]() {
-        (new OpenTerminalDialog(this))->show();
+    connect(openSshAct, &QAction::triggered, this, []() {
+        (new OpenTerminalDialog())->show();
         return true;
     });
     terminalMenu->addAction(openSshAct);

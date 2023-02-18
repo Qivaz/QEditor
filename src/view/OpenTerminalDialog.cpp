@@ -60,11 +60,11 @@ void OpenTerminalDialog::on_pushButtonConnect_clicked()
     QString pwd = ui_->lineEditPwd->text();
     tabView()->OpenSsh(ip, pt, user, pwd);
 
-    hide();
+    close();
 }
 
 void OpenTerminalDialog::on_pushButtonCancel_clicked()
 {
-    hide();
+    close();
 }
 }  // namespace QEditor

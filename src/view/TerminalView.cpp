@@ -43,6 +43,7 @@ void TerminalView::CreateConnection()
     sshClient_ = new SshClient(ip_, port_, user_, pwd_);
     sshClient_->Initialize();
     connect(sshClient_, SIGNAL(sigConnectStateChanged(bool, const QString&, int)), this, SLOT(ConnectStateChanged(bool, const QString&, int)));
+    connect(sshClient_, SIGNAL(sigShellConnected(const QString&, int)), this, SLOT(ShellConnected(const QString&, int)));
     connect(sshClient_, SIGNAL(sigDataArrived(const QString&, const QString&, int)), this, SLOT(DataArrived(const QString&, const QString&, int)));
     connect(this, SIGNAL(sigSend(const QString&)), sshClient_, SLOT(slotSend(const QString&)));
     connect(this, SIGNAL(sigDisconnected()), sshClient_, SLOT(slotDisconnected()));
@@ -187,7 +188,18 @@ void TerminalView::ConnectStateChanged(bool state, const QString &ip, int port)
     Q_UNUSED(port)
 
     qDebug() << "state: " << state;
-    connectState_ = state;
+    if(state) {
+        Toast::Instance().Show(Toast::kInfo, QString("Try to connecting %1:%2.").arg(ip).arg(port));
+    } else {
+        connectState_ = state;
+        Toast::Instance().Show(Toast::kWarning, QString("%1:%2 is disconnected.").arg(ip).arg(port));
+    }
+}
+
+void TerminalView::ShellConnected(const QString &ip, int port)
+{
+    connectState_ = true;
+    Toast::Instance().Show(Toast::kInfo, QString("%1:%2 is connected.").arg(ip).arg(port));
 }
 
 void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)

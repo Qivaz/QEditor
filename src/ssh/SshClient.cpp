@@ -54,7 +54,7 @@ SshClient::~SshClient()
 void SshClient::Initialize()
 {
     thread_ = new QThread(this);
-    connect(thread_, SIGNAL(finished()), this, SLOT(slotThreadFinished()));
+//    connect(thread_, SIGNAL(finished()), this, SLOT(slotThreadFinished()));
     this->moveToThread(thread_);
     thread_->start();
 
@@ -128,7 +128,7 @@ void SshClient::slotConnected()
 
     shell_ = sshSocket_->createRemoteShell();
     connect(shell_.data(), SIGNAL(started()), SLOT(slotShellStart()));
-    connect(shell_.data(), SIGNAL(readyReadStandardOutput()), SLOT(slotDataReceived()));
+    connect(shell_.data(), SIGNAL(readyReadStandardOutput()), SLOT(slotReceived()));
     connect(shell_.data(), SIGNAL(readyReadStandardError()), SLOT(slotShellError()));
     shell_.data()->start();
 
@@ -147,6 +147,35 @@ void SshClient::slotThreadFinished()
     qCritical();
     thread_->deleteLater();
     this->deleteLater();
+}
+
+void SshClient::slotShellStart()
+{
+    qCritical() << "Shell connected: " << IpAndPort();
+    shellConnected_ = true;
+    emit sigShellConnected(ip_, port_);
+}
+
+void SshClient::slotShellError()
+{
+    qCritical() << "Shell error happpended: " << IpAndPort();
+}
+
+void SshClient::slotSend(const QString &message)
+{
+    Send(message);
+}
+
+void SshClient::slotReceived()
+{
+    qCritical();
+    QByteArray recvByteArray = shell_->readAllStandardOutput();
+    QString recv = QString::fromUtf8(recvByteArray);
+    if(recv.isEmpty()) {
+        return;
+    }
+    qCritical() << "Receive: " << recv;
+    emit sigDataArrived(recv, ip_, port_);
 }
 
 void SshClient::slotSshConnectError(const QSsh::SshError &sshError)
@@ -187,33 +216,5 @@ void SshClient::slotSshConnectError(const QSsh::SshError &sshError)
     default:
         break;
     }
-}
-
-void SshClient::slotShellStart()
-{
-    shellConnected_ = true;
-    qCritical() << "Shell connected: " << IpAndPort();
-}
-
-void SshClient::slotShellError()
-{
-    qCritical() << "Shell error happpended: " << IpAndPort();
-}
-
-void SshClient::slotSend(const QString &message)
-{
-    Send(message);
-}
-
-void SshClient::slotDataReceived()
-{
-    qCritical();
-    QByteArray recvByteArray = shell_->readAllStandardOutput();
-    QString recv = QString::fromUtf8(recvByteArray);
-    if(recv.isEmpty()) {
-        return;
-    }
-    qCritical() << "Receive: " << recv;
-    emit sigDataArrived(recv, ip_, port_);
 }
 }  // namespace QEditor

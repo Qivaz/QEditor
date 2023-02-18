@@ -57,12 +57,8 @@ public:
         auto layout = new QHBoxLayout(this);
         label_ = new QLabel(this);
         label_->setStyleSheet("color: white; background: transparent");
+        label_->setAlignment(Qt::AlignCenter);
         layout->addWidget(label_, 1);
-
-        closeButton_ = new QLabel(this);
-        closeButton_->installEventFilter(this);
-        closeButton_->setStyleSheet("background: transparent");
-        layout->addWidget(closeButton_);
 
 #ifdef FRAME_RADIUS
         frame_ = new QFrame(this);
@@ -110,20 +106,8 @@ public:
         show();
     }
 
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override
-    {
-        if (obj == closeButton_) {
-            if (event->type() == QEvent::MouseButtonRelease) {
-                accept();
-            }
-        }
-        return QObject::eventFilter(obj, event);
-    }
-
 private:
     QLabel *label_;
-    QLabel *closeButton_;
 #ifdef FRAME_RADIUS
     QFrame *frame_;
 #endif

@@ -38,13 +38,14 @@ public:
     void Initialize();
     void Uninitialize();
 
-    int Send(const QString &strMessage);
+    int Send(const QString &message);
     bool connected() const { return connected_; }
 
 signals:
     void sigInitForClild();
-    void sigConnectStateChanged(bool bState, const QString &strIp, int nPort);
-    void sigDataArrived(const QString &strMsg, const QString &strIp, int nPort);
+    void sigConnectStateChanged(bool state, const QString &ip, int port);
+    void sigShellConnected(const QString &ip, int port);
+    void sigDataArrived(const QString &msg, const QString &ip, int port);
 
 private:
     QString IpAndPort(){return ip_ + ":" + QString::number(port_);}
@@ -53,7 +54,7 @@ public slots:
     void slotResetConnection(const QString &ipPort);
     void slotSend(const QString &message);
     void slotDisconnected();
-    void slotDataReceived();
+    void slotReceived();
 
 private slots:
     void slotInitForClild();

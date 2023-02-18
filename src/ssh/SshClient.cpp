@@ -31,6 +31,15 @@ SshClient::SshClient(const QString &ip, int port, const QString &user, const QSt
 SshClient::~SshClient()
 {
     qCritical();
+    if (thread_ != nullptr) {
+        thread_->requestInterruption();
+        thread_->quit();
+
+        // We should not delete thread_ here, cause we called this->moveToThread(thread_); before.
+        // To delete thread_ after delete this(SshClient instance).
+        // delete thread_;
+        // thread_ = nullptr;
+    }
     if (timer_ != nullptr) {
         timer_->stop();
         delete timer_;
@@ -40,23 +49,17 @@ SshClient::~SshClient()
         delete sshSocket_;
         sshSocket_ = nullptr;
     }
-    if (thread_ != nullptr) {
-        thread_->requestInterruption();
-        thread_->quit();
-        delete thread_;
-        thread_ = nullptr;
-    }
 }
 
 void SshClient::Initialize()
 {
     thread_ = new QThread(this);
-    connect(thread_,SIGNAL(finished()), this, SLOT(slotThreadFinished()));
+    connect(thread_, SIGNAL(finished()), this, SLOT(slotThreadFinished()));
     this->moveToThread(thread_);
     thread_->start();
 
-    //之后的逻辑都得通过信号和槽接通
-    connect(this,SIGNAL(sigInitForClild()), this, SLOT(slotInitForClild()));
+    // To use signals and slots afterwards.
+    connect(this, SIGNAL(sigInitForClild()), this, SLOT(slotInitForClild()));
     emit sigInitForClild();
 }
 
@@ -65,24 +68,22 @@ void SshClient::Uninitialize()
     thread_->quit();
 }
 
-int SshClient::Send(const QString &strMessage)
+int SshClient::Send(const QString &message)
 {
-    qCritical()<<"SshClient ssh send "<<strMessage;
-
+    qCritical() << "Send: " << message;
     int size = 0;
-    if(connected_ && sendAble_){
-       size = shell_->write(strMessage.toLatin1().data());
-       qCritical()<<"SshClient ssh send successfully, size: "<< size;
+    if(connected_ && shellConnected_){
+       size = shell_->write(message.toLatin1().data());
+       qCritical() << "Send successfully, size: " << size;
     }else{
-       qCritical()<<"SshClient::send() ssh未连接 或 shell未连接:"<<IpAndPort();
+       qCritical() << "Not connected or shell is not connected: " << IpAndPort();
     }
-
     return size;
 }
 
-void SshClient::slotResetConnection(QString strIpPort)
+void SshClient::slotResetConnection(const QString &ipPort)
 {
-    if(this->IpAndPort() == strIpPort){
+    if(this->IpAndPort() == ipPort){
         this->slotDisconnected();
     }
 }
@@ -94,38 +95,35 @@ void SshClient::slotInitForClild()
     parameters_.password = pwd_;
     parameters_.host = ip_;
     parameters_.timeout = 10;
-    parameters_.authenticationType = QSsh::SshConnectionParameters::AuthenticationTypePassword; //密码方式连接
-
-    slotCreateConnection(); //连接
+    parameters_.authenticationType = QSsh::SshConnectionParameters::AuthenticationTypePassword;
+    slotCreateConnection();  // Create connection.
 
     if (timer_ == nullptr) {
         timer_ = new QTimer(this);
     }
     timer_->setInterval(RECONNET_SPAN_TIME);
-    connect(timer_,SIGNAL(timeout()),this,SLOT(slotCreateConnection()));
-    timer_->start();  //启动心跳定时器，每隔一段时间进入slotCreateConnection判断是否需要重连
+    connect(timer_, SIGNAL(timeout()), this, SLOT(slotCreateConnection()));
+    timer_->start();  // Start heartbeat timer, call slotCreateConnection to check if reconnection needed in circles.
 }
 
 void SshClient::slotCreateConnection()
 {
-
-    qCritical()<<"SshClient::slotCreateConnection检查连接" ;
-
-    if(true == connected_)
+    qCritical();
+    if(connected_) {
         return;
-
-    if(nullptr == sshSocket_){
+    }
+    if(sshSocket_ == nullptr){
         sshSocket_ = new QSsh::SshConnection(parameters_);
-        connect(sshSocket_,SIGNAL(connected()),SLOT(slotConnected()));
-        connect(sshSocket_,SIGNAL(error(QSsh::SshError)),SLOT(slotSshConnectError(QSsh::SshError)));
+        connect(sshSocket_, SIGNAL(connected()), SLOT(slotConnected()));
+        connect(sshSocket_, SIGNAL(error(QSsh::SshError)), SLOT(slotSshConnectError(const QSsh::SshError&)));
     }
     sshSocket_->connectToHost();
-    qCritical()<<"SshClient::slotCreateConnection() 以ssh方式 尝试连接:"<<IpAndPort();
+    qCritical() << "Try to connect: " << IpAndPort();
 }
 
 void SshClient::slotConnected()
 {
-    qCritical()<<"SshClient::slotConnected ssh已连接到:"<<IpAndPort();
+    qCritical() << "Ssh connected: " << IpAndPort();
     timer_->stop();
 
     shell_ = sshSocket_->createRemoteShell();
@@ -151,57 +149,55 @@ void SshClient::slotThreadFinished()
     this->deleteLater();
 }
 
-void SshClient::slotSshConnectError(QSsh::SshError sshError)
+void SshClient::slotSshConnectError(const QSsh::SshError &sshError)
 {
-    sendAble_ = false;
+    shellConnected_ = false;
     connected_ = false;
     emit sigConnectStateChanged(connected_, ip_, port_);
-
     timer_->start();
 
     switch(sshError){
     case QSsh::SshNoError:
-        qCritical()<<"slotSshConnectError SshNoError"<<IpAndPort();
+        qCritical() << "SshNoError: " << IpAndPort();
         break;
     case QSsh::SshSocketError:
-        qCritical()<<"slotSshConnectError SshSocketError"<<IpAndPort(); //拔掉网线是这种错误
+        qCritical() << "SshSocketError: " << IpAndPort();  // If cable detached.
         break;
     case QSsh::SshTimeoutError:
-        qCritical()<<"slotSshConnectError SshTimeoutError"<<IpAndPort();
+        qCritical() << "SshTimeoutError: " << IpAndPort();
         break;
     case QSsh::SshProtocolError:
-        qCritical()<<"slotSshConnectError SshProtocolError"<<IpAndPort();
+        qCritical() << "SshProtocolError: " << IpAndPort();
         break;
     case QSsh::SshHostKeyError:
-        qCritical()<<"slotSshConnectError SshHostKeyError"<<IpAndPort();
+        qCritical() << "SshHostKeyError: " << IpAndPort();
         break;
     case QSsh::SshKeyFileError:
-        qCritical()<<"slotSshConnectError SshKeyFileError"<<IpAndPort();
+        qCritical() << "SshKeyFileError: " << IpAndPort();
         break;
     case QSsh::SshAuthenticationError:
-        qCritical()<<"slotSshConnectError SshAuthenticationError"<<IpAndPort();
+        qCritical() << "SshAuthenticationError: " << IpAndPort();
         break;
     case QSsh::SshClosedByServerError:
-        qCritical()<<"slotSshConnectError SshClosedByServerError"<<IpAndPort();
+        qCritical() << "SshClosedByServerError: " << IpAndPort();
         break;
     case QSsh::SshInternalError:
-        qCritical()<<"slotSshConnectError SshInternalError"<<IpAndPort();
+        qCritical() << "SshInternalError: " << IpAndPort();
         break;
     default:
         break;
     }
-
 }
 
 void SshClient::slotShellStart()
 {
-    sendAble_ = true;
-    qCritical()<<"SshClient::slotShellStart Shell已连接:"<<IpAndPort();
+    shellConnected_ = true;
+    qCritical() << "Shell connected: " << IpAndPort();
 }
 
 void SshClient::slotShellError()
 {
-    qCritical()<<"SshClient::slotShellError Shell发生错误:"<<IpAndPort();
+    qCritical() << "Shell error happpended: " << IpAndPort();
 }
 
 void SshClient::slotSend(const QString &message)

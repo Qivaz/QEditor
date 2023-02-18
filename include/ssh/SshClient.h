@@ -50,7 +50,7 @@ private:
     QString IpAndPort(){return ip_ + ":" + QString::number(port_);}
 
 public slots:
-    void slotResetConnection(QString strIpPort);
+    void slotResetConnection(const QString &ipPort);
     void slotSend(const QString &message);
     void slotDisconnected();
     void slotDataReceived();
@@ -62,14 +62,14 @@ private slots:
 
     void slotThreadFinished();
 
-    void slotSshConnectError(QSsh::SshError sshError);
+    void slotSshConnectError(const QSsh::SshError &sshError);
     void slotShellStart();
     void slotShellError();
 
 private:
     QThread *thread_{nullptr};
     bool connected_{false};
-    bool sendAble_{false};
+    bool shellConnected_{false};
 
     QTimer *timer_{nullptr};
 

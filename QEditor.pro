@@ -6,8 +6,6 @@ requires(qtConfig(filedialog))
 
 RC_ICONS = QEditorIcon.ico
 
-include($$PWD/third_party/qssh/qssh.pri)
-
 HEADERS       = \
     include/common/Constants.h \
     include/common/Logger.h \
@@ -108,6 +106,8 @@ INCLUDEPATH += \
     ./include/parser/ \
     ./include/ssh/ \
     ./include/view/ \
+
+include($$PWD/third_party/QSsh/QSsh.pri)
 
 VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"

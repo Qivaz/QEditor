@@ -254,7 +254,7 @@ void TabView::HandleTabCloseRequested(int index)
 {
     auto currentEditView = GetEditView(index);
     if (currentEditView == nullptr) {
-        removeTab(index);
+        DeleteWidget(index);
         return;
     }
     qDebug() << "index: " << index << ", should save: " << currentEditView->ShouldSave()
@@ -318,7 +318,7 @@ bool TabView::TabCloseMaybeSave()
 {
     auto currentEditView = CurrentEditView();
     if (currentEditView == nullptr) {
-        removeTab(indexOf(currentWidget()));
+        DeleteWidget(currentWidget());
         return true;
     }
     return TabCloseMaybeSaveInner(currentEditView);
@@ -329,7 +329,7 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
     if (editView->filePath().isEmpty()) {  // New file.
         if (editView->document()->isEmpty()) {
             // Close tab.
-            removeTab(indexOf(editView));
+            DeleteWidget(editView);
             if (editView->newFileNum() != 0) {
                 NewFileNum::SetNumber(editView->newFileNum(), false);
             }
@@ -343,7 +343,7 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
         if (res == QMessageBox::Discard ||
             (res == QMessageBox::Save && editView->SaveAs())) {
             // Close tab.
-            removeTab(indexOf(editView));
+            DeleteWidget(editView);
             if (editView->newFileNum() != 0) {
                 NewFileNum::SetNumber(editView->newFileNum(), false);
             }
@@ -352,7 +352,7 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
         if (editView->MaybeSave()) {
             // Close tab.
             openFiles().remove(editView->filePath());
-            removeTab(indexOf(editView));
+            DeleteWidget(editView);
         }
     }
     return false;
@@ -364,12 +364,12 @@ bool TabView::TabForceClose()
     auto currentEditView = CurrentEditView();
     if (currentEditView != nullptr) {
         openFiles().remove(currentEditView->filePath());  // Just force remove.
-        removeTab(indexOf(currentEditView));
+        DeleteWidget(currentEditView);
         if (currentEditView->newFileNum() != 0) {
             NewFileNum::SetNumber(currentEditView->newFileNum(), false);
         }
     } else {
-        removeTab(indexOf(currentWidget()));
+        DeleteWidget(currentWidget());
     }
     return true;
 }
@@ -472,6 +472,25 @@ bool TabView::AutoLoad()
         setCurrentIndex(fileRecorder.GetPos());
     }
     return loaded;
+}
+
+void TabView::DeleteWidget(int index)
+{
+    QWidget *widget = this->widget(index);
+    if (widget == nullptr) {
+        qFatal("The widget should not be null");
+    }
+    removeTab(index);
+    delete widget;
+}
+
+void TabView::DeleteWidget(QWidget *widget)
+{
+    if (widget == nullptr) {
+        qFatal("The widget should not be null");
+    }
+    removeTab(indexOf(widget));
+    delete widget;
 }
 
 void TabView::NewFile()

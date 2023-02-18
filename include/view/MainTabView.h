@@ -51,6 +51,9 @@ public:
     void AutoStore();
     bool AutoLoad();
 
+    void DeleteWidget(int index);
+    void DeleteWidget(QWidget *widget);
+
     EditView *CurrentEditView()
     {
         // The tab widget is definitely a EditView.
@@ -130,7 +133,7 @@ public:
         }
     }
 
-    const QString &formerDiffStr() { return formerDiffStr_; }
+    const QString &formerDiffStr() const { return formerDiffStr_; }
     void setFormerDiffStr(const QString &formerDiffStr) { formerDiffStr_ = formerDiffStr; }
 
 protected:
@@ -149,7 +152,7 @@ private:
     EditView *diffFormerEditView_{nullptr};
     Diff diff_;
 
-    QString formerDiffStr_;
+    QString formerDiffStr_{""};
 };
 }  // namespace QEditor
 

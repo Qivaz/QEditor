@@ -18,16 +18,50 @@
 #define TERMINALVIEW_H
 
 #include "EditView.h"
+#include "SshClient.h"
 
 namespace QEditor {
 class TerminalView : public EditView
 {
     Q_OBJECT
 public:
-    TerminalView(QWidget *parent = nullptr);
-    TerminalView(const QString &fileName, QWidget *parent = nullptr);
-    TerminalView(const QFileInfo &fileInfo, QWidget *parent = nullptr);
-    ~TerminalView() {}
+    TerminalView(const QString &ip, int port, const QString &user, const QString &pwd, QWidget *parent = nullptr);
+    ~TerminalView() {
+        qCritical();
+        if (sshClient_ != nullptr) {
+            delete sshClient_;
+        }
+    }
+
+    SshClient *sshClient() const { return sshClient_; }
+    void setSshClient(SshClient *sshClient) { sshClient_ = sshClient; }
+
+    void CreateConnection();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
+private slots:
+    void ConnectStateChanged(bool state, const QString &ip, int port);
+    void DataArrived(const QString &msg, const QString &ip, int port);
+
+private:
+    // SSH Terminal.
+    SshClient *sshClient_{nullptr};
+
+    QString ip_;
+    int port_;
+    QString user_;
+    QString pwd_;
+
+    QString cmdBuffer_;
+
+    bool connectState_{false};
 };
 }  // namespace QEditor
 

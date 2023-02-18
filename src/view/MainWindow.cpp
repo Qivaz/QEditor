@@ -24,12 +24,14 @@
 
 #include "ExplorerTreeView.h"
 #include "ComboView.h"
+#include "OpenTerminalDialog.h"
 #include "RecentFiles.h"
 #include "SearchDialog.h"
 #include "SearchResultList.h"
 #include "Settings.h"
 #include "Toast.h"
 #include "win/WinTheme.h"
+
 #include "Logger.h"
 
 namespace QEditor {
@@ -973,6 +975,21 @@ void MainWindow::CreateActions()
     connect(showHierarchyAct, &QAction::triggered, this, &MainWindow::SwitchHierarchyWindowVisible);
     viewMenu->addAction(showHierarchyAct);
     viewToolBar2->addAction(showHierarchyAct);
+
+    // Terminal menu.
+    QMenu *terminalMenu = menuBar()->addMenu(tr("&Terminal"));
+    QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
+    terminalToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/zoom-in.svg"));
+    QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
+    openSshAct->setStatusTip(tr("Open SSH"));
+    connect(openSshAct, &QAction::triggered, this, [this]() {
+        (new OpenTerminalDialog(this))->show();
+        return true;
+    });
+    terminalMenu->addAction(openSshAct);
+    terminalToolBar->addAction(openSshAct);
 
     // Help menu.
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));

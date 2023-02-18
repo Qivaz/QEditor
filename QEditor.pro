@@ -6,6 +6,8 @@ requires(qtConfig(filedialog))
 
 RC_ICONS = QEditorIcon.ico
 
+include($$PWD/third_party/qssh/qssh.pri)
+
 HEADERS       = \
     include/common/Constants.h \
     include/common/Logger.h \
@@ -30,15 +32,17 @@ HEADERS       = \
     include/hierarchy/NodeItem.h \
     include/parser/IParser.h \
     include/parser/IrParser.h \
+    include/ssh/SshClient.h \
     include/view/ComboView.h \
+    include/view/DiffView.h \
     include/view/DockView.h \
     include/view/EditView.h \
     include/view/ExplorerTreeView.h \
     include/view/GotoLineDialog.h \
     include/view/MainTabView.h \
     include/view/MainWindow.h \
+    include/view/OpenTerminalDialog.h \
     include/view/OutlineList.h \
-    include/view/DiffView.h \
     include/view/SearchDialog.h \
     include/view/SearchResultItem.h \
     include/view/SearchResultList.h \
@@ -66,15 +70,17 @@ SOURCES       = \
     src/hierarchy/HierarchyScene.cpp \
     src/hierarchy/NodeItem.cpp \
     src/parser/IrParser.cpp \
+    src/ssh/SshClient.cpp \
     src/view/ComboView.cpp \
+    src/view/DiffView.cpp \
     src/view/DockView.cpp \
     src/view/EditView.cpp \
     src/view/ExplorerTreeView.cpp \
     src/view/GotoLineDialog.cpp \
     src/view/MainTabView.cpp \
     src/view/MainWindow.cpp \
+    src/view/OpenTerminalDialog.cpp \
     src/view/OutlineList.cpp \
-    src/view/DiffView.cpp \
     src/view/SearchDialog.cpp \
     src/view/SearchResultItem.cpp \
     src/view/SearchResultList.cpp \
@@ -86,17 +92,19 @@ RESOURCES = QEditor.qrc
 
 FORMS += \
     form/GotoLineDialog.ui \
+    form/OpenTerminalDialog.ui \
     form/SearchDialog.ui
 
 INCLUDEPATH += \
     ./include/ \
     ./include/common/ \
+    ./include/diff/ \
+    ./include/diff/diff_match_patch/ \
     ./include/file/ \
     ./include/hierarchy/ \
     ./include/parser/ \
+    ./include/ssh/ \
     ./include/view/ \
-    ./include/diff/ \
-    ./include/diff/diff_match_patch/ \
 
 VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"

@@ -85,7 +85,7 @@ public:
     EditView(QWidget *parent = nullptr);
     EditView(const QString &fileName, QWidget *parent = nullptr);
     EditView(const QFileInfo &fileInfo, QWidget *parent = nullptr);
-    ~EditView() {}
+    ~EditView() = default;
 
     void Init();
 

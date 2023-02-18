@@ -15,11 +15,11 @@
  */
 
 #include "SearchDialog.h"
-
 #include "ui_SearchDialog.h"
 
 #include <QScrollBar>
 #include <QTextBlock>
+
 #include "MainWindow.h"
 #include "Settings.h"
 #include "Logger.h"

@@ -51,7 +51,6 @@ HEADERS       = \
     include/view/Toast.h \
     include/win/WinTheme.h \
     ansiescapecodehandler.h \
-#    inet.h
 
 SOURCES       = \
     src/Entry.cpp \
@@ -90,7 +89,6 @@ SOURCES       = \
     src/view/TextHighlighter.cpp \
     src/view/Toast.cpp \
     ansiescapecodehandler.cpp \
-#    inet.cpp
 
 RESOURCES = QEditor.qrc
 
@@ -110,8 +108,6 @@ INCLUDEPATH += \
     ./include/parser/ \
     ./include/ssh/ \
     ./include/view/ \
-
-#LIBS += -lws2_32.lib
 
 VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"

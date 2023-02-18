@@ -51,9 +51,7 @@ private:
 
 public slots:
     void slotResetConnection(QString strIpPort);
-    void slotSend(QString strIpPort,QString strMessage);
-    void slotSend(const QString &strMsg);
-    void slotSendByQByteArray(QString strIpPort,QByteArray arrMsg);
+    void slotSend(const QString &message);
     void slotDisconnected();
     void slotDataReceived();
 

@@ -87,28 +87,6 @@ void SshClient::slotResetConnection(QString strIpPort)
     }
 }
 
-void SshClient::slotSend(QString strIpPort, QString strMessage)
-{
-    if(0 != ipPort_.compare(strIpPort)){
-        return;
-    }
-
-    Send(strMessage);
-}
-
-void SshClient::slotSendByQByteArray(QString strIpPort, QByteArray arrMsg)
-{
-    if(0 != ipPort_.compare(strIpPort)){
-        return;
-    }
-
-    if(connected_){
-       shell_->write(arrMsg);
-    }else{
-       qCritical()<<"SshClient::send(QString strMessage) 发送失败 未建立连接:"<<IpAndPort();
-    }
-}
-
 void SshClient::slotInitForClild()
 {
     parameters_.port = port_;
@@ -226,25 +204,20 @@ void SshClient::slotShellError()
     qCritical()<<"SshClient::slotShellError Shell发生错误:"<<IpAndPort();
 }
 
-void SshClient::slotSend(const QString &strMessage)
+void SshClient::slotSend(const QString &message)
 {
-    Send(strMessage);
+    Send(message);
 }
 
 void SshClient::slotDataReceived()
 {
     qCritical();
-    QByteArray byteRecv = shell_->readAllStandardOutput();
-    QString strRecv = QString::fromUtf8(byteRecv);
-
-//    if(strRecv.contains("password for")){
-//        m_shell->write(m_strPwd.toLatin1().data());
-//    }
-
-    if(strRecv.isEmpty()) {
+    QByteArray recvByteArray = shell_->readAllStandardOutput();
+    QString recv = QString::fromUtf8(recvByteArray);
+    if(recv.isEmpty()) {
         return;
     }
-    qCritical() << "Receive: " << strRecv;
-    emit sigDataArrived(strRecv, ip_, port_);
+    qCritical() << "Receive: " << recv;
+    emit sigDataArrived(recv, ip_, port_);
 }
 }  // namespace QEditor

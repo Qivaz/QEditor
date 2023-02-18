@@ -136,12 +136,12 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
             if (event->key() == Qt::Key_Tab) {
                 QTextCursor startCursor = textCursor();
                 startCursor.setPosition(QTextCursor::End, QTextCursor::MoveAnchor);
-                for (int i = 0; i < cmdBuffer_.length(); ++i) {
+                for (int i = 0; i < cmdBuffer_.length() + ; ++i) {
                     bool res = startCursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
                     if (!res) {
                         break;
                     }
-                }
+                } this->update()
                 startCursor.deleteChar();
             }
 

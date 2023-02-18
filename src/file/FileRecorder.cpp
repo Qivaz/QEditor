@@ -18,7 +18,10 @@
 
 #include <QDir>
 #include <QFile>
+
+#include "TerminalView.h"
 #include "Utils.h"
+
 #include "Logger.h"
 
 namespace QEditor {
@@ -40,13 +43,19 @@ void FileRecorder::StoreFiles()
     fileList.pos_ = pos_;
     for (int i = 0; i < editViews_.size(); ++i) {
         auto const &editView = editViews_[i];
-        int pos = i;
-        // Open file edit, not change, or empty new file edit.
-        if (!editView->ShouldSave()) {
-            pos = -1;
+        auto terminalView = qobject_cast<TerminalView*>(editView);
+        if (terminalView == nullptr) {
+            int pos = i;
+            // Open file edit, not change, or empty new file edit.
+            if (!editView->ShouldSave()) {
+                pos = -1;
+            }
+            FileInfo fileInfo(pos, editView->newFileNum(), editView->filePath());
+            fileList.fileInfos_.push_back(fileInfo);
+        } else {
+            FileInfo fileInfo(terminalView->ip(), terminalView->port(), terminalView->user(), terminalView->pwd());
+            fileList.fileInfos_.push_back(fileInfo);
         }
-        FileInfo fileInfo(pos, editView->newFileNum(), editView->filePath());
-        fileList.fileInfos_.push_back(fileInfo);
     }
     filesInfoStream << fileList;
 
@@ -89,7 +98,7 @@ void FileRecorder::LoadFiles()
     filesInfoStream >> fileList;
     pos_ = fileList.pos_;
     for (int i = 0; i < fileList.fileInfos_.size(); ++i) {
-        qDebug() << i << "-> pos_: " << fileList.fileInfos_[i].pos_;
+        qDebug() << i << "-> pos_: " << fileList.fileInfos_[i].index_;
         loadedFileInfos_.emplace_back(fileList.fileInfos_[i]);
     }
 
@@ -97,14 +106,18 @@ void FileRecorder::LoadFiles()
     qDebug() << ", loadedFileInfos_.size: " << loadedFileInfos_.size();
     for (size_t i = 0; i < loadedFileInfos_.size(); ++i) {
         auto const &fileInfo = loadedFileInfos_[i];
+        // Terminal view.
+        if (!fileInfo.IsTerminal()) {
+            continue;
+        }
         // Open file edit, not change, or empty new file edit.
-        if (fileInfo.pos_ == -1) {
+        if (fileInfo.IsNewFileOrOriginalOpenFile()) {
             texts_.emplace_back(QString(""));
             mibEnums_.emplace_back(106);  // UTF-8 in default.
             continue;
         }
         // New file edit, or open file edit, has change.
-        QFile fileDataFile(autoSavePath + QString::number(fileInfo.pos_));
+        QFile fileDataFile(autoSavePath + QString::number(fileInfo.index_));
         if (!fileDataFile.exists()) {
             qDebug() << ", not exists, " << fileDataFile.fileName();
             return;

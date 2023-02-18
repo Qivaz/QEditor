@@ -49,7 +49,9 @@ HEADERS       = \
     include/view/TerminalView.h \
     include/view/TextHighlighter.h \
     include/view/Toast.h \
-    include/win/WinTheme.h
+    include/win/WinTheme.h \
+    ansiescapecodehandler.h \
+#    inet.h
 
 SOURCES       = \
     src/Entry.cpp \
@@ -86,7 +88,9 @@ SOURCES       = \
     src/view/SearchResultList.cpp \
     src/view/TerminalView.cpp \
     src/view/TextHighlighter.cpp \
-    src/view/Toast.cpp
+    src/view/Toast.cpp \
+    ansiescapecodehandler.cpp \
+#    inet.cpp
 
 RESOURCES = QEditor.qrc
 
@@ -96,6 +100,7 @@ FORMS += \
     form/SearchDialog.ui
 
 INCLUDEPATH += \
+    ./ \
     ./include/ \
     ./include/common/ \
     ./include/diff/ \
@@ -105,6 +110,8 @@ INCLUDEPATH += \
     ./include/parser/ \
     ./include/ssh/ \
     ./include/view/ \
+
+#LIBS += -lws2_32.lib
 
 VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"

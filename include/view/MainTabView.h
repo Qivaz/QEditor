@@ -22,6 +22,7 @@
 #include <QAction>
 
 #include "EditView.h"
+#include "TerminalView.h"
 #include "Diff.h"
 #include "DiffView.h"
 
@@ -106,6 +107,7 @@ public:
     bool LoadFile(EditView *editView, const QString &filePath);
     bool LoadFile(EditView *editView, const QString &filePath,
                   FileEncoding &&fileEncoding, bool forceUseFileEncoding = false);
+    void OpenSsh(const QString &ip, int port, const QString &user, const QString &pwd);
 
     void ChangeTabDescription(const QFileInfo &fileInfo, int index = -1);
     void ApplyWrapTextState(int index);

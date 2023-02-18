@@ -38,6 +38,14 @@ public:
 
     void CreateConnection();
 
+    QString ip() const;
+
+    int port() const;
+
+    QString user() const;
+
+    QString pwd() const;
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -50,6 +58,10 @@ private slots:
     void ConnectStateChanged(bool state, const QString &ip, int port);
     void DataArrived(const QString &msg, const QString &ip, int port);
 
+signals:
+    void sigSend(const QString &msg);
+    void sigDisconnected();
+
 private:
     // SSH Terminal.
     SshClient *sshClient_{nullptr};
@@ -60,6 +72,8 @@ private:
     QString pwd_;
 
     QString cmdBuffer_;
+    QString sendingCmd_;
+    bool sending_{false};
 
     bool connectState_{false};
 };

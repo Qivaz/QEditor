@@ -82,7 +82,7 @@ TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu())
     connect(tabBar(), &QTabBar::tabBarClicked, this, &TabView::HandleTabBarClicked);
     connect(this, &QTabWidget::tabCloseRequested, this, &TabView::HandleTabCloseRequested);
 
-//    setFont(QFont("Consolas", 14));
+    setFont(QFont("Consolas", 10));
 }
 
 void TabView::ChangeTabCloseButtonToolTip(int index, const QString &tip)
@@ -404,6 +404,10 @@ bool TabView::AutoLoad()
         EditView *editView;
         bool modified = false;
         auto fileInfo = fileRecorder.GetFileInfo(i);
+        if (fileInfo.IsTerminal()) {  // Terminal view.
+            OpenSsh(fileInfo.ip_, fileInfo.port_, fileInfo.user_, fileInfo.pwd_);
+            continue;
+        }
         if (fileInfo.IsNewFile()) {  // New file.
             fileName = QString("new ") + QString::number(fileInfo.num_);
             filePathTip = fileName;
@@ -690,6 +694,16 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
     return true;
 }
 
+void TabView::OpenSsh(const QString &ip, int port, const QString &user, const QString &pwd)
+{
+    auto terminalView = new TerminalView(ip, port, user, pwd, this);
+    addTab(terminalView, terminalView->fileName());
+    setCurrentIndex(count() - 1);
+    setTabToolTip(count() - 1, terminalView->fileName());
+    setTabIcon(count() - 1, QIcon::fromTheme("terminal-open", QIcon(":/images/terminal.svg")));
+    terminalView->setFocus();
+}
+
 void TabView::ChangeTabDescription(const QFileInfo &fileInfo, int index)
 {
     if (index == -1) {
@@ -729,11 +743,14 @@ void TabView::tabInserted(int index)
 //    GetEditView(index)->TrigerParser();
 
 //    ApplyWrapTextState(index);  // TODO: Cause transparent window...
+
+    AutoStore();
 }
 
 void TabView::tabRemoved(int index)
 {
     // Should notice that 'index' is the position of previous tab closed.
+    AutoStore();
 }
 
 void TabView::mouseDoubleClickEvent(QMouseEvent *event) {

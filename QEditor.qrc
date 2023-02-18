@@ -42,5 +42,6 @@
         <file>images/QEditorIcon.webp</file>
         <file>images/sitemap.svg</file>
         <file>images/diff.svg</file>
+        <file>images/terminal.svg</file>
     </qresource>
 </RCC>

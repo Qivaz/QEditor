@@ -981,7 +981,7 @@ void MainWindow::CreateActions()
     QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
     terminalToolBar->setStyleSheet(toolBarStyle);
 
-    const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/zoom-in.svg"));
+    const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/terminal.svg"));
     QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
     openSshAct->setStatusTip(tr("Open SSH"));
     connect(openSshAct, &QAction::triggered, this, [this]() {

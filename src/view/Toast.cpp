@@ -40,11 +40,11 @@ void Toast::Show(Toast::Level level, const QString &text)
     if (timerId_ != 0) {
         killTimer(timerId_);
     }
-    int interval = 2000;
+    int interval = 1000;
     if (level == kWarning) {
-        interval = 3000;
+        interval = 1000;
     } else if (level == kError) {
-        interval = 5000;
+        interval = 1500;
     }
     timerId_ = startTimer(interval);
 }

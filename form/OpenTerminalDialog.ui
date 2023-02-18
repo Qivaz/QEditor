@@ -29,25 +29,6 @@
     <string>IP Address:</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBoxIp">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>30</y>
-     <width>171</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="currentText">
-    <string/>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-  </widget>
   <widget class="QLabel" name="labelPort">
    <property name="geometry">
     <rect>
@@ -70,6 +51,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid gray;</string>
+   </property>
    <property name="text">
     <string>22</string>
    </property>
@@ -88,19 +72,6 @@
    </property>
    <property name="text">
     <string>User Name:</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBoxUser">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>120</y>
-     <width>171</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="currentText">
-    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="labelPwd">
@@ -125,6 +96,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid gray;</string>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -144,6 +118,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+   </property>
    <property name="text">
     <string>Connect</string>
    </property>
@@ -157,11 +134,60 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{border: 1px solid gray;border-radius:5px;} QPushButton:hover{ border-color: lightgray; background-color: rgb(54, 54, 54);} QPushButton:pressed{ background-color: rgb(28, 28, 28); }</string>
+   </property>
    <property name="text">
     <string>Cancel</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="lineEditIp">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>30</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid gray;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="placeholderText">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditUser">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>120</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid gray;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="placeholderText">
+    <string/>
+   </property>
+  </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEditIp</tabstop>
+  <tabstop>lineEditPort</tabstop>
+  <tabstop>lineEditUser</tabstop>
+  <tabstop>lineEditPwd</tabstop>
+  <tabstop>pushButtonConnect</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

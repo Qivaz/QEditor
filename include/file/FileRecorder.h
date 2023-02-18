@@ -35,51 +35,82 @@ public:
     public:
         FileInfo() = default;
         FileInfo(int pos, int num, const QString &path)
-            : pos_(pos), num_(num), path_(std::move(path)) {}
+            : index_(pos), num_(num), path_(path), ip_(""), port_(-1), user_(""), pwd_("") {}
+
+        FileInfo(const QString &ip, int port, const QString &user, const QString &pwd)
+            : index_(-1), num_(0), path_(""), ip_(ip), port_(port), user_(user), pwd_(pwd) {}
 
         // Store data.
         friend QDataStream &operator<<(QDataStream &stream, const FileInfo &data)
         {
-            stream << data.pos_;
+            // New file or open file.
+            stream << data.index_;
             stream << data.num_;
             stream << data.path_;
+
+            // Terminal session.
+            stream << data.ip_;
+            stream << data.port_;
+            stream << data.user_;
+            stream << data.pwd_;
             return stream;
         }
         // Load into data.
         friend QDataStream &operator>>(QDataStream &stream, FileInfo &data)
         {
-            stream >> data.pos_;
+            // New file or open file.
+            stream >> data.index_;
             stream >> data.num_;
             stream >> data.path_;
+
+            // Terminal session.
+            stream >> data.ip_;
+            stream >> data.port_;
+            stream >> data.user_;
+            stream >> data.pwd_;
             return stream;
         }
 
         ///////////////////////////////////////////
-        int pos_;               // Previous tab index, used as file name for storing data.
+        /// New file or open file.
+        int index_;             // Used as file name for storing data.
                                 // -1 if no need to store or load. Such as: Open file edit but not change, or empty new file edit.
-
         int num_;               // New file edit, "* new xxx".
-
         QString path_;          // Open file edit.
                                 // Empty if new file.
+
+        /// Terminal session.
+        QString ip_;            // Terminal SSH IP
+        int port_;              // Terminal SSH port, -1 means new file or open file, otherwise terminal data.
+        QString user_;          // Terminal SSH user name
+        QString pwd_;           // Terminal SSH password
         ///////////////////////////////////////////
 
-        bool IsNewFile()
+        bool IsTerminal() const
+        {
+            return port_ != -1;
+        }
+
+        bool IsNewFile() const
         {
             // Notice that, pos_ == -1 maybe empty new file, should not be used as new file checking.
             return path_.isEmpty();
         }
-        bool IsOpenFile()
+        bool IsOpenFile() const
         {
             return !path_.isEmpty();
         }
-        bool IsChangedOpenFile()
+        bool IsChangedOpenFile() const
         {
-            return !path_.isEmpty() && pos_ != -1;
+            return !path_.isEmpty() && index_ != -1;
         }
-        bool IsOriginalOpenFile()
+        bool IsOriginalOpenFile() const
         {
-            return !path_.isEmpty() && pos_ == -1;
+            return !path_.isEmpty() && index_ == -1;
+        }
+        bool IsNewFileOrOriginalOpenFile() const
+        {
+            return index_ == -1;
         }
     };
 

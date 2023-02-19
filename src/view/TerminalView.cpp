@@ -49,6 +49,29 @@ void TerminalView::CreateConnection()
     connect(this, SIGNAL(sigDisconnected()), sshClient_, SLOT(slotDisconnected()));
 }
 
+void TerminalView::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << "event: " << event;
+    EditView::mousePressEvent(event);
+}
+
+void TerminalView::mouseMoveEvent(QMouseEvent *event)
+{
+    qDebug() << "event: " << event;
+    EditView::mouseMoveEvent(event);
+}
+
+void TerminalView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    qDebug() << "event: " << event;
+    EditView::mouseDoubleClickEvent(event);
+}
+
+void TerminalView::contextMenuEvent(QContextMenuEvent *event)
+{
+    EditView::contextMenuEvent(event);
+}
+
 void TerminalView::keyPressEvent(QKeyEvent *event)
 {
     qCritical() << "event: " << event << ", cursor: " << textCursor().position();
@@ -58,8 +81,11 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
                 QTextCursor cursor = textCursor();
                 // document()->characterCount() contains \n and EOF.
                 auto offset = document()->characterCount() - 1 - cursor.position();
-                cmdBuffer_.remove(cmdBuffer_.length() - offset - 1, 1);
-                cursor.deletePreviousChar();
+                auto pos = cmdBuffer_.length() - offset - 1;
+                if (pos >= 0) {
+                    cmdBuffer_.remove(pos, 1);
+                    cursor.deletePreviousChar();
+                }
             }
             return;
         case Qt::Key_Delete:
@@ -83,71 +109,82 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
             setTextCursor(cursor);
             return;
         }
-        case Qt::Key_Up: {
-            QTextCursor cursor = textCursor();
-            cursor.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
-            setTextCursor(cursor);
-            return;
-        }
-        case Qt::Key_Down: {
-            QTextCursor cursor = textCursor();
-            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
-            setTextCursor(cursor);
-            return;
-        }
+//        case Qt::Key_Up: {
+//            QTextCursor cursor = textCursor();
+//            cursor.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+//            setTextCursor(cursor);
+//            return;
+//        }
+//        case Qt::Key_Down: {
+//            QTextCursor cursor = textCursor();
+//            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+//            setTextCursor(cursor);
+//            return;
+//        }
     }
 
-    if (!event->text().isEmpty()) {
-        if (event->key() == Qt::Key_Return) {
+    if (event->key() == Qt::Key_Return) {
+        moveCursor(QTextCursor::End);
+        insertPlainText(event->text());
+        cmdBuffer_.append(event->text())/*.append('\n')*/;
+    } else if (event->key() == Qt::Key_Tab) {
+        cmdBuffer_.append(event->text());
+    } else if (event->key() == Qt::Key_Up) {
+        cmdBuffer_.append(tr("\u0010"));
+    } else if (event->key() == Qt::Key_Down) {
+        cmdBuffer_.append(tr("\u000E"));
+    } else if (event->text() == "\u0003" || event->text() == "\u0004") {  // Ctrl+C("\u0003") or Ctrl+D("\u0004")
+        cmdBuffer_.clear();
+        cmdBuffer_.append(event->text());
+    } else if (!event->text().isEmpty()) {
+        int pos = -1;
+        // document()->characterCount() contains \n and EOF.
+        // Backward offset must >= 0.
+        auto offset = document()->characterCount() - 1 - textCursor().position();
+        qCritical() << "cmd: " << cmdBuffer_ << cmdBuffer_.length() << ", offset: " << offset << ", position: " << textCursor().position() << ", char: " << event->text();
+        if (offset > cmdBuffer_.length()) {
+            // It the cursor is not in command input area, move cursor to end and append input char to inputed cmd's tail.
             moveCursor(QTextCursor::End);
-            insertPlainText(event->text());
-        } else if (event->text() == "\u0003" || event->text() == "\u0004") {  // Ctrl+C("\u0003") or Ctrl+D("\u0004")
-            cmdBuffer_.clear();
-            cmdBuffer_.append(event->text());
-//        } else if (!std::isalnum(event->text().front().toLatin1())) {  // Not chars.
-//            cmdBuffer_.append(event->text());
+            pos = cmdBuffer_.length();
+            Toast::Instance().Show(Toast::kInfo, QString("Append \'%1\' in command line tail.").arg(event->text()));
         } else {
-            int pos = -1;
-            // document()->characterCount() contains \n and EOF.
-            // Backward offset must >= 0.
-            auto offset = document()->characterCount() - 1 - textCursor().position();
-            qCritical() << "cmd: " << cmdBuffer_ << cmdBuffer_.length() << ", offset: " << offset << ", position: " << textCursor().position() << ", char: " << event->text();
-            if (offset > cmdBuffer_.length()) {
-                // It the cursor is not in command input area, move cursor to end and append input char to inputed cmd's tail.
-                moveCursor(QTextCursor::End);
-                pos = cmdBuffer_.length();
-                Toast::Instance().Show(Toast::kInfo, QString("Append \'%1\' in command line tail.").arg(event->text()));
-            } else {
-                pos = cmdBuffer_.length() - offset;
-            }
-            cmdBuffer_.insert(pos, event->text());
-            qCritical() << "cmd: " << cmdBuffer_ << ", pos: " << pos << ", char: " << event->text();
-
-            insertPlainText(event->text());
+            pos = cmdBuffer_.length() - offset;
         }
+        cmdBuffer_.insert(pos, event->text());
+        qCritical() << "cmd: " << cmdBuffer_ << ", pos: " << pos << ", char: " << event->text();
+
+        insertPlainText(event->text());
+    } else {
+        // Error.
     }
+
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Tab ||
+        event->key() == Qt::Key_Up || event->key() == Qt::Key_Down ||
         event->text() == "\u0003" || event->text() == "\u0004") {  // Enter, Tab, Ctrl+C("\u0003") or Ctrl+D("\u0004")
         if(sshClient_->connected()){
             // If cmdBuffer_ is empty, we send it for 'Key_Return';
             sendingCmd_ = cmdBuffer_;
-            qDebug() << "cmdBuffer_: " << cmdBuffer_;
+            qCritical() << "cmdBuffer_: " << cmdBuffer_;
             sending_ = true;
 
-            if (event->key() == Qt::Key_Tab) {
-                QTextCursor startCursor = textCursor();
-                startCursor.setPosition(QTextCursor::End, QTextCursor::MoveAnchor);
-                for (int i = 0; i < cmdBuffer_.length(); ++i) {
-                    bool res = startCursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
-                    if (!res) {
-                        break;
-                    }
-                }
-                startCursor.deleteChar();
-            }
+//            if (event->key() == Qt::Key_Tab) {
+//                QTextCursor startCursor = textCursor();
+//                startCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+//                for (int i = 0; i < cmdBuffer_.length() - 1; ++i) {
+//                    bool res = startCursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
+//                    if (!res) {
+//                        break;
+//                    }
+//                }
+//                startCursor.deleteChar();
+
+//                emit sigSend(sendingCmd_);
+//                cmdBuffer_.clear();
+//                return;
+//            }
 
 //            sshClient_->slotSend(sendingCmd_);
-            emit sigSend(sendingCmd_ + "\n");
+            emit sigSend(sendingCmd_/* + "\n"*/);
             cmdBuffer_.clear();
         }
     }
@@ -157,29 +194,6 @@ void TerminalView::keyReleaseEvent(QKeyEvent *event)
 {
     qDebug() << "event: " << event;
 //    EditView::keyReleaseEvent(event);
-}
-
-void TerminalView::mousePressEvent(QMouseEvent *event)
-{
-    qDebug() << "event: " << event;
-    EditView::mousePressEvent(event);
-}
-
-void TerminalView::mouseMoveEvent(QMouseEvent *event)
-{
-    qDebug() << "event: " << event;
-    EditView::mouseMoveEvent(event);
-}
-
-void TerminalView::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    qDebug() << "event: " << event;
-    EditView::mouseDoubleClickEvent(event);
-}
-
-void TerminalView::contextMenuEvent(QContextMenuEvent *event)
-{
-    EditView::contextMenuEvent(event);
 }
 
 void TerminalView::ConnectStateChanged(bool state, const QString &ip, int port)
@@ -208,12 +222,34 @@ void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)
     Q_UNUSED(port)
 
     QString pureRecvMsg = msg;
-    auto cmd = sendingCmd_ + "\r\n";  // If cmd is "\r\n", the received message must be: "xxx@XXX-PC:~$ "
-    qCritical() << "msg: " << msg << ", cmd: " << cmd;
-    if (pureRecvMsg.startsWith(cmd)) {
-        pureRecvMsg = pureRecvMsg.mid(cmd.size());
+    qCritical() << "msg: " << msg << ", cmd: " << sendingCmd_;
+    for (int i = 0; i < sendingCmd_.length() && i < msg.length(); ++i) {
+        const auto &c = sendingCmd_[i];
+        if (c == msg[i]) {
+            pureRecvMsg = pureRecvMsg.mid(1);
+        }
+        if (c == '\r') {  // Send \r, received \r\n.
+            pureRecvMsg = pureRecvMsg.mid(1);
+        }
     }
     qCritical() << "pureRecvMsg: " << pureRecvMsg;
+    // Handle \b (\u0008).
+    if (pureRecvMsg.startsWith('\b')) {
+        const QString constPureRecvMsg = pureRecvMsg;
+        for (const auto &c : constPureRecvMsg) {
+            if (c == '\b') {
+                pureRecvMsg = pureRecvMsg.mid(1);
+                textCursor().deletePreviousChar();
+            } else {
+                break;
+            }
+        }
+    }
+    // Handle bell.
+    if (pureRecvMsg.startsWith('\u0007')) {
+        sendingCmd_.clear();
+        return;
+    }
     auto cursor = textCursor();
     AnsiEscapeCodeHandler handler;
     auto fts = handler.parseText(FormattedText(pureRecvMsg, currentCharFormat()));
@@ -224,6 +260,8 @@ void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)
         cursor.insertText(ft.text);
     }
     ensureCursorVisible();  // verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+
+    sendingCmd_.clear();
 }
 
 QString TerminalView::pwd() const

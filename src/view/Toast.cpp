@@ -21,6 +21,8 @@
 #include <QLabel>
 #include <QEvent>
 
+#include "MainWindow.h"
+
 namespace QEditor {
 Toast::Toast()
 {
@@ -47,6 +49,7 @@ void Toast::Show(Toast::Level level, const QString &text)
         interval = 1500;
     }
     timerId_ = startTimer(interval);
+    MainWindow::Instance().statusBar()->showMessage(text, interval);
 }
 
 void Toast::timerEvent(QTimerEvent *event)

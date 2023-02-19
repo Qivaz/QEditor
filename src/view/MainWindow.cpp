@@ -721,7 +721,7 @@ void MainWindow::CreateActions()
     // Use addPixmap() set on/off icons.
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/file.svg"));
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
-    newAct->setShortcuts(QKeySequence::New);
+//    newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, &QAction::triggered, this, &MainWindow::NewFile);
     fileMenu->addAction(newAct);

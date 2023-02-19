@@ -107,7 +107,7 @@ INCLUDEPATH += \
     ./include/ssh/ \
     ./include/view/ \
 
-include($$PWD/third_party/QSsh/QSsh.pri)
+include($$PWD/third_party/qssh/QSsh.pri)
 
 VERSION = "0.0.2"
 QMAKE_TARGET_PRODUCT = "QEditor"

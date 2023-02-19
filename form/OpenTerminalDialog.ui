@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Open SSH</string>
   </property>
   <property name="styleSheet">
    <string notr="true">color: lightGray; background-color: black; font: 11pt;</string>
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>80</y>
+     <y>70</y>
      <width>55</width>
      <height>18</height>
     </rect>

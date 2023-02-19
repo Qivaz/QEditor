@@ -17,6 +17,9 @@ OpenTerminalDialog::OpenTerminalDialog(QWidget *parent) :
     ui_(new Ui::OpenTerminalDialog)
 {
     ui_->setupUi(this);
+    if (ui_->lineEditIp->text().isEmpty()) {
+        ui_->lineEditIp->setFocus();
+    }
 }
 
 OpenTerminalDialog::~OpenTerminalDialog()

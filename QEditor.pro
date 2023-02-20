@@ -107,6 +107,9 @@ INCLUDEPATH += \
     ./include/ssh/ \
     ./include/view/ \
 
+win32:CONFIG(release, debug|release): LIBS += -lws2_32
+else:win32:CONFIG(debug, debug|release): LIBS += -lws2_32
+
 include($$PWD/third_party/qssh/QSsh.pri)
 
 VERSION = "0.0.2"

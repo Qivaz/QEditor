@@ -49,7 +49,7 @@ void Toast::Show(Toast::Level level, const QString &text)
         interval = 1500;
     }
     timerId_ = startTimer(interval);
-    MainWindow::Instance().statusBar()->showMessage(text, interval);
+    MainWindow::Instance().statusBar()->showMessage(text, 10000);
 }
 
 void Toast::timerEvent(QTimerEvent *event)

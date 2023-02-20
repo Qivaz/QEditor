@@ -238,7 +238,7 @@ void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)
         const QString constPureRecvMsg = pureRecvMsg;
         for (const auto &c : constPureRecvMsg) {
             if (c == '\b') {
-                pureRecvMsg = pureRecvMsg.mid(1);
+                pureRecvMsg.remove(0, 1);
                 textCursor().deletePreviousChar();
             } else {
                 break;
@@ -247,19 +247,22 @@ void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)
     }
     // Handle bell.
     if (pureRecvMsg.startsWith('\u0007')) {
-        sendingCmd_.clear();
-        return;
+        pureRecvMsg.remove(0, 1);
     }
-    auto cursor = textCursor();
+
+    auto savedCharFormat = currentCharFormat();
     AnsiEscapeCodeHandler handler;
     auto fts = handler.parseText(FormattedText(pureRecvMsg, currentCharFormat()));
     foreach (auto &ft, fts) {
-        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
-        setCurrentCharFormat(ft.format);
+        qCritical() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
+        auto cursor = textCursor();
         cursor.movePosition(QTextCursor::End);
-        cursor.insertText(ft.text);
+        cursor.insertText(ft.text, ft.format);
     }
-    ensureCursorVisible();  // verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    setCurrentCharFormat(savedCharFormat);
+    if (textCursor().position() == document()->characterCount() - 1) {
+        ensureCursorVisible();  // verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
 
     sendingCmd_.clear();
 }

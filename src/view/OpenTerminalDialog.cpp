@@ -2,7 +2,10 @@
 #include "ui_OpenTerminalDialog.h"
 
 #if defined (Q_OS_WIN)
-#include "inet.h"
+#include <winsock2.h>
+#include <windows.h>
+// Need link with Ws2_32.lib
+#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #endif
@@ -31,10 +34,12 @@ TabView* OpenTerminalDialog::tabView() { return MainWindow::Instance().tabView()
 
 static inline bool IsValidIpAddress(const QString &ip)
 {
-#ifdef WIN32
+#if defined (Q_OS_WIN)
+    auto res = inet_addr(ip.toStdString().c_str());
+    if (res == INADDR_ANY || res == INADDR_NONE) {
+        return false;
+    }
     return true;
-    // struct in_addr dst;
-    // return (inet_pton(AF_INET, ip.toStdString().c_str(), &dst) != 0);
 #else
     struct sockaddr_in sa;
     return (inet_pton(AF_INET, ip.toStdString().c_str(), &sa.sin_addr) != 0);

@@ -17,12 +17,26 @@
 #ifndef SEARCHRESULTLIST_H
 #define SEARCHRESULTLIST_H
 
+#include <QStyledItemDelegate>
 #include <QTreeWidget>
+
 #include "EditView.h"
 #include "MainTabView.h"
 #include "Logger.h"
 
 namespace QEditor {
+// https://stackoverflow.com/questions/1956542/how-to-make-item-view-render-rich-html-text-in-qt
+class HtmlDelegate : public QStyledItemDelegate
+{
+public:
+    HtmlDelegate() = default;
+    ~HtmlDelegate() = default;
+
+protected:
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+};
+
 class SearchResultList : public QTreeWidget
 {
 public:

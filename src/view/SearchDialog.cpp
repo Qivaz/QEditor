@@ -167,6 +167,7 @@ void SearchDialog::FindNext(const QString &text)
 void SearchDialog::on_pushButtonFindFindNext_clicked()
 {   
     auto const &target = ui_->lineEditFindFindWhat->text();
+    qCritical() << target;  // ¶
     FindNext(target);
 }
 
@@ -230,7 +231,7 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     MainWindow::Instance().ShowSearchDockView();
 
     auto sessionItem = searchResultList_->StartSearchSession(editView());
-    qCritical() << "Find all start....";
+    qDebug() << "Find all start....";
     std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     if (ui_->radioButtonFindRe->isChecked()) {
@@ -239,29 +240,29 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     } else {
         res = FindAll<QString>(target);
     }
-    qCritical() << "Find all finish....";
+    qDebug() << "Find all finish....";
     int matchCount = 0;
 
     // TODO:
     // To support display dynamic visible list items, and do fetchMore for user scrolling.
     for (const auto &item : res) {
-        qCritical() << "Display item start....";
+        qDebug() << "Display item start....";
         auto currentBlock = item.block();
         int lineNum = item.blockNumber();
-        auto highlighting_target = item.selectedText().toHtmlEscaped();
-        auto htmlTarget = QString("<font color=#BCE08C>") + highlighting_target + QString("</font>");
+        auto highlightingTarget = item.selectedText().toHtmlEscaped();
+        auto htmlTarget = QString("<font color=#BCE08C>") + highlightingTarget + QString("</font>");
         auto currentStr = currentBlock.text();
         auto escapedStr = currentStr.toHtmlEscaped();
-        escapedStr.replace(highlighting_target, htmlTarget, Qt::CaseSensitive);
-        qCritical() << "Line " << lineNum << ": highlighting_target: " << highlighting_target << ", htmlTarget: " << htmlTarget
-                   << ", currentStr: " << escapedStr;
+        escapedStr.replace(highlightingTarget, htmlTarget, Qt::CaseSensitive);
+        auto htmlEscapedStr = QString("<font color=#BEBEBE>") + escapedStr + QString("</font>");
+        qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget << ", htmlTarget: " << htmlTarget
+                 << ", currentStr: " << escapedStr;
 
-        auto text = /*QString("<html>") + */"Line " + QString::number(lineNum + 1) + ":  " + escapedStr/* + "</html>"*/;
-//        const auto &text = item.selectedText();
-        qCritical() << "Line " << lineNum << ": text: " << text;
+        auto text = QString("<font color=#BEBEBE>") + "Line " + QString::number(lineNum + 1) + ":  " + htmlEscapedStr + QString("</font>");
+        qDebug() << "Line " << lineNum << ": text: " << text;
         ++matchCount;
         searchResultList_->AddSearchResult(sessionItem, lineNum, text, item);
-        qCritical() << "Display item end....";
+        qDebug() << "Display item end....";
     }
     searchResultList_->FinishSearchSession(sessionItem, QString("(Search \"") + target + "\": " + QString::number(matchCount) + " hits)");
     ++sessionCount_;

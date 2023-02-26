@@ -23,11 +23,52 @@
 #include <QStyleFactory>
 #include <QTextEdit>
 
+#include <QApplication>
+
 #include "SearchResultItem.h"
 #include "MainTabView.h"
 #include "Logger.h"
 
 namespace QEditor {
+void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItemV4 optionV4 = option;
+    initStyleOption(&optionV4, index);
+
+    QStyle *style = optionV4.widget? optionV4.widget->style() : QApplication::style();
+
+    QTextDocument doc;
+    doc.setHtml(optionV4.text);
+
+    /// Painting item without text
+    optionV4.text = QString();
+    style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter);
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+
+    // Highlighting text if item is selected
+    if (optionV4.state & QStyle::State_Selected)
+        ctx.palette.setColor(QPalette::Text, optionV4.palette.color(QPalette::Active, QPalette::HighlightedText));
+
+    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4);
+    painter->save();
+    painter->translate(textRect.topLeft());
+    painter->setClipRect(textRect.translated(-textRect.topLeft()));
+    doc.documentLayout()->draw(painter, ctx);
+    painter->restore();
+}
+
+QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItemV4 optionV4 = option;
+    initStyleOption(&optionV4, index);
+
+    QTextDocument doc;
+    doc.setHtml(optionV4.text);
+    doc.setTextWidth(optionV4.rect.width());
+    return QSize(doc.idealWidth(), doc.size().height());
+}
+
 SearchResultList::SearchResultList(TabView *tabView) : tabView_(tabView)
 {
 //    setHeaderLabel("Result...");
@@ -51,6 +92,11 @@ SearchResultList::SearchResultList(TabView *tabView) : tabView_(tabView)
     setIndentation(15);
 
     connect(this, &QTreeWidget::itemDoubleClicked, this, &SearchResultList::HandleItemDoubleClicked);
+
+    // Create custom delegate
+    QEditor::HtmlDelegate *delegate = new HtmlDelegate();
+    // Set delegate to the treeview object
+    setItemDelegate(delegate);
 }
 
 void SearchResultList::SetQss()
@@ -90,42 +136,19 @@ QTreeWidgetItem* SearchResultList::StartSearchSession(EditView *editView)
     editView_ = editView;
     const QString &title = editView->fileName();
     SearchResultItem *sessionItem = new SearchResultItem();
-    topItem_->addChild(sessionItem);
+    topItem_->insertChild(0, sessionItem);
     setItemWidget(sessionItem, 0, new QLabel(title));
     return sessionItem;
 }
 
 void SearchResultList::AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &line, const QTextCursor &cursor)
 {
-    qCritical() << "Display add item start....";
     SearchResultItem *searchItem = new SearchResultItem(editView_);
     searchItem->setText(0, line);
+    searchItem->setPosition(cursor.selectionStart());
+    searchItem->setLen(cursor.selectionEnd() - cursor.selectionStart());
+    searchItem->setLine(lineNum);
     sessionItem->addChild(searchItem);
-//    searchItem->setPosition(cursor.selectionStart());
-//    searchItem->setLen(cursor.selectionEnd() - cursor.selectionStart());
-//    searchItem->setLine(lineNum);
-//    sessionItem->addChild(searchItem);
-//    qCritical() << "Display session item finish....";
-
-//    auto lineText = new QLabel();
-//    lineText->setTextFormat(Qt::RichText);
-//    lineText->setWordWrap(true);
-//    lineText->setStyleSheet("QLabel { background: transparent; color: darkGray; }");
-//    lineText->setFont(QFont("Consolas", 11));
-//    setItemWidget(searchItem, 0, lineText);
-//    lineText->setText(line);
-//    qDebug() << "editView_ size: " << editView_->sizeHint() << ", " << editView_->size();
-//    qCritical() << "lineText size: " << lineText->sizeHint();
-//    // TODO:
-//    // The label height would be abnormal if not set a width for it.
-//    // But the horizonal scroll bar will not show when window resize.
-//    lineText->setMinimumWidth(editView_->size().width());
-//    lineText->adjustSize();
-//    searchItem->treeWidget()->setStyleSheet("QTreeView { background: transparent; color: darkGray; }");
-//    qCritical() << "Display line text finish....";
-
-//    resizeColumnToContents(0);
-    qCritical() << "Display add item end....";
 }
 
 void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &extra_info)

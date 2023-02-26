@@ -42,30 +42,35 @@ public:
     bool connected() const { return connected_; }
 
 signals:
-    void sigInitForClild();
+    void sigInitializeInThread();
     void sigConnectStateChanged(bool state, const QString &ip, int port);
     void sigShellConnected(const QString &ip, int port);
-    void sigDataArrived(const QString &msg, const QString &ip, int port);
+    void sigShellDataArrived(const QString &msg, const QString &ip, int port);
 
 private:
     QString IpAndPort(){return ip_ + ":" + QString::number(port_);}
 
 public slots:
-    void slotResetConnection(const QString &ipPort);
-    void slotSend(const QString &message);
-    void slotDisconnected();
-    void slotReceived();
+    void HandleDisconnected();
+    void HandleResetConnection(const QString &ipPort);
+    void HandleShellSend(const QString &message);
+    void HandleShellReceived();
 
 private slots:
-    void slotInitForClild();
-    void slotCreateConnection();
-    void slotConnected();
+    void HandleInitializeInThread();
+    void HandleCreateConnection();
+    void HandleConnected();
+    void HandleThreadFinished();
+    void HandleSshConnectError(const QSsh::SshError &sshError);
 
-    void slotThreadFinished();
+    void HandleShellStart();
+    void HandleShellError();
 
-    void slotSshConnectError(const QSsh::SshError &sshError);
-    void slotShellStart();
-    void slotShellError();
+    void HandleChannelInitialized();
+    void HandleChannelInitializationFailure(const QString &);
+    void HandleChannelJobFinished(const QSsh::SftpJobId, const QString &);
+    void HandleChannelClosed();
+    void HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList);
 
 private:
     QThread *thread_{nullptr};
@@ -81,8 +86,9 @@ private:
     QString ipPort_;
 
     QSsh::SshConnectionParameters parameters_;
-    QSsh::SshConnection *sshSocket_ = nullptr;
+    QSsh::SshConnection *sshConnection_ = nullptr;
     QSharedPointer<QSsh::SshRemoteProcess> shell_;
+    QSharedPointer<QSsh::SftpChannel> channel_;
 };
 }  // namespace QEditor
 

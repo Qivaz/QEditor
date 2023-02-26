@@ -25,6 +25,9 @@
 #include "Logger.h"
 
 namespace QEditor {
+//
+// https://www.iana.org/assignments/character-sets/character-sets.xml
+//
 // Check Byte Order Mark.
 // BOM Encoding:
 //    EF BB BF      UTF-8
@@ -43,7 +46,6 @@ namespace QEditor {
 // 1018 UTF-32BE    utf-32 be
 // 1019 UTF-32LE    utf-32 le
 //
-extern const QMap<int, QPair<QString, QString>> encodings;
 
 class FileEncoding : public QObject
 {
@@ -51,56 +53,48 @@ class FileEncoding : public QObject
 public:
     FileEncoding()
         : codec_(QTextCodec::codecForMib(106)),
-          hasBom_(false),
-          mibEnum_(106),
-          description_("UTF-8") {
-        qDebug() << "hasBom_:" << hasBom_ << ", codec_: " << codec_->name()
-                   << ", mibEnum_: " << mibEnum_ << ", description_: " << description_;
+          hasBom_(false) {
+        qDebug() << "hasBom_:" << hasBom_ << ", codec_: " << codec_
+                 << ", mibEnum: " << mibEnum() << ", name: " << name();
+    }
+    FileEncoding(QTextCodec *codec, bool hasBom = false)
+        : codec_(codec),
+          hasBom_(hasBom) {
+        qDebug() << "hasBom_:" << hasBom_ << ", codec_: " << codec_
+                 << ", mibEnum: " << mibEnum() << ", name: " << name();
     }
     FileEncoding(int mibEnum)
         : codec_(mibEnum == 0 ? QTextCodec::codecForLocale() : QTextCodec::codecForMib(mibEnum)),
-          hasBom_(mibEnum != 106 && mibEnum != 0),  // ANSI and UTF-8 have no BOM in default.
-          mibEnum_(mibEnum),
-          description_(GetDescription(mibEnum)) {
-        qDebug() << "hasBom_:" << hasBom_ << ", codec_: " << codec_->name()
-                   << ", mibEnum_: " << mibEnum_ << ", description_: " << description_;
+          hasBom_(mibEnum != 106 && mibEnum != 0) {  // ANSI and UTF-8 have no BOM in default.
+        qDebug() << "hasBom_:" << hasBom_ << ", codec_: " << codec_
+                 << ", mibEnum: " << mibEnum << ", name: " << name();
     }
     FileEncoding(QFile &file)
         :
           // The max BOM size is 4, and use mibenum 106 i.e. utf-8 in default.
           codec_(QTextCodec::codecForUtfText(file.peek(4), QTextCodec::codecForMib(106))),
-          hasBom_(QTextCodec::codecForUtfText(file.peek(4), nullptr) != nullptr),
-          mibEnum_(codec_->mibEnum()),
-          description_(GetDescription(mibEnum_)) {
-        qDebug() << "BOM: " << file.peek(4) << ", hasBom_:" << hasBom_ << ", codec_: " << codec_->name()
-                   << ", mibEnum_: " << mibEnum_ << ", description_: " << description_;
+          hasBom_(QTextCodec::codecForUtfText(file.peek(4), nullptr) != nullptr) {
+        qDebug() << "BOM: " << file.peek(4) << ", hasBom_:" << hasBom_ << ", codec_: " << codec_
+                 << ", mibEnum: " << mibEnum() << ", name: " << name();
     }
 
     FileEncoding(const FileEncoding &encoding) {
         codec_ = encoding.codec_;
         hasBom_ = encoding.hasBom_;
-        mibEnum_ = encoding.mibEnum_;
-        description_ = encoding.description_;
     }
     FileEncoding(FileEncoding &&encoding) {
         codec_ = encoding.codec_;
         hasBom_ = encoding.hasBom_;
-        mibEnum_ = encoding.mibEnum_;
-        description_ = std::move(encoding.description_);
     }
 
     FileEncoding &operator=(const FileEncoding &encoding) {
         codec_ = encoding.codec_;
         hasBom_ = encoding.hasBom_;
-        mibEnum_ = encoding.mibEnum_;
-        description_ = encoding.description_;
         return *this;
     }
     FileEncoding &operator=(FileEncoding &&encoding) {
         codec_ = std::move(encoding.codec_);
         hasBom_ = encoding.hasBom_;
-        mibEnum_ = encoding.mibEnum_;
-        description_ = std::move(encoding.description_);
         return *this;
     }
 
@@ -110,28 +104,23 @@ public:
     QTextCodec *codec() { return codec_; }
     void setCodec(QTextCodec *codec) {
         codec_ = codec;
-        mibEnum_ = codec->mibEnum();
-        description_ = GetDescription(mibEnum_);
     }
 
-    int mibEnum() const { return mibEnum_; }
-    const QString &description() const { return description_; }
+    int mibEnum() const { return codec_->mibEnum(); }
+    QString name() const { return codec_->name(); }
 
-    QTextCodec *GetCodecByDecription(const QString &codecDesc)
-    {
-        int mib = GetMibByDescription(codecDesc);
-        return QTextCodec::codecForMib(mib);
-    }
-    int GetMibByDescription(const QString &name);
+    // Find proper codec, then change owned codec and return decoded text.
+    QString ProcessAnsi(QFile &file);
+
+    static int GetMibByName(const QString &name);
+    static QStringList encodingNames();
 
 private:
-    QString GetDescription(int mibEnum);
-    QString GetMibName(int mibEnum);
-
     QTextCodec *codec_{nullptr};
     bool hasBom_{false};  // If Byte Order Mark exists.
-    int mibEnum_{106};
-    QString description_;
+
+    static QMap<QString, int> encodingNameToMib_;
+    static QStringList encodingNameList_;
 };
 }  // namespace QEditor
 

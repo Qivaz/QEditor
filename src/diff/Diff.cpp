@@ -21,8 +21,9 @@ QString Diff::ToLineHtml() {
     foreach(_Diff aDiff, diffs_) {
         text = aDiff.text;
         qDebug() << "diff text: " << text << ", op: " << aDiff.operation;
-        text.replace("&", "&amp;").replace("<", "&lt;")
-            .replace(">", "&gt;").replace("\n", html_line_feed);
+        text.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;")
+            .replace("\u0020", "&nbsp;").replace("\n", html_line_feed);
         switch (aDiff.operation) {
             case DELETE:
                 oldHtml += QString("<font color=\"red\">") + text + QString("</font>");
@@ -34,7 +35,7 @@ QString Diff::ToLineHtml() {
                 // Find \n from start.
                 auto pos = text.indexOf(html_line_feed);
                 if (pos != -1) {
-                    // If difference exists before.
+                    // If previous differences exist.
                     if ((!oldHtml.isEmpty() || !newHtml.isEmpty())) {
                         auto first = text.mid(0, pos + html_line_feed_len);
                         if (oldHtml != newHtml) {  // Add the first line's text to old line and new line.
@@ -61,7 +62,16 @@ QString Diff::ToLineHtml() {
                             newHtml += QString("<span>") + text.mid(lastPos + html_line_feed_len) + QString("</span>");
                         }
                     } else {  // No difference, append to common line.
-                        html += QString("<span>") + text + QString("</span>");
+                        // Handle common line's tail spaces.
+                        // Find \n from end.
+                        auto lastPos = text.lastIndexOf(html_line_feed, -1);
+                        if (lastPos == -1) {
+                            html += QString("<span>") + text + QString("</span>");
+                        } else {
+                            html += QString("<span>") + text.mid(0, lastPos + html_line_feed_len) + QString("</span>");
+                            oldHtml += QString("<span>") + text.mid(lastPos + html_line_feed_len) + QString("</span>");
+                            newHtml += QString("<span>") + text.mid(lastPos + html_line_feed_len) + QString("</span>");
+                        }
                     }
                 } else {  // Gather old line text and new line text.
                     newHtml += QString("<span>") + text + QString("</span>");

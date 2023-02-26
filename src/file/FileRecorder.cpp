@@ -107,7 +107,7 @@ void FileRecorder::LoadFiles()
     for (size_t i = 0; i < loadedFileInfos_.size(); ++i) {
         auto const &fileInfo = loadedFileInfos_[i];
         // Terminal view.
-        if (!fileInfo.IsTerminal()) {
+        if (fileInfo.IsTerminal()) {
             continue;
         }
         // Open file edit, not change, or empty new file edit.

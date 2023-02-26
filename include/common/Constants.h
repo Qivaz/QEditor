@@ -49,17 +49,6 @@ constexpr auto kFormatNewLineUnix = "Unix";
 constexpr auto kFormatNewLineDos = "Dos";
 constexpr auto kFormatNewLineMac = "Mac";
 
-// File encoding.
-constexpr auto kEncodingSystem  = "ANSI";
-constexpr auto kEncodingUtf8    = "UTF-8";
-constexpr auto kEncodingUtf8Bom = "UTF-8 BOM";
-constexpr auto kEncodingUtf16   = "UTF-16";
-constexpr auto kEncodingUtf16Be = "UTF-16 BE";
-constexpr auto kEncodingUtf16Le = "UTF-16 LE";
-constexpr auto kEncodingUtf32   = "UTF-32";
-constexpr auto kEncodingUtf32Be = "UTF-32 BE";
-constexpr auto kEncodingUtf32Le = "UTF-32 LE";
-
 extern QString kAppPath;           // Should initialize once when startup.
 extern QString kAppInternalPath;   // Should initialize once when startup.
 }  // namespace

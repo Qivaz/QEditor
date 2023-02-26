@@ -41,6 +41,7 @@ HEADERS       = \
     include/view/MainWindow.h \
     include/view/OpenTerminalDialog.h \
     include/view/OutlineList.h \
+    include/view/RemoteExplorerTreeView.h \
     include/view/SearchDialog.h \
     include/view/SearchResultItem.h \
     include/view/SearchResultList.h \
@@ -80,6 +81,7 @@ SOURCES       = \
     src/view/MainWindow.cpp \
     src/view/OpenTerminalDialog.cpp \
     src/view/OutlineList.cpp \
+    src/view/RemoteExplorerTreeView.cpp \
     src/view/SearchDialog.cpp \
     src/view/SearchResultItem.cpp \
     src/view/SearchResultList.cpp \

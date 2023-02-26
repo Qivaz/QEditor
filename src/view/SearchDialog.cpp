@@ -230,7 +230,7 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     MainWindow::Instance().ShowSearchDockView();
 
     auto sessionItem = searchResultList_->StartSearchSession(editView());
-    qDebug() << "Find all start....";
+    qCritical() << "Find all start....";
     std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     if (ui_->radioButtonFindRe->isChecked()) {
@@ -239,12 +239,13 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     } else {
         res = FindAll<QString>(target);
     }
-    qDebug() << "Find all finish....";
+    qCritical() << "Find all finish....";
     int matchCount = 0;
 
     // TODO:
     // To support display dynamic visible list items, and do fetchMore for user scrolling.
     for (const auto &item : res) {
+        qCritical() << "Display item start....";
         auto currentBlock = item.block();
         int lineNum = item.blockNumber();
         auto highlighting_target = item.selectedText().toHtmlEscaped();
@@ -252,14 +253,15 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
         auto currentStr = currentBlock.text();
         auto escapedStr = currentStr.toHtmlEscaped();
         escapedStr.replace(highlighting_target, htmlTarget, Qt::CaseSensitive);
-        qDebug() << "Line " << lineNum << ": highlighting_target: " << highlighting_target << ", htmlTarget: " << htmlTarget
+        qCritical() << "Line " << lineNum << ": highlighting_target: " << highlighting_target << ", htmlTarget: " << htmlTarget
                    << ", currentStr: " << escapedStr;
 
         auto text = /*QString("<html>") + */"Line " + QString::number(lineNum + 1) + ":  " + escapedStr/* + "</html>"*/;
 //        const auto &text = item.selectedText();
-        qDebug() << "Line " << lineNum << ": text: " << text;
+        qCritical() << "Line " << lineNum << ": text: " << text;
         ++matchCount;
         searchResultList_->AddSearchResult(sessionItem, lineNum, text, item);
+        qCritical() << "Display item end....";
     }
     searchResultList_->FinishSearchSession(sessionItem, QString("(Search \"") + target + "\": " + QString::number(matchCount) + " hits)");
     ++sessionCount_;

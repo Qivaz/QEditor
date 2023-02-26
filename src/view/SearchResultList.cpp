@@ -97,29 +97,35 @@ QTreeWidgetItem* SearchResultList::StartSearchSession(EditView *editView)
 
 void SearchResultList::AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &line, const QTextCursor &cursor)
 {
+    qCritical() << "Display add item start....";
     SearchResultItem *searchItem = new SearchResultItem(editView_);
-    searchItem->setPosition(cursor.selectionStart());
-    searchItem->setLen(cursor.selectionEnd() - cursor.selectionStart());
-    searchItem->setLine(lineNum);
+    searchItem->setText(0, line);
     sessionItem->addChild(searchItem);
+//    searchItem->setPosition(cursor.selectionStart());
+//    searchItem->setLen(cursor.selectionEnd() - cursor.selectionStart());
+//    searchItem->setLine(lineNum);
+//    sessionItem->addChild(searchItem);
+//    qCritical() << "Display session item finish....";
 
-    auto lineText = new QLabel();
-    lineText->setTextFormat(Qt::RichText);
-    lineText->setWordWrap(true);
-    lineText->setStyleSheet("QLabel { background: transparent; color: darkGray; }");
-    lineText->setFont(QFont("Consolas", 11));
-    setItemWidget(searchItem, 0, lineText);
-    lineText->setText(line);
-    qDebug() << "editView_ size: " << editView_->sizeHint() << ", " << editView_->size();
-    qDebug() << "lineText size: " << lineText->sizeHint();
-    // TODO:
-    // The label height would be abnormal if not set a width for it.
-    // But the horizonal scroll bar will not show when window resize.
-    lineText->setMinimumWidth(editView_->size().width());
-    lineText->adjustSize();
-    searchItem->treeWidget()->setStyleSheet("QTreeView { background: transparent; color: darkGray; }");
+//    auto lineText = new QLabel();
+//    lineText->setTextFormat(Qt::RichText);
+//    lineText->setWordWrap(true);
+//    lineText->setStyleSheet("QLabel { background: transparent; color: darkGray; }");
+//    lineText->setFont(QFont("Consolas", 11));
+//    setItemWidget(searchItem, 0, lineText);
+//    lineText->setText(line);
+//    qDebug() << "editView_ size: " << editView_->sizeHint() << ", " << editView_->size();
+//    qCritical() << "lineText size: " << lineText->sizeHint();
+//    // TODO:
+//    // The label height would be abnormal if not set a width for it.
+//    // But the horizonal scroll bar will not show when window resize.
+//    lineText->setMinimumWidth(editView_->size().width());
+//    lineText->adjustSize();
+//    searchItem->treeWidget()->setStyleSheet("QTreeView { background: transparent; color: darkGray; }");
+//    qCritical() << "Display line text finish....";
 
-    resizeColumnToContents(0);
+//    resizeColumnToContents(0);
+    qCritical() << "Display add item end....";
 }
 
 void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &extra_info)

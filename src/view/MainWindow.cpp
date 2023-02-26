@@ -23,6 +23,7 @@
 #include <MainWindow.h>
 
 #include "ExplorerTreeView.h"
+#include "RemoteExplorerTreeView.h"
 #include "ComboView.h"
 #include "OpenTerminalDialog.h"
 #include "RecentFiles.h"
@@ -1289,9 +1290,7 @@ void MainWindow::CreateStatusBar()
 
     // File encoding.
     encoding_ = new ComboView(this);
-    encoding_->addItems({Constants::kEncodingSystem,    Constants::kEncodingUtf8,      Constants::kEncodingUtf8Bom,
-                         Constants::kEncodingUtf16,     Constants::kEncodingUtf16Be,   Constants::kEncodingUtf16Le,
-                         Constants::kEncodingUtf32,     Constants::kEncodingUtf32Be,   Constants::kEncodingUtf32Le});
+    encoding_->addItems(FileEncoding::encodingNames());
     statusBar()->addPermanentWidget(encoding_);
     encoding_->ShrinkForPopup();
     encoding_->ShrinkForChosen();
@@ -1332,7 +1331,7 @@ void MainWindow::HandleEncodingChanged(int index)
         Toast::Instance().Show(Toast::kError, "Can't convert the encoding since the text is modified.");
         return;
     }
-    auto mib = editView->fileEncoding().GetMibByDescription(encoding_->currentText());
+    auto mib = FileEncoding::GetMibByName(encoding_->currentText());
     auto fileEncoding = FileEncoding(mib);
     qDebug() << "currentText: " << encoding_->currentText() << ", itemText: " << encoding_->itemText(index)
              << ", new mib: " << fileEncoding.hasBom() << fileEncoding.mibEnum()

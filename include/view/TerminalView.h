@@ -46,6 +46,9 @@ public:
 
     QString pwd() const;
 
+private:
+    void HandleAnsiEscapeCode(const QString &constMsg, QTextCursor &cursor);
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -55,12 +58,12 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
 private slots:
-    void ConnectStateChanged(bool state, const QString &ip, int port);
-    void ShellConnected(const QString &ip, int port);
-    void DataArrived(const QString &msg, const QString &ip, int port);
+    void HandleConnectStateChanged(bool state, const QString &ip, int port);
+    void HandleShellConnected(const QString &ip, int port);
+    void HandleShellDataArrived(const QString &msg, const QString &ip, int port);
 
 signals:
-    void sigSend(const QString &msg);
+    void sigShellSend(const QString &msg);
     void sigDisconnected();
 
 private:
@@ -75,6 +78,9 @@ private:
     QString cmdBuffer_;
     QString sendingCmd_;
     bool sending_{false};
+
+    bool cmdEntered_{false};
+    int promptPos_{-1};
 
     bool connectState_{false};
 };

@@ -131,7 +131,7 @@ void TabView::HandleCurrentIndexChanged(int index)
     UpdateWindowTitle();
 
     // Update status bar info. if file encoding changes.
-    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", CurrentEditView()->fileEncoding().description(), 0);
+    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", CurrentEditView()->fileEncoding().name(), 0);
 }
 
 void TabView::HandleTabBarClicked(int index)
@@ -653,32 +653,16 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
         QTextStream in(&file);
         in.setCodec(fileEncoding.codec());
         const auto &text = in.readAll();
-//        qDebug() << "text: " << text << ", bytearry: " << text.toUtf8();
+        qDebug() << "text: " << text << ", bytearry: " << text.toUtf8();
         editView->setPlainText(text);
         editView->setFileEncoding(std::move(fileEncoding));
     } else {
-        // If no BOM, we try to decode by UTF8 firstly,
-        // then decode by System if failed.
-        const QByteArray &data = file.readAll();
-        QTextCodec::ConverterState state;
-        // FileEncoding.codec is UTF8 in default.
-        const auto &text = fileEncoding.codec()->toUnicode(data.constData(), data.size(), &state);
-//        qDebug() << "text: " << text << ", bytearry: " << data.data();
-        if (state.invalidChars > 0) {
-            auto systemCodec = QTextCodec::codecForLocale();  // Use system codec.
-            if (systemCodec == nullptr) {
-                qFatal("codecForLocale() returns null.");
-            }
-            const auto &ansiText = systemCodec->toUnicode(data.constData());
-            editView->setPlainText(ansiText);
-            // Change fileEncoding from UTF8 to System.
-            fileEncoding.setCodec(systemCodec);
-        } else {
-            editView->setPlainText(text);
-        }
+        // If no BOM.
+        const auto &ansiText = fileEncoding.ProcessAnsi(file);
+        editView->setPlainText(ansiText);
         editView->setFileEncoding(std::move(fileEncoding));
     }
-    qDebug() << "encoding: " << editView->fileEncoding().description()
+    qDebug() << "encoding: " << editView->fileEncoding().name()
                << ", file: " << file.fileName();
 
 #ifndef QT_NO_CURSOR

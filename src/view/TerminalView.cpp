@@ -42,11 +42,13 @@ void TerminalView::CreateConnection()
 {
     sshClient_ = new SshClient(ip_, port_, user_, pwd_);
     sshClient_->Initialize();
-    connect(sshClient_, SIGNAL(sigConnectStateChanged(bool, const QString&, int)), this, SLOT(ConnectStateChanged(bool, const QString&, int)));
-    connect(sshClient_, SIGNAL(sigShellConnected(const QString&, int)), this, SLOT(ShellConnected(const QString&, int)));
-    connect(sshClient_, SIGNAL(sigDataArrived(const QString&, const QString&, int)), this, SLOT(DataArrived(const QString&, const QString&, int)));
-    connect(this, SIGNAL(sigSend(const QString&)), sshClient_, SLOT(slotSend(const QString&)));
-    connect(this, SIGNAL(sigDisconnected()), sshClient_, SLOT(slotDisconnected()));
+    // Handle event.
+    connect(sshClient_, SIGNAL(sigConnectStateChanged(bool, const QString&, int)), this, SLOT(HandleConnectStateChanged(bool, const QString&, int)));
+    connect(sshClient_, SIGNAL(sigShellConnected(const QString&, int)), this, SLOT(HandleShellConnected(const QString&, int)));
+    connect(sshClient_, SIGNAL(sigShellDataArrived(const QString&, const QString&, int)), this, SLOT(HandleShellDataArrived(const QString&, const QString&, int)));
+    // Request event.
+    connect(this, SIGNAL(sigShellSend(const QString&)), sshClient_, SLOT(HandleShellSend(const QString&)));
+    connect(this, SIGNAL(sigDisconnected()), sshClient_, SLOT(HandleDisconnected()));
 }
 
 void TerminalView::mousePressEvent(QMouseEvent *event)
@@ -123,15 +125,17 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
 //        }
     }
 
+    cmdEntered_ = false;
     if (event->key() == Qt::Key_Return) {
+        cmdEntered_ = true;
         moveCursor(QTextCursor::End);
         insertPlainText(event->text());
         cmdBuffer_.append(event->text())/*.append('\n')*/;
     } else if (event->key() == Qt::Key_Tab) {
         cmdBuffer_.append(event->text());
-    } else if (event->key() == Qt::Key_Up) {
+    } else if (event->key() == Qt::Key_Up || event->text() == "\u0010") {
         cmdBuffer_.append(tr("\u0010"));
-    } else if (event->key() == Qt::Key_Down) {
+    } else if (event->key() == Qt::Key_Down || event->text() == "\u000E") {
         cmdBuffer_.append(tr("\u000E"));
     } else if (event->text() == "\u0003" || event->text() == "\u0004") {  // Ctrl+C("\u0003") or Ctrl+D("\u0004")
         cmdBuffer_.clear();
@@ -178,13 +182,13 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
 //                }
 //                startCursor.deleteChar();
 
-//                emit sigSend(sendingCmd_);
+//                emit sigShellSend(sendingCmd_);
 //                cmdBuffer_.clear();
 //                return;
 //            }
 
-//            sshClient_->slotSend(sendingCmd_);
-            emit sigSend(sendingCmd_/* + "\n"*/);
+//            sshClient_->HandleShellSend(sendingCmd_);
+            emit sigShellSend(sendingCmd_/* + "\n"*/);
             cmdBuffer_.clear();
         }
     }
@@ -196,7 +200,7 @@ void TerminalView::keyReleaseEvent(QKeyEvent *event)
 //    EditView::keyReleaseEvent(event);
 }
 
-void TerminalView::ConnectStateChanged(bool state, const QString &ip, int port)
+void TerminalView::HandleConnectStateChanged(bool state, const QString &ip, int port)
 {
     Q_UNUSED(ip)
     Q_UNUSED(port)
@@ -210,58 +214,124 @@ void TerminalView::ConnectStateChanged(bool state, const QString &ip, int port)
     }
 }
 
-void TerminalView::ShellConnected(const QString &ip, int port)
+void TerminalView::HandleShellConnected(const QString &ip, int port)
 {
     connectState_ = true;
     Toast::Instance().Show(Toast::kInfo, QString("%1:%2 is connected.").arg(ip).arg(port));
 }
 
-void TerminalView::DataArrived(const QString &msg, const QString &ip, int port)
+void TerminalView::HandleAnsiEscapeCode(const QString &constMsg, QTextCursor &cursor) {
+    if (constMsg.startsWith('\r') || constMsg.startsWith('\u001B')) {
+        for (int i = 0; i < constMsg.length(); ++i) {
+            const auto &c = constMsg[i];
+            if (c == '\r') {
+//                auto cursor = textCursor();
+                cursor.setPosition(promptPos_);
+//                setTextCursor(cursor);
+            } else if (c == '\u001B') {  // Escape
+                if (constMsg.length() <= i + 2) {
+                    qCritical() << "Recv: " << constMsg;
+                    qFatal("Receive invalid message.");
+                }
+                const auto &c1 = constMsg[i + 1];
+                const auto &c2 = constMsg[i + 2];
+                if (c1 != '[') {
+                    break;
+                }
+                switch (c2.toLatin1()) {
+                    case 'A': {  // Up
+//                        QTextCursor cursor = textCursor();
+                        cursor.movePosition(QTextCursor::Up, QTextCursor::MoveAnchor);
+//                        setTextCursor(cursor);
+                        break;
+                    }
+                    case 'B': {  // Down
+//                        QTextCursor cursor = textCursor();
+                        cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+//                        setTextCursor(cursor);
+                        break;
+                    }
+                    case 'C': {  // Right
+//                        QTextCursor cursor = textCursor();
+                        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+//                        setTextCursor(cursor);
+                        break;
+                    }
+                    case 'D': {  // Left
+//                        QTextCursor cursor = textCursor();
+                        cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
+//                        setTextCursor(cursor);
+                        break;
+                    }
+                    case 'K': {  // Only one 'K', Erase from cursor to end of line.
+//                        QTextCursor cursor = textCursor();
+                        cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
+//                        setTextCursor(cursor);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+}
+
+void TerminalView::HandleShellDataArrived(const QString &msg, const QString &ip, int port)
 {
     Q_UNUSED(ip)
     Q_UNUSED(port)
 
-    QString pureRecvMsg = msg;
+    QString strippedMsg = msg;
     qCritical() << "msg: " << msg << ", cmd: " << sendingCmd_;
+    // Handle feedback sent command, skip them.
     for (int i = 0; i < sendingCmd_.length() && i < msg.length(); ++i) {
         const auto &c = sendingCmd_[i];
         if (c == msg[i]) {
-            pureRecvMsg = pureRecvMsg.mid(1);
+            strippedMsg = strippedMsg.mid(1);
         }
         if (c == '\r') {  // Send \r, received \r\n.
-            pureRecvMsg = pureRecvMsg.mid(1);
+            strippedMsg = strippedMsg.mid(1);
         }
     }
-    qCritical() << "pureRecvMsg: " << pureRecvMsg;
+    // Handle bell, skip.
+    if (strippedMsg.startsWith('\u0007')) {
+        strippedMsg.remove(0, 1);
+    }
+
     // Handle \b (\u0008).
-    if (pureRecvMsg.startsWith('\b')) {
-        const QString constPureRecvMsg = pureRecvMsg;
-        for (const auto &c : constPureRecvMsg) {
+    if (strippedMsg.startsWith('\b')) {
+        const QString constRecvMsg = strippedMsg;
+        for (const auto &c : constRecvMsg) {
             if (c == '\b') {
-                pureRecvMsg.remove(0, 1);
+                strippedMsg.remove(0, 1);
                 textCursor().deletePreviousChar();
             } else {
                 break;
             }
         }
     }
-    // Handle bell.
-    if (pureRecvMsg.startsWith('\u0007')) {
-        pureRecvMsg.remove(0, 1);
-    }
 
+    qCritical() << "stripped msg: " << strippedMsg;
+    auto cursor = textCursor();
+    cursor.movePosition(QTextCursor::End);
+    HandleAnsiEscapeCode(strippedMsg, cursor);
     auto savedCharFormat = currentCharFormat();
     AnsiEscapeCodeHandler handler;
-    auto fts = handler.parseText(FormattedText(pureRecvMsg, currentCharFormat()));
+    auto fts = handler.parseText(FormattedText(strippedMsg, currentCharFormat()));
     foreach (auto &ft, fts) {
         qCritical() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
-        auto cursor = textCursor();
-        cursor.movePosition(QTextCursor::End);
         cursor.insertText(ft.text, ft.format);
+        HandleAnsiEscapeCode(strippedMsg, cursor);
     }
     setCurrentCharFormat(savedCharFormat);
     if (textCursor().position() == document()->characterCount() - 1) {
         ensureCursorVisible();  // verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
+    if (cmdEntered_) {
+        promptPos_ = document()->characterCount() - 1;
     }
 
     sendingCmd_.clear();

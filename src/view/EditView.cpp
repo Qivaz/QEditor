@@ -162,7 +162,7 @@ void EditView::setFileEncoding(FileEncoding &&fileEncoding)
     fileEncoding_ = std::move(fileEncoding);
 
     // Update status bar info. if file encoding changes.
-    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.description(), 0);
+    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.name(), 0);
 }
 
 void EditView::ChangeFileEncoding(FileEncoding &&fileEncoding)
@@ -582,7 +582,7 @@ void EditView::UpdateStatusBarWithCursor()
                 "Length: " + QString::number(document()->characterCount()));
 
     // Update the rarely change information.
-    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.description(), 0);
+    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.name(), 0);
 }
 
 void EditView::HandleCursorPositionChanged()

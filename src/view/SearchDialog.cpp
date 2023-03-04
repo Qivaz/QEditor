@@ -106,14 +106,14 @@ const QString SearchDialog::GetSelectedText()
     return text;
 }
 
-bool SearchDialog::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor) {
+bool SearchDialog::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
     int firstStart = -1;
     QTextCursor currentCursor = startCursor;
     while (true) {
         // The first block.
         int count = 0;
         QTextCursor cursor;
-        if (!Find(target[0], currentCursor, cursor)) {
+        if (!Find(target[0], currentCursor, cursor, backward)) {
             qDebug();
             return false;
         }
@@ -192,9 +192,9 @@ bool SearchDialog::Find(const QStringList &target, const QTextCursor &startCurso
 }
 
 template <class T>
-bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor) {
+bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
     int flag = 0;
-    if (ui_->checkBoxFindBackward->isChecked()) {
+    if (backward) {
         flag |= QTextDocument::FindFlag::FindBackward;
     }
     if (ui_->checkBoxFindMatchCase->isChecked()) {
@@ -217,7 +217,7 @@ bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCu
         QScrollBar *scrollBar = editView()->verticalScrollBar();
         auto sliderPos = scrollBar->sliderPosition();
         QTextCursor anewCursor = startCursor;
-        if (ui_->checkBoxFindBackward->isChecked()) {
+        if (backward) {
             anewCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
         } else {
             anewCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
@@ -258,14 +258,33 @@ void HandleEscapeChars(QString &text)
     text.replace("\\t", "\t");
 }
 
-// Should save original cursor, and restore it if failed.
+QTextCursor SearchDialog::FindPrevious(const QString &text, const QTextCursor &startCursor)
+{
+    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    return FindNext(text, startCursor, !backwardCheck);
+}
+
+QTextCursor SearchDialog::FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
+{
+    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    return FindNext(text, startCursor, backward ? backwardCheck : !backwardCheck);
+}
+
 QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &startCursor)
 {
+    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    return FindNext(text, startCursor, backwardCheck);
+}
+
+// Should save original cursor, and restore it if failed.
+QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
+{
+    MainWindow::Instance().setSearchingString(text);
     bool res;
     QTextCursor cursor;
     if (ui_->radioButtonFindRe->isChecked()) {
         const QRegExp reTarget = QRegExp(text);
-        res = Find<QRegExp>(reTarget, startCursor, cursor);
+        res = Find<QRegExp>(reTarget, startCursor, cursor, backward);
     } else {
         if (ui_->radioButtonFindExtended->isChecked()) {
             auto extendedText = text;
@@ -273,9 +292,9 @@ QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &start
             qDebug() << extendedText;
             auto extendedTexts = extendedText.split("\n");
             qDebug() << extendedTexts;
-            res = Find(extendedTexts, startCursor, cursor);
+            res = Find(extendedTexts, startCursor, cursor, backward);
         } else {
-            res = Find<QString>(text, startCursor, cursor);
+            res = Find<QString>(text, startCursor, cursor, backward);
         }
     }
 
@@ -291,11 +310,10 @@ QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &start
 void SearchDialog::on_pushButtonFindFindNext_clicked()
 {   
     auto const &target = ui_->lineEditFindFindWhat->text();
-    auto res = FindNext(target, editView()->textCursor());
-    if (!res.isNull()) {
-        editView()->setTextCursor(res);
+    auto cursor = FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
+    if (!cursor.isNull()) {
+        editView()->setTextCursor(cursor);
     }
-
 }
 
 void SearchDialog::on_radioButtonFindRe_toggled(bool checked)
@@ -412,19 +430,19 @@ void SearchDialog::on_pushButtonReplaceCancel_clicked()
 void SearchDialog::on_pushButtonReplaceFindNext_clicked()
 {
     auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto res = FindNext(target, editView()->textCursor());
+    auto res = FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
     if (!res.isNull()) {
         editView()->setTextCursor(res);
     }
 }
 
 // Replace 'target' with 'text'.
-void SearchDialog::Replace(const QString &target, const QString &text) {
+void SearchDialog::Replace(const QString &target, const QString &text, bool backward) {
     // Check find options.
     bool wrapAround = (ui_->checkBoxFindWrapAround->isChecked());
     QString startStr;
     QString endStr;
-    if (ui_->checkBoxFindBackward->isChecked()) {
+    if (backward) {
         startStr = "bottom";
         endStr = "top";
     } else {
@@ -441,7 +459,7 @@ void SearchDialog::Replace(const QString &target, const QString &text) {
     // Move the search start pos to the start of selection if has selection.
     if (editView()->textCursor().hasSelection()) {
         int start;
-        if (ui_->checkBoxFindBackward->isChecked()) {
+        if (backward) {
             start = editView()->textCursor().selectionEnd();
         } else {
             start = editView()->textCursor().selectionStart();
@@ -452,11 +470,11 @@ void SearchDialog::Replace(const QString &target, const QString &text) {
     }
 
     // To find and replace.
-    auto res = FindNext(target, editView()->textCursor());
+    auto res = FindNext(target, editView()->textCursor(), backward);
     if (!res.isNull()) {  // Find success.
         editView()->setTextCursor(res);
         res.insertText(extendedText);
-        res = FindNext(target, res);
+        res = FindNext(target, res, backward);
         if (!res.isNull()) {
             editView()->setTextCursor(res);
             auto info = QString("<b><font color=#67A9FF size=4>") +
@@ -492,7 +510,7 @@ void SearchDialog::on_pushButtonReplaceReplace_clicked()
 {
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     auto const &text = ui_->lineEditReplaceReplaceWith->text();
-    Replace(target, text);
+    Replace(target, text, ui_->checkBoxFindBackward->isChecked());
 }
 
 

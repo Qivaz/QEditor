@@ -42,6 +42,9 @@ public:
     EditView* editView();
     TabView* tabView();
 
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
+    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
+
 private slots:
     void on_pushButtonFindFindNext_clicked();
 
@@ -69,14 +72,16 @@ private:
     void ReplaceInsensitiveStr(QString &str, const QString &target);
     const QString GetSelectedText();
 
-    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
 
-    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor);
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
+    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
+
+    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
     template <class T>
-    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor);
+    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
     std::vector<QTextCursor> FindAll(const QString &target);
 
-    void Replace(const QString &target, const QString &text);
+    void Replace(const QString &target, const QString &text, bool backward);
     int ReplaceAll(const QString &target, const QString &text);
 
 private:

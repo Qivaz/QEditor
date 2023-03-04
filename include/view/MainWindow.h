@@ -153,8 +153,13 @@ public:
 
     void UpdateRecentFilesMenu();
 
+    QString searchingString() const;
+    void setSearchingString(const QString &searchingString);
+
 public slots:
     bool Find();
+    bool FindNext();
+    bool FindPrevious();
     bool Replace();
 
     bool MarkUnmarkCursorText();
@@ -247,6 +252,8 @@ private:
 
     QMenu *recentFilesMenu_{nullptr};
     QList<QAction*> recentFileActions_;
+
+    QString searchingString_;
 };
 }  // namespace QEditor
 

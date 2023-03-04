@@ -387,6 +387,16 @@ bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
 }
 
+QString MainWindow::searchingString() const
+{
+    return searchingString_;
+}
+
+void MainWindow::setSearchingString(const QString &searchingString)
+{
+    searchingString_ = searchingString;
+}
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     qDebug() << "event: " << event->type() << ", obj: " << obj;
@@ -484,6 +494,32 @@ bool MainWindow::Find()
     }
     searchDialog_->Start(0);
     return true;
+}
+
+bool MainWindow::FindNext()
+{
+    if (searchingString().isEmpty()) {
+        return false;
+    }
+    auto cursor = searchDialog_->FindNext(searchingString(), editView()->textCursor());
+    if (!cursor.isNull()) {
+        editView()->setTextCursor(cursor);
+        return true;
+    }
+    return false;
+}
+
+bool MainWindow::FindPrevious()
+{
+    if (searchingString().isEmpty()) {
+        return false;
+    }
+    auto cursor = searchDialog_->FindPrevious(searchingString(), editView()->textCursor());
+    if (!cursor.isNull()) {
+        editView()->setTextCursor(cursor);
+        return true;
+    }
+    return false;
 }
 
 bool MainWindow::Replace()
@@ -831,6 +867,18 @@ void MainWindow::CreateActions()
     connect(findAct, &QAction::triggered, this, &MainWindow::Find);
     selectMenu->addAction(findAct);
     searchToolBar->addAction(findAct);
+
+    QAction *findNextAct = new QAction(tr("&Find Next"), this);
+    findNextAct->setShortcuts(QKeySequence::FindNext);
+    findNextAct->setStatusTip(tr("Find next"));
+    connect(findNextAct, &QAction::triggered, this, &MainWindow::FindNext);
+    selectMenu->addAction(findNextAct);
+
+    QAction *findPreviousAct = new QAction(tr("&Find Previous"), this);
+    findPreviousAct->setShortcuts(QKeySequence::FindPrevious);
+    findPreviousAct->setStatusTip(tr("Find previous"));
+    connect(findPreviousAct, &QAction::triggered, this, &MainWindow::FindPrevious);
+    selectMenu->addAction(findPreviousAct);
 
     const QIcon replaceIcon = QIcon::fromTheme("select-replace", QIcon(":/images/replace.svg"));
     QAction *replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);

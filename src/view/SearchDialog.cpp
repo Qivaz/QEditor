@@ -35,10 +35,12 @@ extern void SetDarkTitleBar(HWND hwnd);
 namespace QEditor {
 SearchDialog::SearchDialog(QWidget *parent, int index) :
     QDialog(parent),
-    ui_(new Ui::UISearchDialog)
+    ui_(new Ui::UISearchDialog())
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_DeleteOnClose);
+
     qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
@@ -365,11 +367,7 @@ void SearchDialog::ReplaceInsensitiveStr(QString &text, const QString &target)
 void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
 {
     if (searchResultList_ == nullptr) {
-        searchResultList_ = new SearchResultList(tabView());
-        auto dockView = MainWindow::Instance().CreateSearchDockView();
-        dockView->setWidget(searchResultList_);
-        searchResultList_->setParent(dockView);
-        searchResultList_->setFont(QFont("Consolas", 11));
+        searchResultList_ = MainWindow::Instance().GetSearchResultList();
     }
     MainWindow::Instance().ShowSearchDockView();
 
@@ -385,26 +383,25 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     // To support display dynamic visible list items, and do fetchMore for user scrolling.
     for (const auto &item : res) {
         qDebug() << "Display item start....";
-        auto currentBlock = item.block();
+        const auto currentBlock = item.block();
         int lineNum = item.blockNumber();
-        auto highlightingTarget = item.selectedText().toHtmlEscaped();
-        auto htmlTarget = QString("<span style=\"font-size:16px;font-family:Consolas;color:#BCE08C\">") + highlightingTarget + QString("</span>");
-        auto currentStr = currentBlock.text();
-        auto escapedStr = currentStr.toHtmlEscaped();
+        const auto highlightingTarget = item.selectedText().toHtmlEscaped();
+        const auto htmlTarget = QString("<span style=\"font-size:14px;font-family:Consolas;color:#BCE08C\">") + highlightingTarget + QString("</span>");
+        const auto plainText = currentBlock.text();
+        auto escapedStr = plainText.toHtmlEscaped();
         escapedStr.replace(highlightingTarget, htmlTarget, Qt::CaseSensitive);
         qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget << ", htmlTarget: " << htmlTarget
                  << ", currentStr: " << escapedStr;
 
-        auto text = QString("<div style=\"font-size:15px;font-family:Consolas;color:#BEBEBE\">") +
-                    "Line " + QString::number(lineNum + 1) + ":  " + escapedStr + QString("</div>");
-        qDebug() << "Line " << lineNum << ": text: " << text;
+        auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") +
+                    "Line " + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
+                    QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
+        qDebug() << "Line " << lineNum << ": text: " << htmlText;
         ++matchCount;
-        searchResultList_->AddSearchResult(sessionItem, lineNum, text, item);
+        searchResultList_->AddSearchResult(sessionItem, lineNum, htmlText, plainText, item);
         qDebug() << "Display item end....";
     }
-    searchResultList_->FinishSearchSession(sessionItem, QString("(Search \"") + target + "\": " + QString::number(matchCount) + " hits)");
-    ++sessionCount_;
-    searchResultList_->UpdateTopTitle(QString::number(sessionCount_) + " results:");
+    searchResultList_->FinishSearchSession(sessionItem, target, matchCount);
 }
 
 void SearchDialog::on_pushButtonFindCount_clicked()
@@ -419,12 +416,12 @@ void SearchDialog::on_pushButtonFindCount_clicked()
 
 void SearchDialog::on_pushButtonFindCancel_clicked()
 {
-    hide();
+    close();
 }
 
 void SearchDialog::on_pushButtonReplaceCancel_clicked()
 {
-    hide();
+    close();
 }
 
 void SearchDialog::on_pushButtonReplaceFindNext_clicked()

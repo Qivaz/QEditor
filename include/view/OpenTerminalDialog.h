@@ -13,7 +13,6 @@ namespace QEditor {
 class OpenTerminalDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit OpenTerminalDialog(QWidget *parent = nullptr);
     ~OpenTerminalDialog();

@@ -50,12 +50,20 @@ public:
     }
 
     QTreeWidgetItem* StartSearchSession(EditView *editView);
-    void AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &line, const QTextCursor &cursor);
-    void FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &extra_info);
-
-    void UpdateTopTitle(const QString &info);
+    void AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &htmlText, const QString &plainText, const QTextCursor &cursor);
+    void FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount);
 
     void HandleItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void HandleItemClicked(QTreeWidgetItem *item, int column);
+
+    QTreeWidgetItem *topItem();
+
+    void setTopItem(QTreeWidgetItem *topItem);
+
+protected:
+    bool event(QEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 private:
     void SetQss();
@@ -65,6 +73,8 @@ private:
 
     TabView *tabView_{nullptr};
     QTreeWidgetItem *topItem_{nullptr};
+
+    QMenu *menu_;
 };
 }  // namespace QEditor
 

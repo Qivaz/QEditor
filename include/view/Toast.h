@@ -70,10 +70,11 @@ public:
         setLayout(layout);
 #endif
         setWindowFlag(Qt::FramelessWindowHint);
-        setAttribute(Qt::WA_ShowWithoutActivating,true);
+        setAttribute(Qt::WA_ShowWithoutActivating);
 #ifdef FRAME_RADIUS
-        setAttribute(Qt::WA_TranslucentBackground, true);
+        setAttribute(Qt::WA_TranslucentBackground);
 #endif
+        setAttribute(Qt::WA_DeleteOnClose);
     }
 
     void Show(Toast::Level level, const QString& text)
@@ -91,13 +92,13 @@ public:
         }
 #else
         QPalette pal = palette();
-        pal.setColor(QPalette::Window, QColor(0,0,0,200));
+        pal.setColor(QPalette::Window, QColor(0, 0, 0, 200));
         if (level == Toast::kInfo) {
-            pal.setColor(QPalette::Window, QColor(0,0,0,200));
+            pal.setColor(QPalette::Window, QColor(0, 0, 0, 200));
         } else if (level == Toast::kWarning) {
-            pal.setColor(QPalette::Window, QColor(0,0,255,200));
+            pal.setColor(QPalette::Window, QColor(0, 0, 255, 200));
         } else {
-            pal.setColor(QPalette::Window, QColor(255,0,0,200));
+            pal.setColor(QPalette::Window, QColor(255, 0, 0, 200));
         }
         setPalette(pal);
 #endif

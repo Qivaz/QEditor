@@ -56,12 +56,6 @@ public:
         if (searchDockView_ != nullptr) {
             delete searchDockView_;
         }
-        if (searchDialog_ != nullptr) {
-            delete searchDialog_;
-        }
-        if (gotoLineDialog_ != nullptr) {
-            delete gotoLineDialog_;
-        }
     }
 
     static MainWindow &Instance() {
@@ -156,6 +150,8 @@ public:
     QString searchingString() const;
     void setSearchingString(const QString &searchingString);
 
+    SearchResultList *GetSearchResultList();
+
 public slots:
     bool Find();
     bool FindNext();
@@ -210,7 +206,6 @@ private:
     TabView *tabView_{nullptr};
     DockView *searchDockView_{nullptr};
     SearchDialog *searchDialog_{nullptr};
-    GotoLineDialog *gotoLineDialog_{nullptr};
 
     DockView *explorerDockView_{nullptr};
     DockView *outlineDockView_{nullptr};
@@ -253,6 +248,7 @@ private:
     QMenu *recentFilesMenu_{nullptr};
     QList<QAction*> recentFileActions_;
 
+    SearchResultList *searchResultList_;
     QString searchingString_;
 };
 }  // namespace QEditor

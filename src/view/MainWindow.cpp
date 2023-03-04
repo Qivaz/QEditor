@@ -49,7 +49,7 @@ MainWindow::MainWindow()
     setAcceptDrops(true);
     setWindowOpacity(opa);
 
-    setStyleSheet("background: rgb(68, 68, 68); border: 5px, solid, rgb(255, 0, 0);");
+    setStyleSheet("background: rgb(68, 68, 68); selection-background-color: rgb(9, 71, 113); border: 5px, solid, rgb(255, 0, 0);");
     setCentralWidget(tabView_);
 
     CreateActions();
@@ -92,6 +92,11 @@ MainWindow::MainWindow()
     } else {
         HideOutlineDockView();
     }
+
+    QPalette pal = QPalette();
+//    pal.setColor(QPalette::ToolTipBase, QColor(0, 0, 255));
+    pal.setColor(QPalette::ToolTipText, Qt::lightGray);
+    QToolTip::setPalette(pal);
 }
 
 void MainWindow::HandleCurrentTabChanged(int index)
@@ -112,7 +117,7 @@ void MainWindow::ShowSearchDockView()
 DockView *MainWindow::CreateSearchDockView()
 {
     if (searchDockView_ == nullptr) {
-        searchDockView_ = new DockView();
+        searchDockView_ = new DockView(this);
     }
     searchDockView_->setWindowTitle("Search result:");
 //    searchDockView_->setFont(QFont("Consolas", 11));
@@ -237,7 +242,7 @@ void MainWindow::HideOutlineDockView()
 DockView *MainWindow::CreateOutlineDockView()
 {
     if (outlineDockView_ == nullptr) {
-        outlineDockView_ = new DockView();
+        outlineDockView_ = new DockView(this);
         outlineDockView_->setSavedMaxWidth(outlineDockView_->maximumWidth());
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         outlineDockView_->setMinimumWidth(0);
@@ -283,7 +288,7 @@ void MainWindow::HideHierarchyDockView()
 DockView *MainWindow::CreateHierarchyDockView()
 {
     if (hierarchyDockView_ == nullptr) {
-        hierarchyDockView_ = new DockView();
+        hierarchyDockView_ = new DockView(this);
         hierarchyDockView_->setSavedMaxWidth(hierarchyDockView_->maximumWidth());
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         hierarchyDockView_->setMinimumWidth(0);
@@ -333,7 +338,7 @@ void MainWindow::HideNodeHierarchyDockView()
 DockView *MainWindow::CreateNodeHierarchyDockView()
 {
     if (nodeHierarchyDockView_ == nullptr) {
-        nodeHierarchyDockView_ = new DockView();
+        nodeHierarchyDockView_ = new DockView(this);
         nodeHierarchyDockView_->setSavedMaxWidth(nodeHierarchyDockView_->maximumWidth());
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         nodeHierarchyDockView_->setMinimumWidth(0);
@@ -385,6 +390,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
 bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
     constexpr auto distance_threhold = 3;
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
+}
+
+SearchResultList *MainWindow::GetSearchResultList()
+{
+    if (searchResultList_ == nullptr) {
+        searchResultList_ = new SearchResultList(tabView());
+        auto dockView = MainWindow::Instance().CreateSearchDockView();
+        dockView->setWidget(searchResultList_);
+        searchResultList_->setParent(dockView);
+        searchResultList_->setFont(QFont("Consolas", 11));
+    }
+    return searchResultList_;
 }
 
 QString MainWindow::searchingString() const
@@ -489,10 +506,7 @@ bool MainWindow::Save()
 bool MainWindow::Find()
 {
     qDebug() << "MainWindow::find()";
-    if (searchDialog_ == nullptr) {
-        searchDialog_ = new SearchDialog(this);
-    }
-    searchDialog_->Start(0);
+    (new SearchDialog(this))->Start(0);
     return true;
 }
 
@@ -525,10 +539,7 @@ bool MainWindow::FindPrevious()
 bool MainWindow::Replace()
 {
     qDebug() << "MainWindow::find()";
-    if (searchDialog_ == nullptr) {
-        searchDialog_ = new SearchDialog(this);
-    }
-    searchDialog_->Start(1);
+    (new SearchDialog(this))->Start(1);
     return true;
 }
 
@@ -1034,7 +1045,7 @@ void MainWindow::CreateActions()
     QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
     openSshAct->setStatusTip(tr("Open SSH"));
     connect(openSshAct, &QAction::triggered, this, []() {
-        (new OpenTerminalDialog())->show();
+        (new OpenTerminalDialog(&MainWindow::Instance()))->show();
         return true;
     });
     terminalMenu->addAction(openSshAct);
@@ -1068,10 +1079,7 @@ void MainWindow::SelectAll()
 
 void MainWindow::GotoLine()
 {
-    if (gotoLineDialog_ == nullptr) {
-        gotoLineDialog_ = new GotoLineDialog(this);
-    }
-    gotoLineDialog_->show();
+    (new GotoLineDialog(this))->show();
 }
 
 void MainWindow::SyncWrapTextState()

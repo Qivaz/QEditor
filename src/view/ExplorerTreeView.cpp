@@ -30,7 +30,7 @@
 #include "Logger.h"
 
 namespace QEditor {
-ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu())
+ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(this))
 {
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
@@ -172,7 +172,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(filePath);
     });
-    menu_->popup(QCursor::pos());
+//    menu_->popup(QCursor::pos());
 
     auto fileName = fileInfo.fileName();
     QAction *copyNameAction = new QAction("Copy File Name");
@@ -181,7 +181,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(fileName);
     });
-    menu_->popup(QCursor::pos());
+//    menu_->popup(QCursor::pos());
 
     menu_->addSeparator();
 

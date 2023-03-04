@@ -87,7 +87,6 @@ private:
 private:
     Ui::UISearchDialog *ui_;
     SearchResultList *searchResultList_{nullptr};
-    int sessionCount_{0};
 };
 }  // namespace QEditor
 

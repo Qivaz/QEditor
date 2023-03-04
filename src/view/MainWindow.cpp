@@ -392,6 +392,14 @@ bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
 }
 
+Searcher *MainWindow::GetSearcher()
+{
+    if (searcher_ == nullptr) {
+        searcher_ = new Searcher();
+    }
+    return searcher_;
+}
+
 SearchResultList *MainWindow::GetSearchResultList()
 {
     if (searchResultList_ == nullptr) {
@@ -515,7 +523,7 @@ bool MainWindow::FindNext()
     if (searchingString().isEmpty()) {
         return false;
     }
-    auto cursor = searchDialog_->FindNext(searchingString(), editView()->textCursor());
+    auto cursor = searcher_->FindNext(searchingString(), editView()->textCursor());
     if (!cursor.isNull()) {
         editView()->setTextCursor(cursor);
         return true;
@@ -528,7 +536,7 @@ bool MainWindow::FindPrevious()
     if (searchingString().isEmpty()) {
         return false;
     }
-    auto cursor = searchDialog_->FindPrevious(searchingString(), editView()->textCursor());
+    auto cursor = searcher_->FindPrevious(searchingString(), editView()->textCursor());
     if (!cursor.isNull()) {
         editView()->setTextCursor(cursor);
         return true;

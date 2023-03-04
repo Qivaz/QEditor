@@ -19,6 +19,7 @@
 
 #include <QScrollBar>
 #include <QTextBlock>
+#include <SearchDialog.h>
 
 #include "MainWindow.h"
 #include "Settings.h"
@@ -63,8 +64,6 @@ SearchDialog::~SearchDialog()
 
 EditView* SearchDialog::editView() { return MainWindow::Instance().editView(); }
 
-TabView* SearchDialog::tabView() { return MainWindow::Instance().tabView(); }
-
 void SearchDialog::Start(int index)
 {
 #define FORCE_DARK_THEME
@@ -78,6 +77,8 @@ void SearchDialog::Start(int index)
 #endif
 #endif
 
+    searcher_ = MainWindow::Instance().GetSearcher();
+
     if (index == 0) {  // Find.
         ui_->lineEditFindFindWhat->setText(GetSelectedText());
     } else {  // Replace.
@@ -85,6 +86,17 @@ void SearchDialog::Start(int index)
     }
     setCurrentTabIndex(index);
     show();
+}
+
+void SearchDialog::InitSetting()
+{
+    searcher_->setCheckBoxFindBackward(ui_->checkBoxFindBackward->isChecked());
+    searcher_->setCheckBoxFindWholeWord(ui_->checkBoxFindWholeWord->isChecked());
+    searcher_->setCheckBoxFindMatchCase(ui_->checkBoxFindMatchCase->isChecked());
+    searcher_->setCheckBoxFindWrapAround(ui_->checkBoxFindWrapAround->isChecked());
+    searcher_->setRadioButtonFindNormal(ui_->radioButtonFindNormal->isChecked());
+    searcher_->setRadioButtonFindExtended(ui_->radioButtonFindExtended->isChecked());
+    searcher_->setRadioButtonFindRe(ui_->radioButtonFindRe->isChecked());
 }
 
 int SearchDialog::currentTabIndex()
@@ -108,7 +120,143 @@ const QString SearchDialog::GetSelectedText()
     return text;
 }
 
-bool SearchDialog::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+void SearchDialog::on_pushButtonFindFindNext_clicked()
+{
+    auto const &target = ui_->lineEditFindFindWhat->text();
+    InitSetting();
+    auto cursor = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
+    if (!cursor.isNull()) {
+        editView()->setTextCursor(cursor);
+    }
+}
+
+void SearchDialog::on_radioButtonFindRe_toggled(bool checked)
+{
+    if (checked) {
+        ui_->checkBoxFindWholeWord->setDisabled(true);
+        ui_->checkBoxFindMatchCase->setDisabled(true);
+    }
+}
+
+void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
+{
+    if (searchResultList_ == nullptr) {
+        searchResultList_ = MainWindow::Instance().GetSearchResultList();
+    }
+    MainWindow::Instance().ShowSearchDockView();
+
+    auto sessionItem = searchResultList_->StartSearchSession(editView());
+    qDebug() << "Find all start....";
+    std::vector<QTextCursor> res;
+    auto const &target = ui_->lineEditFindFindWhat->text();
+    InitSetting();
+    res = searcher_->FindAll(target);
+    qDebug() << "Find all finish....";
+    int matchCount = 0;
+
+    // TODO:
+    // To support display dynamic visible list items, and do fetchMore for user scrolling.
+    for (const auto &item : res) {
+        qDebug() << "Display item start....";
+        const auto currentBlock = item.block();
+        int lineNum = item.blockNumber();
+        const auto highlightingTarget = item.selectedText().toHtmlEscaped();
+        const auto htmlTarget = QString("<span style=\"font-size:14px;font-family:Consolas;color:#BCE08C\">") + highlightingTarget + QString("</span>");
+        const auto plainText = currentBlock.text();
+        auto escapedStr = plainText.toHtmlEscaped();
+        escapedStr.replace(highlightingTarget, htmlTarget, Qt::CaseSensitive);
+        qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget << ", htmlTarget: " << htmlTarget
+                 << ", currentStr: " << escapedStr;
+
+        auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") +
+                    "Line " + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
+                    QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
+        qDebug() << "Line " << lineNum << ": text: " << htmlText;
+        ++matchCount;
+        searchResultList_->AddSearchResult(sessionItem, lineNum, htmlText, plainText, item);
+        qDebug() << "Display item end....";
+    }
+    searchResultList_->FinishSearchSession(sessionItem, target, matchCount);
+}
+
+void SearchDialog::on_pushButtonFindCount_clicked()
+{
+    std::vector<QTextCursor> res;
+    auto const &target = ui_->lineEditFindFindWhat->text();
+    InitSetting();
+    res = searcher_->FindAll(target);
+    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) +
+                " matches in " + editView()->fileName() + "</font></b>";
+    ui_->labelInfo->setText(info);
+}
+
+void SearchDialog::on_pushButtonFindCancel_clicked()
+{
+    close();
+}
+
+void SearchDialog::on_pushButtonReplaceCancel_clicked()
+{
+    close();
+}
+
+void SearchDialog::on_pushButtonReplaceFindNext_clicked()
+{
+    auto const &target = ui_->lineEditReplaceFindWhat->text();
+    InitSetting();
+    auto res = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
+    if (!res.isNull()) {
+        editView()->setTextCursor(res);
+    }
+}
+
+void SearchDialog::on_pushButtonReplaceReplace_clicked()
+{
+    auto const &target = ui_->lineEditReplaceFindWhat->text();
+    auto const &text = ui_->lineEditReplaceReplaceWith->text();
+    InitSetting();
+    searcher_->setInfo("");
+    searcher_->Replace(target, text, ui_->checkBoxFindBackward->isChecked());
+    ui_->labelInfo->setText(searcher_->info());
+}
+
+void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
+{
+    int count;
+    auto const &target = ui_->lineEditReplaceFindWhat->text();
+    auto const &text = ui_->lineEditReplaceReplaceWith->text();
+    InitSetting();
+    count = searcher_->ReplaceAll(target, text);
+    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(count) +
+                " occurrences were replaced in " + editView()->fileName() + "</font></b>";
+    ui_->labelInfo->setText(info);
+}
+
+void SearchDialog::on_lineEditFindFindWhat_textChanged(const QString &)
+{
+    ui_->labelInfo->clear();
+}
+
+void SearchDialog::on_lineEditReplaceFindWhat_textChanged(const QString &)
+{
+    ui_->labelInfo->clear();
+}
+
+EditView* Searcher::editView() { return MainWindow::Instance().editView(); }
+
+TabView* Searcher::tabView() { return MainWindow::Instance().tabView(); }
+
+QString Searcher::info() const
+{
+    return info_;
+}
+
+void Searcher::setInfo(const QString &info)
+{
+    info_ = info;
+}
+
+bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
     int firstStart = -1;
     QTextCursor currentCursor = startCursor;
     while (true) {
@@ -194,15 +342,15 @@ bool SearchDialog::Find(const QStringList &target, const QTextCursor &startCurso
 }
 
 template <class T>
-bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+bool Searcher::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
     int flag = 0;
     if (backward) {
         flag |= QTextDocument::FindFlag::FindBackward;
     }
-    if (ui_->checkBoxFindMatchCase->isChecked()) {
+    if (checkBoxFindMatchCase) {
         flag |= QTextDocument::FindFlag::FindCaseSensitively;
     }
-    if (ui_->checkBoxFindWholeWord->isChecked()) {
+    if (checkBoxFindWholeWord) {
         flag |= QTextDocument::FindFlag::FindWholeWords;
     }
 
@@ -215,7 +363,7 @@ bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCu
     }
 
     bool atStart = true;  // TODO: Only re-find if not at start position.
-    if (ui_->checkBoxFindWrapAround->isChecked() && atStart) {
+    if (checkBoxFindWrapAround && atStart) {
         QScrollBar *scrollBar = editView()->verticalScrollBar();
         auto sliderPos = scrollBar->sliderPosition();
         QTextCursor anewCursor = startCursor;
@@ -236,7 +384,7 @@ bool SearchDialog::Find(const T &target, const QTextCursor &startCursor, QTextCu
     return res;
 }
 
-void HandleEscapeChars(QString &text)
+static void HandleEscapeChars(QString &text)
 {
 //    text.replace("\\a", "\a");  // 0x07, Alert bell
 //    text.replace("\\b", "\b");  // 0x08, Backspace
@@ -260,35 +408,35 @@ void HandleEscapeChars(QString &text)
     text.replace("\\t", "\t");
 }
 
-QTextCursor SearchDialog::FindPrevious(const QString &text, const QTextCursor &startCursor)
+QTextCursor Searcher::FindPrevious(const QString &text, const QTextCursor &startCursor)
 {
-    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    bool backwardCheck = checkBoxFindBackward;
     return FindNext(text, startCursor, !backwardCheck);
 }
 
-QTextCursor SearchDialog::FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
+QTextCursor Searcher::FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
 {
-    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    bool backwardCheck = checkBoxFindBackward;
     return FindNext(text, startCursor, backward ? backwardCheck : !backwardCheck);
 }
 
-QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &startCursor)
+QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCursor)
 {
-    bool backwardCheck = ui_->checkBoxFindBackward->isChecked();
+    bool backwardCheck = checkBoxFindBackward;
     return FindNext(text, startCursor, backwardCheck);
 }
 
 // Should save original cursor, and restore it if failed.
-QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
+QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
 {
     MainWindow::Instance().setSearchingString(text);
     bool res;
     QTextCursor cursor;
-    if (ui_->radioButtonFindRe->isChecked()) {
+    if (radioButtonFindRe) {
         const QRegExp reTarget = QRegExp(text);
         res = Find<QRegExp>(reTarget, startCursor, cursor, backward);
     } else {
-        if (ui_->radioButtonFindExtended->isChecked()) {
+        if (radioButtonFindExtended) {
             auto extendedText = text;
             HandleEscapeChars(extendedText);
             qDebug() << extendedText;
@@ -309,24 +457,7 @@ QTextCursor SearchDialog::FindNext(const QString &text, const QTextCursor &start
     }
 }
 
-void SearchDialog::on_pushButtonFindFindNext_clicked()
-{   
-    auto const &target = ui_->lineEditFindFindWhat->text();
-    auto cursor = FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
-    if (!cursor.isNull()) {
-        editView()->setTextCursor(cursor);
-    }
-}
-
-void SearchDialog::on_radioButtonFindRe_toggled(bool checked)
-{
-    if (checked) {
-        ui_->checkBoxFindWholeWord->setDisabled(true);
-        ui_->checkBoxFindMatchCase->setDisabled(true);
-    }
-}
-
-std::vector<QTextCursor> SearchDialog::FindAll(const QString &target) {
+std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
     std::vector<QTextCursor> cursors;
     QTextCursor savedCursor = editView()->textCursor();
     QTextCursor cursor = editView()->textCursor();
@@ -351,92 +482,10 @@ std::vector<QTextCursor> SearchDialog::FindAll(const QString &target) {
     return cursors;
 }
 
-void SearchDialog::ReplaceInsensitiveStr(QString &text, const QString &target)
-{
-    int index = 0;
-    qDebug() << "text: " << text;
-    while((index = text.indexOf(target, index, Qt::CaseInsensitive)) != -1) {
-        auto substr = text.mid(index, target.length());
-        auto tr = QString("<font face = Consolas size = 11 color = #BCE08C>") + substr + QString("</font>");
-        text.replace(index, substr.length(), tr);
-        index += tr.length();
-        qDebug() << "index: " << index;
-    }
-}
-
-void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
-{
-    if (searchResultList_ == nullptr) {
-        searchResultList_ = MainWindow::Instance().GetSearchResultList();
-    }
-    MainWindow::Instance().ShowSearchDockView();
-
-    auto sessionItem = searchResultList_->StartSearchSession(editView());
-    qDebug() << "Find all start....";
-    std::vector<QTextCursor> res;
-    auto const &target = ui_->lineEditFindFindWhat->text();
-    res = FindAll(target);
-    qDebug() << "Find all finish....";
-    int matchCount = 0;
-
-    // TODO:
-    // To support display dynamic visible list items, and do fetchMore for user scrolling.
-    for (const auto &item : res) {
-        qDebug() << "Display item start....";
-        const auto currentBlock = item.block();
-        int lineNum = item.blockNumber();
-        const auto highlightingTarget = item.selectedText().toHtmlEscaped();
-        const auto htmlTarget = QString("<span style=\"font-size:14px;font-family:Consolas;color:#BCE08C\">") + highlightingTarget + QString("</span>");
-        const auto plainText = currentBlock.text();
-        auto escapedStr = plainText.toHtmlEscaped();
-        escapedStr.replace(highlightingTarget, htmlTarget, Qt::CaseSensitive);
-        qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget << ", htmlTarget: " << htmlTarget
-                 << ", currentStr: " << escapedStr;
-
-        auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") +
-                    "Line " + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
-                    QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
-        qDebug() << "Line " << lineNum << ": text: " << htmlText;
-        ++matchCount;
-        searchResultList_->AddSearchResult(sessionItem, lineNum, htmlText, plainText, item);
-        qDebug() << "Display item end....";
-    }
-    searchResultList_->FinishSearchSession(sessionItem, target, matchCount);
-}
-
-void SearchDialog::on_pushButtonFindCount_clicked()
-{
-    std::vector<QTextCursor> res;
-    auto const &target = ui_->lineEditFindFindWhat->text();
-    res = FindAll(target);
-    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) +
-                " matches in " + editView()->fileName() + "</font></b>";
-    ui_->labelInfo->setText(info);
-}
-
-void SearchDialog::on_pushButtonFindCancel_clicked()
-{
-    close();
-}
-
-void SearchDialog::on_pushButtonReplaceCancel_clicked()
-{
-    close();
-}
-
-void SearchDialog::on_pushButtonReplaceFindNext_clicked()
-{
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto res = FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
-    if (!res.isNull()) {
-        editView()->setTextCursor(res);
-    }
-}
-
 // Replace 'target' with 'text'.
-void SearchDialog::Replace(const QString &target, const QString &text, bool backward) {
+void Searcher::Replace(const QString &target, const QString &text, bool backward) {
     // Check find options.
-    bool wrapAround = (ui_->checkBoxFindWrapAround->isChecked());
+    bool wrapAround = (checkBoxFindWrapAround);
     QString startStr;
     QString endStr;
     if (backward) {
@@ -449,7 +498,7 @@ void SearchDialog::Replace(const QString &target, const QString &text, bool back
 
     // Handle \r, \n, and \t.
     auto extendedText = text;
-    if (ui_->radioButtonFindExtended->isChecked()) {
+    if (radioButtonFindExtended) {
         HandleEscapeChars(extendedText);
     }
 
@@ -477,42 +526,34 @@ void SearchDialog::Replace(const QString &target, const QString &text, bool back
             auto info = QString("<b><font color=#67A9FF size=4>") +
                                 "1 occurrence were replaced" +
                                 ", to continue replacing.</font></b>";
-            ui_->labelInfo->setText(info);
+            setInfo(info);
         } else {
             if (wrapAround) {
                 auto info = QString("<b><font color=#67A9FF size=4>") +
                                     "1 occurrence were replaced. No more occurrence to replace." + "</font></b>";
-                ui_->labelInfo->setText(info);
+                setInfo(info);
             } else {
                 auto info = QString("<b><font color=#67A9FF size=4>") +
                                     "1 occurrence were replaced." + endStr +
                                     " has been reached." + "</font></b>";
-                ui_->labelInfo->setText(info);
+                setInfo(info);
             }
         }
     } else {  // Find failure.
         if (wrapAround) {  // No found in the whole text.
             auto info = QString("<b><font color=#67A9FF size=4>") +
                                 "No more occurrence to replace." + "</font></b>";
-            ui_->labelInfo->setText(info);
+            setInfo(info);
         } else {  // Not found from current cursor to TOP or BOTTOM.
             auto info = QString("<b><font color=#67A9FF size=4>") +
                                 "No occurrence to replace, the " + endStr + " has been reached." + "</font></b>";
-            ui_->labelInfo->setText(info);
+            setInfo(info);
         }
     }
 }
 
-void SearchDialog::on_pushButtonReplaceReplace_clicked()
-{
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto const &text = ui_->lineEditReplaceReplaceWith->text();
-    Replace(target, text, ui_->checkBoxFindBackward->isChecked());
-}
-
-
 // Replace all 'target' with 'text'.
-int SearchDialog::ReplaceAll(const QString &target, const QString &text) {
+int Searcher::ReplaceAll(const QString &target, const QString &text) {
     // Move the search start pos to the start of selection if has selection.
     if (editView()->textCursor().hasSelection()) {
         int start = editView()->textCursor().selectionStart();
@@ -523,7 +564,7 @@ int SearchDialog::ReplaceAll(const QString &target, const QString &text) {
 
     // Handle \r, \n, and \t.
     auto extendedText = text;
-    if (ui_->radioButtonFindExtended->isChecked()) {
+    if (radioButtonFindExtended) {
         HandleEscapeChars(extendedText);
     }
 
@@ -540,24 +581,38 @@ int SearchDialog::ReplaceAll(const QString &target, const QString &text) {
     return res.size();
 }
 
-void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
+void Searcher::setRadioButtonFindRe(bool value)
 {
-    int count;
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto const &text = ui_->lineEditReplaceReplaceWith->text();
-    count = ReplaceAll(target, text);
-    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(count) +
-                " occurrences were replaced in " + editView()->fileName() + "</font></b>";
-    ui_->labelInfo->setText(info);
+    radioButtonFindRe = value;
 }
 
-void SearchDialog::on_lineEditFindFindWhat_textChanged(const QString &)
+void Searcher::setRadioButtonFindExtended(bool value)
 {
-    ui_->labelInfo->clear();
+    radioButtonFindExtended = value;
 }
 
-void SearchDialog::on_lineEditReplaceFindWhat_textChanged(const QString &)
+void Searcher::setRadioButtonFindNormal(bool value)
 {
-    ui_->labelInfo->clear();
+    radioButtonFindNormal = value;
+}
+
+void Searcher::setCheckBoxFindWrapAround(bool value)
+{
+    checkBoxFindWrapAround = value;
+}
+
+void Searcher::setCheckBoxFindMatchCase(bool value)
+{
+    checkBoxFindMatchCase = value;
+}
+
+void Searcher::setCheckBoxFindWholeWord(bool value)
+{
+    checkBoxFindWholeWord = value;
+}
+
+void Searcher::setCheckBoxFindBackward(bool value)
+{
+    checkBoxFindBackward = value;
 }
 }  // namespace QEditor

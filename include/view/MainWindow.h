@@ -152,6 +152,8 @@ public:
 
     SearchResultList *GetSearchResultList();
 
+    Searcher *GetSearcher();
+
 public slots:
     bool Find();
     bool FindNext();
@@ -248,7 +250,8 @@ private:
     QMenu *recentFilesMenu_{nullptr};
     QList<QAction*> recentFileActions_;
 
-    SearchResultList *searchResultList_;
+    SearchResultList *searchResultList_{nullptr};
+    Searcher *searcher_{nullptr};
     QString searchingString_;
 };
 }  // namespace QEditor

@@ -27,6 +27,61 @@ class UISearchDialog;
 }
 
 namespace QEditor {
+class Searcher : public QObject
+{
+    Q_OBJECT
+public:
+    Searcher() = default;
+    ~Searcher() = default;
+
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
+    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
+
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
+    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
+
+    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
+    template <class T>
+    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
+    std::vector<QTextCursor> FindAll(const QString &target);
+
+    void Replace(const QString &target, const QString &text, bool backward);
+    int ReplaceAll(const QString &target, const QString &text);
+
+    void setCheckBoxFindBackward(bool value);
+
+    void setCheckBoxFindWholeWord(bool value);
+
+    void setCheckBoxFindMatchCase(bool value);
+
+    void setCheckBoxFindWrapAround(bool value);
+
+    void setRadioButtonFindNormal(bool value);
+
+    void setRadioButtonFindExtended(bool value);
+
+    void setRadioButtonFindRe(bool value);
+
+    QString info() const;
+    void setInfo(const QString &info);
+
+private:
+    EditView* editView();
+    TabView* tabView();
+
+private:
+    bool checkBoxFindBackward;
+    bool checkBoxFindWholeWord;
+    bool checkBoxFindMatchCase;
+    bool checkBoxFindWrapAround;
+
+    bool radioButtonFindNormal;
+    bool radioButtonFindExtended;
+    bool radioButtonFindRe;
+
+    QString info_;
+};
+
 class SearchDialog : public QDialog
 {
     Q_OBJECT
@@ -38,12 +93,6 @@ public:
 
     int currentTabIndex();
     void setCurrentTabIndex(int index);
-
-    EditView* editView();
-    TabView* tabView();
-
-    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
-    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
 
 private slots:
     void on_pushButtonFindFindNext_clicked();
@@ -69,24 +118,14 @@ private slots:
     void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
 
 private:
-    void ReplaceInsensitiveStr(QString &str, const QString &target);
+    void InitSetting();
+    EditView* editView();
     const QString GetSelectedText();
-
-
-    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
-    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
-
-    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
-    template <class T>
-    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
-    std::vector<QTextCursor> FindAll(const QString &target);
-
-    void Replace(const QString &target, const QString &text, bool backward);
-    int ReplaceAll(const QString &target, const QString &text);
 
 private:
     Ui::UISearchDialog *ui_;
     SearchResultList *searchResultList_{nullptr};
+    Searcher *searcher_{nullptr};
 };
 }  // namespace QEditor
 

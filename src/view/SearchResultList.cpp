@@ -35,7 +35,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     QStyleOptionViewItemV4 optionV4 = option;
     initStyleOption(&optionV4, index);
 
-    QStyle *style = optionV4.widget? optionV4.widget->style() : QApplication::style();
+    QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
 
     QTextDocument doc;
     doc.setHtml(optionV4.text);
@@ -156,7 +156,7 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
     auto widget = itemWidget(sessionItem, 0);
     auto title = dynamic_cast<QLabel*>(widget);
     if (title == nullptr) {
-        qCritical() << "Expect a label, but got others";
+        qDebug() << "Expect a label, but got others";
         return;
     }
     title->setFont(QFont("Consolas", 11));

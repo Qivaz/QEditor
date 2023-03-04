@@ -69,17 +69,15 @@ private:
     void ReplaceInsensitiveStr(QString &str, const QString &target);
     const QString GetSelectedText();
 
-    void FindNext(const QString &text);
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
 
+    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor);
     template <class T>
-    bool Find(const T &target);
-    template <class T>
-    std::vector<QTextCursor> FindAll(const T &target);
+    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor);
+    std::vector<QTextCursor> FindAll(const QString &target);
 
-    template <class T>
-    bool Replace(const T &target, const QString &text);
-    template <class T>
-    int ReplaceAll(const T &target, const QString &text);
+    void Replace(const QString &target, const QString &text);
+    int ReplaceAll(const QString &target, const QString &text);
 
 private:
     Ui::UISearchDialog *ui_;

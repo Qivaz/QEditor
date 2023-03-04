@@ -14,7 +14,7 @@
    <string>Find &amp; Replace</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">color: lightGray; background-color: black; font: 11pt;</string>
+   <string notr="true">color: lightGray; background-color: rgb(68, 68, 68); font: 11pt;</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
@@ -308,7 +308,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Extended(\n, \r, \t, ...)</string>
+     <string>Extended(\n, \r, \t)</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="radioButtonFindRe">

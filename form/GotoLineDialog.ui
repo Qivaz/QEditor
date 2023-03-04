@@ -14,8 +14,7 @@
    <string>Goto Line</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">color: lightGray;background-color: rgb(54, 54, 54); 
-font: 10pt;</string>
+   <string notr="true">color: lightGray; background-color: rgb(68, 68, 68); font: 11pt;</string>
   </property>
   <widget class="QLabel" name="labelGotoLine">
    <property name="geometry">

@@ -144,17 +144,17 @@ void TabView::HandleTabBarClicked(int index)
     if (QApplication::mouseButtons() == Qt::RightButton) {
         qDebug() << "TabView::barClicked(RightButton), index: " << index;
         menu_->clear();
-        QAction *closeAction = new QAction("Close  (Click Close Button)");
+        QAction *closeAction = new QAction(tr("Close  (Click Close Button)"));
         menu_->addAction(closeAction);
         connect(closeAction, &QAction::triggered, this, &TabView::TabCloseMaybeSave);
         menu_->popup(QCursor::pos());
 
-        QAction *forceCloseAction = new QAction("Force Close  (Double Click)");
+        QAction *forceCloseAction = new QAction(tr("Force Close  (Double Click)"));
         menu_->addAction(forceCloseAction);
         connect(forceCloseAction, &QAction::triggered, this, &TabView::TabForceClose);
         menu_->popup(QCursor::pos());
 
-        QAction *closeAllAction = new QAction("Force Close All");
+        QAction *closeAllAction = new QAction(tr("Force Close All"));
         menu_->addAction(closeAllAction);
         connect(closeAllAction, &QAction::triggered, this, [&]() {
             clear();
@@ -166,7 +166,7 @@ void TabView::HandleTabBarClicked(int index)
             menu_->addSeparator();
 
             auto filePath = editView->filePath();
-            QAction *copyPathAction = new QAction("Copy Full Path");
+            QAction *copyPathAction = new QAction(tr("Copy Full Path"));
             menu_->addAction(copyPathAction);
             connect(copyPathAction, &QAction::triggered, this, [filePath]() {
                 QClipboard *clipboard = QGuiApplication::clipboard();
@@ -175,7 +175,7 @@ void TabView::HandleTabBarClicked(int index)
             menu_->popup(QCursor::pos());
 
             auto fileName = editView->fileName();
-            QAction *copyNameAction = new QAction("Copy File Name");
+            QAction *copyNameAction = new QAction(tr("Copy File Name"));
             menu_->addAction(copyNameAction);
             connect(copyNameAction, &QAction::triggered, this, [fileName]() {
                 QClipboard *clipboard = QGuiApplication::clipboard();
@@ -189,7 +189,7 @@ void TabView::HandleTabBarClicked(int index)
 #if defined(Q_OS_WIN)
             QAction *openExplorerAction = new QAction("Reveal in File Explorer");
 #else
-            QAction *openExplorerAction = new QAction("Open Containing Folder");
+            QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif
             menu_->addAction(openExplorerAction);
             connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {
@@ -211,14 +211,14 @@ void TabView::HandleTabBarClicked(int index)
             menu_->addSeparator();
 
             static bool has_before_path = false;
-            QAction *viewDiffWithAction = new QAction("View Diff between...");
+            QAction *viewDiffWithAction = new QAction(tr("View Diff between..."));
             menu_->addAction(viewDiffWithAction);
             connect(viewDiffWithAction, &QAction::triggered, this, [editView, this]() {
                 diffFormerEditView_ = editView;
                 has_before_path = true;
             });
             if (has_before_path) {
-                QAction *viewDiffWithPreviousAction = new QAction("View Diff with \'" + diffFormerEditView_->fileName() + "\'");
+                QAction *viewDiffWithPreviousAction = new QAction(tr("View Diff with") + " \'" + diffFormerEditView_->fileName() + "\'");
                 menu_->addAction(viewDiffWithPreviousAction);
                 connect(viewDiffWithPreviousAction, &QAction::triggered, this, [editView, this]() {
                     ViewDiff(diffFormerEditView_, editView);
@@ -231,7 +231,7 @@ void TabView::HandleTabBarClicked(int index)
             auto diffView = GetDiffView(index);
             if (diffView != nullptr && diffView->diffFormerEditView() != nullptr && diffView->diffLatterEditView() != nullptr) {
                 menu_->addSeparator();
-                QAction *swapDiffAction = new QAction("Swap Diff");
+                QAction *swapDiffAction = new QAction(tr("Swap Diff"));
                 menu_->addAction(swapDiffAction);
                 connect(swapDiffAction, &QAction::triggered, this, [index, this]() {
                     SwapDiff(index);
@@ -430,7 +430,7 @@ bool TabView::AutoLoad()
             }
             // Don't open file multiple times.
             if (openFiles_.contains(filePathTip)) {
-                Toast::Instance().Show(Toast::kWarning, filePathTip + " already opened.");
+                Toast::Instance().Show(Toast::kWarning, filePathTip + tr(" already opened."));
                 continue;
             }
 
@@ -500,7 +500,7 @@ void TabView::DeleteWidget(QWidget *widget)
 void TabView::NewFile()
 {
     int num = NewFileNum::GetNumber();
-    QString fileName = QString("new ") + QString::number(num);
+    QString fileName = QString(tr("new ")) + QString::number(num);
     auto editView = new EditView(fileName, this);
     editView->setNewFileNum(num);
     qDebug() << "fileName: " << fileName << ", num: " << num << ", editView: " << editView;
@@ -517,12 +517,12 @@ void TabView::ViewDiff(const QString &former, const QString &latter)
     diff_.Impose(former, latter);
     const QString html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
-    QString diffName = former.left(20) + "... ==> " + latter.left(20) + "...";
+    QString diffName = former.left(20) + "... → " + latter.left(20) + "...";
     auto diffView = new DiffView(this);
     addTab(diffView, diffName);
     setTabIcon(count() - 1, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
     setCurrentIndex(count() - 1);
-    QString diffTip = QString("Diff: ") + diffName;
+    QString diffTip = QString(tr("Diff: ")) + diffName;
     setTabToolTip(count() - 1, diffTip);
     diffView->setReadOnly(true);
     diffView->setFocus();
@@ -536,7 +536,7 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter)
     diff_.Impose(former->toPlainText(), latter->toPlainText());
     const QString html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
-    QString diffName = former->fileName() + QString(" ==> ") + latter->fileName();
+    QString diffName = former->fileName() + QString(" → ") + latter->fileName();
     auto diffView = new DiffView(this);
     diffView->setDiffFormerEditView(former);
     diffView->setDiffLatterEditView(latter);
@@ -545,7 +545,7 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter)
     setCurrentIndex(count() - 1);
     auto beforeName = former->filePath().isEmpty() ? former->fileName() : former->filePath();
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
-    QString diffTip = QString("Diff: ") + beforeName + QString(" ==> ") + afterName;
+    QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(count() - 1, diffTip);
     diffView->setReadOnly(true);
     diffView->setFocus();
@@ -575,12 +575,12 @@ void TabView::SwapDiff(int index)
     diff_.Impose(former->toPlainText(), latter->toPlainText());
     const QString html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
-    QString diffName = former->fileName() + QString(" ==> ") + latter->fileName();
+    QString diffName = former->fileName() + QString(" → ") + latter->fileName();
     setTabText(index, diffName);
     setTabIcon(index, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
     auto beforeName = former->filePath().isEmpty() ? former->fileName() : former->filePath();
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
-    QString diffTip = QString("Diff: ") + beforeName + QString(" ==> ") + afterName;
+    QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(index, diffTip);
     diffView->insertHtml(html);
     qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
@@ -603,7 +603,7 @@ void TabView::OpenFile(const QString &filePath)
         // Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + " already opened.");
         auto index = FindEditViewIndex(fileInfo.canonicalFilePath());
         if (index == -1) {
-            Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + " already opened, but not found!");
+            Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + tr(" already opened, but not found!"));
         } else {
             setCurrentIndex(index);
         }
@@ -722,7 +722,7 @@ void TabView::tabInserted(int index)
         return;
     }
     qDebug() << "index: " << index << ", widget: " << editView->fileName();
-    ChangeTabCloseButtonToolTip(index, "Double click to force close.");
+    ChangeTabCloseButtonToolTip(index, tr("Double click to force close."));
 //    UpdateWindowTitle(index);
 //    GetEditView(index)->TrigerParser();
 

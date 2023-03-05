@@ -19,7 +19,6 @@
 
 #include <QScrollBar>
 #include <QTextBlock>
-#include <SearchDialog.h>
 
 #include "MainWindow.h"
 #include "Settings.h"
@@ -169,7 +168,7 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
                  << ", currentStr: " << escapedStr;
 
         auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") +
-                    "Line " + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
+                    tr("Line ") + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
                     QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
         qDebug() << "Line " << lineNum << ": text: " << htmlText;
         ++matchCount;
@@ -186,7 +185,7 @@ void SearchDialog::on_pushButtonFindCount_clicked()
     InitSetting();
     res = searcher_->FindAll(target);
     auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) +
-                " matches in " + editView()->fileName() + "</font></b>";
+                tr(" matches in ") + editView()->fileName() + "</font></b>";
     ui_->labelInfo->setText(info);
 }
 
@@ -228,7 +227,7 @@ void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
     InitSetting();
     count = searcher_->ReplaceAll(target, text);
     auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(count) +
-                " occurrences were replaced in " + editView()->fileName() + "</font></b>";
+                tr(" occurrences were replaced in ") + editView()->fileName() + "</font></b>";
     ui_->labelInfo->setText(info);
 }
 
@@ -489,11 +488,11 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
     QString startStr;
     QString endStr;
     if (backward) {
-        startStr = "bottom";
-        endStr = "top";
+        startStr = tr("bottom");
+        endStr = tr("top");
     } else {
-        startStr = "top";
-        endStr = "bottom";
+        startStr = tr("top");
+        endStr = tr("bottom");
     }
 
     // Handle \r, \n, and \t.
@@ -524,29 +523,31 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
         if (!res.isNull()) {
             editView()->setTextCursor(res);
             auto info = QString("<b><font color=#67A9FF size=4>") +
-                                "1 occurrence were replaced" +
-                                ", to continue replacing.</font></b>";
+                                tr("1 occurrence were replaced, to continue replacing.") +
+                                "</font></b>";
             setInfo(info);
         } else {
             if (wrapAround) {
                 auto info = QString("<b><font color=#67A9FF size=4>") +
-                                    "1 occurrence were replaced. No more occurrence to replace." + "</font></b>";
+                                    tr("1 occurrence were replaced. No more occurrence to replace.") +
+                                    "</font></b>";
                 setInfo(info);
             } else {
                 auto info = QString("<b><font color=#67A9FF size=4>") +
-                                    "1 occurrence were replaced." + endStr +
-                                    " has been reached." + "</font></b>";
+                                    tr("1 occurrence were replaced. ") + endStr +
+                                    tr(" has been reached.") + "</font></b>";
                 setInfo(info);
             }
         }
     } else {  // Find failure.
         if (wrapAround) {  // No found in the whole text.
             auto info = QString("<b><font color=#67A9FF size=4>") +
-                                "No more occurrence to replace." + "</font></b>";
+                                tr("No more occurrence to replace.") + "</font></b>";
             setInfo(info);
         } else {  // Not found from current cursor to TOP or BOTTOM.
             auto info = QString("<b><font color=#67A9FF size=4>") +
-                                "No occurrence to replace, the " + endStr + " has been reached." + "</font></b>";
+                                tr("No occurrence to replace, the ") + endStr +
+                                tr(" has been reached.") + "</font></b>";
             setInfo(info);
         }
     }

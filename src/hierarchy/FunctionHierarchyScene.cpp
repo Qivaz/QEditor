@@ -111,7 +111,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &fu
     int maxY = 0;
     auto [startNode, exist] = GetNode(funcName);
     if (depth >= xPos_.size()) {
-        Toast::Instance().Show(Toast::kWarning, QString("Wrong call depth."));
+        Toast::Instance().Show(Toast::kWarning, QString(tr("Wrong call depth.")));
         return {0, 0};
     }
     startNode->setPos(QPointF(xPos_[depth], (depth + 1) * distanceY));
@@ -127,7 +127,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &fu
                 xPos_.push_back(0);
             }
             if (depth >= xPos_.size()) {
-                Toast::Instance().Show(Toast::kWarning, QString("Wrong call depth."));
+                Toast::Instance().Show(Toast::kWarning, QString(tr("Wrong call depth.")));
                 return {0, 0};
             }
             int newX = xPos_[depth] + distanceX;

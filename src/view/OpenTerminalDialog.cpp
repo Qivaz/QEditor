@@ -53,7 +53,7 @@ void OpenTerminalDialog::on_pushButtonConnect_clicked()
     if (!IsValidIpAddress(ip)) {
         ui_->lineEditIp->setFocus();
         ui_->lineEditIp->selectAll();
-        Toast::Instance().Show(Toast::kError, QString("The input IP is invalid: %1").arg(ip));
+        Toast::Instance().Show(Toast::kError, QString(tr("The input IP is invalid: %1")).arg(ip));
         return;
     }
     QString port = ui_->lineEditPort->text();
@@ -62,7 +62,7 @@ void OpenTerminalDialog::on_pushButtonConnect_clicked()
     if (!success || pt < 0 || pt > 255) {
         ui_->lineEditPort->setFocus();
         ui_->lineEditPort->selectAll();
-        Toast::Instance().Show(Toast::kError, QString("The input port is invalid: %1").arg(port));
+        Toast::Instance().Show(Toast::kError, QString(tr("The input port is invalid: %1")).arg(port));
         return;
     }
     QString user = ui_->lineEditUser->text();

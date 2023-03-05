@@ -36,6 +36,7 @@ protected:
 
 class ExplorerTreeView : public QTreeView
 {
+    Q_OBJECT
 public:
     ExplorerTreeView(QWidget *parent = nullptr, const QString &rootPath = QString());
     ~ExplorerTreeView() = default;

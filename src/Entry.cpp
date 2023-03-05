@@ -37,6 +37,11 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(OutputMessageOutput);
 #endif
 
+    qCritical() << "currentPath: " << QDir::currentPath();
+    QTranslator translator;
+    translator.load("zh_CN");
+    app.installTranslator(&translator);
+
     QCoreApplication::setOrganizationName(QEditor::Constants::kOrgName);
     QCoreApplication::setApplicationName(QEditor::Constants::kAppName);
     QCoreApplication::setApplicationVersion(QEditor::Constants::kVersionStr);
@@ -66,7 +71,7 @@ int main(int argc, char *argv[])
     if (!singleRunLockFile.tryLock(1000)) {
         qCritical() << "Already run, lock error: " << singleRunLockFile.error();
         QMessageBox::warning(nullptr, QString(QEditor::Constants::kAppName),
-                             QString("Cannot read file %1:\n%2.")
+                             QString(QObject::tr("Cannot read file %1:\n%2."))
                              .arg(QDir::toNativeSeparators(singleRunFilePath), singleRunLockFile.error()));
         return 0;
     }

@@ -14,7 +14,7 @@
    <string>Open SSH</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">color: lightGray; background-color: black; font: 11pt;</string>
+   <string notr="true">color: lightGray; background-color: rgb(68, 68, 68); font: 11pt;</string>
   </property>
   <widget class="QLabel" name="labelIp">
    <property name="geometry">

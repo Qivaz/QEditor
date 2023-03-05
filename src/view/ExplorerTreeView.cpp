@@ -166,7 +166,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
 
     const auto &fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
     auto filePath = fileInfo.canonicalFilePath();
-    QAction *copyPathAction = new QAction("Copy Full Path");
+    QAction *copyPathAction = new QAction(tr("Copy Full Path"));
     menu_->addAction(copyPathAction);
     connect(copyPathAction, &QAction::triggered, this, [filePath]() {
         QClipboard *clipboard = QGuiApplication::clipboard();
@@ -175,7 +175,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
 //    menu_->popup(QCursor::pos());
 
     auto fileName = fileInfo.fileName();
-    QAction *copyNameAction = new QAction("Copy File Name");
+    QAction *copyNameAction = new QAction(tr("Copy File Name"));
     menu_->addAction(copyNameAction);
     connect(copyNameAction, &QAction::triggered, this, [fileName]() {
         QClipboard *clipboard = QGuiApplication::clipboard();
@@ -189,7 +189,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
 #if defined(Q_OS_WIN)
     QAction *openExplorerAction = new QAction("Reveal in File Explorer");
 #else
-    QAction *openExplorerAction = new QAction("Open Containing Folder");
+    QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif
     menu_->addAction(openExplorerAction);
     connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {

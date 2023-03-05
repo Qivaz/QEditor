@@ -27,6 +27,54 @@ class UISearchDialog;
 }
 
 namespace QEditor {
+class Searcher;
+
+class SearchDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit SearchDialog(QWidget *parent = nullptr, int index = 0);
+    ~SearchDialog();
+
+    void Start(int index);
+
+    int currentTabIndex();
+    void setCurrentTabIndex(int index);
+
+private slots:
+    void on_pushButtonFindFindNext_clicked();
+
+    void on_radioButtonFindRe_toggled(bool checked);
+
+    void on_pushButtonFindFindAllInCurrent_clicked();
+
+    void on_pushButtonReplaceCancel_clicked();
+
+    void on_pushButtonFindCancel_clicked();
+
+    void on_pushButtonFindCount_clicked();
+
+    void on_pushButtonReplaceFindNext_clicked();
+
+    void on_pushButtonReplaceReplace_clicked();
+
+    void on_pushButtonReplaceReplaceAll_clicked();
+
+    void on_lineEditFindFindWhat_textChanged(const QString &arg1);
+
+    void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
+
+private:
+    void InitSetting();
+    EditView* editView();
+    const QString GetSelectedText();
+
+private:
+    Ui::UISearchDialog *ui_;
+    SearchResultList *searchResultList_{nullptr};
+    Searcher *searcher_{nullptr};
+};
+
 class Searcher : public QObject
 {
     Q_OBJECT
@@ -80,52 +128,6 @@ private:
     bool radioButtonFindRe;
 
     QString info_;
-};
-
-class SearchDialog : public QDialog
-{
-    Q_OBJECT
-public:
-    explicit SearchDialog(QWidget *parent = nullptr, int index = 0);
-    ~SearchDialog();
-
-    void Start(int index);
-
-    int currentTabIndex();
-    void setCurrentTabIndex(int index);
-
-private slots:
-    void on_pushButtonFindFindNext_clicked();
-
-    void on_radioButtonFindRe_toggled(bool checked);
-
-    void on_pushButtonFindFindAllInCurrent_clicked();
-
-    void on_pushButtonReplaceCancel_clicked();
-
-    void on_pushButtonFindCancel_clicked();
-
-    void on_pushButtonFindCount_clicked();
-
-    void on_pushButtonReplaceFindNext_clicked();
-
-    void on_pushButtonReplaceReplace_clicked();
-
-    void on_pushButtonReplaceReplaceAll_clicked();
-
-    void on_lineEditFindFindWhat_textChanged(const QString &arg1);
-
-    void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
-
-private:
-    void InitSetting();
-    EditView* editView();
-    const QString GetSelectedText();
-
-private:
-    Ui::UISearchDialog *ui_;
-    SearchResultList *searchResultList_{nullptr};
-    Searcher *searcher_{nullptr};
 };
 }  // namespace QEditor
 

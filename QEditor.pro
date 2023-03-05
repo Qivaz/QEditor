@@ -92,6 +92,9 @@ SOURCES       = \
 
 RESOURCES = QEditor.qrc
 
+TRANSLATIONS = \
+    zh_CN.ts\
+
 FORMS += \
     form/GotoLineDialog.ui \
     form/OpenTerminalDialog.ui \

@@ -99,6 +99,322 @@ MainWindow::MainWindow()
     QToolTip::setPalette(pal);
 }
 
+void MainWindow::CreateActions()
+{
+    menuBar()->setStyleSheet("QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
+                             QMenu{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(40, 40, 40); border: none;}\
+                             QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
+
+    auto toolBarStyle = "QToolBar { color: lightGray;" "background-color: rgb(28, 28, 28); }"\
+                        "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
+                        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
+                        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
+                        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
+                        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
+    // File menu.
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    QToolBar *fileToolBar = addToolBar(tr("File"));
+    fileToolBar->setStyleSheet(toolBarStyle);
+
+    // TODO:
+    // Use addPixmap() set on/off icons.
+    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/file.svg"));
+    QAction *newAct = new QAction(newIcon, tr("&New"), this);
+//    newAct->setShortcuts(QKeySequence::New);
+    newAct->setStatusTip(tr("Create a new file"));
+    connect(newAct, &QAction::triggered, this, &MainWindow::NewFile);
+    fileMenu->addAction(newAct);
+    fileToolBar->addAction(newAct);
+
+    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/folder-open.svg"));
+    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+    openAct->setShortcuts(QKeySequence::Open);
+    openAct->setStatusTip(tr("Open an existing file"));
+    connect(openAct, &QAction::triggered, this, &MainWindow::Open);
+    fileMenu->addAction(openAct);
+    fileToolBar->addAction(openAct);
+
+    recentFilesMenu_ = fileMenu->addMenu(tr("Open Recent"));
+    UpdateRecentFilesMenu();
+
+    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.svg"));
+    QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
+    saveAct->setShortcuts(QKeySequence::Save);
+    saveAct->setStatusTip(tr("Save the document to disk"));
+    connect(saveAct, &QAction::triggered, this, &MainWindow::Save);
+    fileMenu->addAction(saveAct);
+    fileToolBar->addAction(saveAct);
+
+    const QIcon saveAllIcon = QIcon::fromTheme("document-save-all");
+    QAction *saveAllAct = fileMenu->addAction(saveAllIcon, tr("Save all"), this, &MainWindow::SaveAll);
+    saveAllAct->setShortcuts(QKeySequence::SaveAs);
+    saveAllAct->setStatusTip(tr("Save all open documents"));
+
+    const QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
+    QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::SaveAs);
+    saveAsAct->setShortcuts(QKeySequence::SaveAs);
+    saveAsAct->setStatusTip(tr("Save the document under a new name"));
+
+    fileMenu->addSeparator();
+
+    const QIcon exitIcon = QIcon::fromTheme("application-exit");
+    QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
+    exitAct->setShortcuts(QKeySequence::Quit);
+    exitAct->setStatusTip(tr("Exit the application"));
+
+    // Edit menu.
+    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    QToolBar *editToolBar = addToolBar(tr("Edit"));
+    editToolBar->setStyleSheet(toolBarStyle);
+#ifndef QT_NO_CLIPBOARD
+    const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(":/images/cut.svg"));
+    cutAct_ = new QAction(cutIcon, tr("Cu&t"), this);
+    cutAct_->setShortcuts(QKeySequence::Cut);
+    cutAct_->setStatusTip(tr("Cut the current selection's contents to the "
+                            "clipboard"));
+    connect(cutAct_, &QAction::triggered, this, &MainWindow::Cut);
+    editMenu->addAction(cutAct_);
+    editToolBar->addAction(cutAct_);
+
+    const QIcon copyIcon = QIcon::fromTheme("edit-copy", QIcon(":/images/copy.svg"));
+    copyAct_ = new QAction(copyIcon, tr("&Copy"), this);
+    copyAct_->setShortcuts(QKeySequence::Copy);
+    copyAct_->setStatusTip(tr("Copy the current selection's contents to the "
+                             "clipboard"));
+    connect(copyAct_, &QAction::triggered, this, &MainWindow::Copy);
+    editMenu->addAction(copyAct_);
+    editToolBar->addAction(copyAct_);
+
+    const QIcon pasteIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.svg"));
+    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
+    pasteAct->setShortcuts(QKeySequence::Paste);
+    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+                              "selection"));
+    connect(pasteAct, &QAction::triggered, this, &MainWindow::Paste);
+    editMenu->addAction(pasteAct);
+    editToolBar->addAction(pasteAct);
+
+    menuBar()->addSeparator();
+#endif // !QT_NO_CLIPBOARD
+
+    // Undo&Redo
+    QToolBar *undoRedoToolBar = addToolBar(tr("Undo&Redo"));
+    undoRedoToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/action-undo.svg"));
+    undoAct_ = new QAction(undoIcon, tr("&Undo"), this);
+    undoAct_->setShortcuts(QKeySequence::Undo);
+    undoAct_->setStatusTip(tr("Undo"));
+    connect(undoAct_, &QAction::triggered, this, &MainWindow::Undo);
+    editMenu->addAction(undoAct_);
+    undoRedoToolBar->addAction(undoAct_);
+
+    const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon(":/images/action-redo.svg"));
+    redoAct_ = new QAction(redoIcon, tr("&Redo"), this);
+    redoAct_->setShortcuts(QKeySequence::Redo);
+    redoAct_->setStatusTip(tr("Redo"));
+    connect(redoAct_, &QAction::triggered, this, &MainWindow::Redo);
+    editMenu->addAction(redoAct_);
+    undoRedoToolBar->addAction(redoAct_);
+
+    // Select menu.
+    QMenu *selectMenu = menuBar()->addMenu(tr("&Select"));
+    QToolBar *searchToolBar = addToolBar(tr("Select"));
+    searchToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon findIcon = QIcon::fromTheme("select-search", QIcon(":/images/search.svg"));
+    QAction *findAct = new QAction(findIcon, tr("&Find..."), this);
+    findAct->setShortcuts(QKeySequence::Find);
+    findAct->setStatusTip(tr("Find"));
+    connect(findAct, &QAction::triggered, this, &MainWindow::Find);
+    selectMenu->addAction(findAct);
+    searchToolBar->addAction(findAct);
+
+    QAction *findNextAct = new QAction(tr("&Find Next"), this);
+    findNextAct->setShortcuts(QKeySequence::FindNext);
+    findNextAct->setStatusTip(tr("Find next"));
+    connect(findNextAct, &QAction::triggered, this, &MainWindow::FindNext);
+    selectMenu->addAction(findNextAct);
+
+    QAction *findPreviousAct = new QAction(tr("&Find Previous"), this);
+    findPreviousAct->setShortcuts(QKeySequence::FindPrevious);
+    findPreviousAct->setStatusTip(tr("Find previous"));
+    connect(findPreviousAct, &QAction::triggered, this, &MainWindow::FindPrevious);
+    selectMenu->addAction(findPreviousAct);
+
+    const QIcon replaceIcon = QIcon::fromTheme("select-replace", QIcon(":/images/replace.svg"));
+    QAction *replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);
+    auto replaceKeySeq = QKeySequence(Qt::CTRL + Qt::Key_H);
+    replaceAct->setShortcut(replaceKeySeq);  // QKeySequence::Replace
+    replaceAct->setStatusTip(tr("Replace"));
+    connect(replaceAct, &QAction::triggered, this, &MainWindow::Replace);
+    selectMenu->addAction(replaceAct);
+    searchToolBar->addAction(replaceAct);
+
+    selectMenu->addSeparator();
+
+    const QIcon gotoLineIcon = QIcon::fromTheme("select-got-line", QIcon(":/images/goto-line.svg"));
+    QAction *gotoLineAct = new QAction(gotoLineIcon, tr("&Go to Line..."), this);
+    auto gotoLineKeySeq = QKeySequence(Qt::CTRL + Qt::Key_G);  // QKeySequence(tr("F3, Ctrl+G"))
+    gotoLineAct->setShortcut(gotoLineKeySeq);
+    gotoLineAct->setStatusTip(tr("GotoLine"));
+    connect(gotoLineAct, &QAction::triggered, this, &MainWindow::GotoLine);
+    selectMenu->addAction(gotoLineAct);
+    searchToolBar->addAction(gotoLineAct);
+
+    const QIcon selectAllIcon = QIcon::fromTheme("select-all-lines", QIcon(":/images/select-all.svg"));
+    QAction *selectAllAct = new QAction(selectAllIcon, tr("&Select All Lines"), this);
+    selectAllAct->setShortcuts(QKeySequence::SelectAll);
+    selectAllAct->setStatusTip(tr("SelectAll"));
+    connect(selectAllAct, &QAction::triggered, this, &MainWindow::SelectAll);
+    selectMenu->addAction(selectAllAct);
+    searchToolBar->addAction(selectAllAct);
+
+    selectMenu->addSeparator();
+
+    QToolBar *markToolBar = addToolBar(tr("Mark"));
+    markToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon markIcon = QIcon::fromTheme("select-mark", QIcon(":/images/highlighter.svg"));
+    QAction *markAct = new QAction(markIcon, tr("&Mark or Unmark"), this);
+    auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
+    markAct->setShortcut(markKeySeq);
+    markAct->setStatusTip(tr("Mark & Unmack"));
+    connect(markAct, &QAction::triggered, this, &MainWindow::MarkUnmarkCursorText);
+    selectMenu->addAction(markAct);
+    markToolBar->addAction(markAct);
+
+    const QIcon unmarkAllIcon = QIcon::fromTheme("select-unmark-all", QIcon(":/images/eraser.svg"));
+    QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
+    auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+    unmarkAllAct->setShortcut(unmarkAllKeySeq);
+    unmarkAllAct->setStatusTip(tr("Mark"));
+    connect(unmarkAllAct, &QAction::triggered, this, &MainWindow::UnmarkAll);
+    selectMenu->addAction(unmarkAllAct);
+    markToolBar->addAction(unmarkAllAct);
+
+    selectMenu->addSeparator();
+
+    QToolBar *stepToolBar = addToolBar(tr("Step"));
+    stepToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon stepBackIcon = QIcon::fromTheme("step-back", QIcon(":/images/arrow-thick-to-left.svg"));
+    QAction *stepBackAct = new QAction(stepBackIcon, tr("&Step Back"), this);
+    auto stepBackSeq = QKeySequence(Qt::ALT + Qt::Key_Left);
+    stepBackAct->setShortcut(stepBackSeq);
+    stepBackAct->setStatusTip(tr("Step back"));
+    connect(stepBackAct, &QAction::triggered, this, &MainWindow::StepBack);
+    selectMenu->addAction(stepBackAct);
+    stepToolBar->addAction(stepBackAct);
+
+    const QIcon stepForwardIcon = QIcon::fromTheme("step-forward", QIcon(":/images/arrow-thick-to-right.svg"));
+    QAction *stepForwardAct = new QAction(stepForwardIcon, tr("&Step Forward"), this);
+    auto stepForwardSeq = QKeySequence(Qt::ALT + Qt::Key_Right);
+    stepForwardAct->setShortcut(stepForwardSeq);
+    stepForwardAct->setStatusTip(tr("Step forward"));
+    connect(stepForwardAct, &QAction::triggered, this, &MainWindow::StepForward);
+    selectMenu->addAction(stepForwardAct);
+    stepToolBar->addAction(stepForwardAct);
+
+    // View menu.
+    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    QToolBar *viewToolBar = addToolBar(tr("View"));
+    viewToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon zoomInIcon = QIcon::fromTheme("view-zoomin", QIcon(":/images/zoom-in.svg"));
+    QAction *zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
+    zoomInAct->setStatusTip(tr("ZoomIn"));
+    connect(zoomInAct, &QAction::triggered, this, &MainWindow::ZoomIn);
+    viewMenu->addAction(zoomInAct);
+    viewToolBar->addAction(zoomInAct);
+
+    const QIcon zoomOutIcon = QIcon::fromTheme("view-zoomout", QIcon(":/images/zoom-out.svg"));
+    QAction *zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
+    zoomOutAct->setStatusTip(tr("ZoomOut"));
+    connect(zoomOutAct, &QAction::triggered, this, &MainWindow::ZoomOut);
+    viewMenu->addAction(zoomOutAct);
+    viewToolBar->addAction(zoomOutAct);
+
+    viewMenu->addSeparator();
+
+    const QIcon wrapTextIcon = QIcon::fromTheme("view-wrap-text", QIcon(":/images/wrap-text.svg"));
+    QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
+    wrapTextAct->setStatusTip(tr("WrapText"));
+    wrapTextAct->setCheckable(true);
+    wrapTextAct->setChecked(shouldWrapText_);
+    connect(wrapTextAct, &QAction::triggered, this, &MainWindow::SwitchWrapText);
+    viewMenu->addAction(wrapTextAct);
+    viewToolBar->addAction(wrapTextAct);
+
+    const QIcon showAllCharsIcon = QIcon::fromTheme("view-show-chars", QIcon(":/images/show-all-chars.svg"));
+    QAction *showAllCharsAct = new QAction(showAllCharsIcon, tr("Show All Chars"), this);
+    showAllCharsAct->setStatusTip(tr("ShowSpecialChars"));
+    showAllCharsAct->setCheckable(true);
+    showAllCharsAct->setChecked(specialCharsVisible_);
+    connect(showAllCharsAct, &QAction::triggered, this, &MainWindow::SwitchSpecialCharsVisible);
+    viewMenu->addAction(showAllCharsAct);
+    viewToolBar->addAction(showAllCharsAct);
+
+    viewMenu->addSeparator();
+
+    QToolBar *viewToolBar2 = addToolBar(tr("View addin"));
+    viewToolBar2->setStyleSheet(toolBarStyle);
+
+    const QIcon showDirIcon = QIcon::fromTheme("view-show-dir", QIcon(":/images/folder.svg"));
+    QAction *showDirAct = new QAction(showDirIcon, tr("Show Explorer Window"), this);
+    showDirAct->setStatusTip(tr("ShowExplorerWindow"));
+    showDirAct->setCheckable(true);
+    showDirAct->setChecked(explorerVisible_);
+    connect(showDirAct, &QAction::triggered, this, &MainWindow::SwitchExplorerWindowVisible);
+    viewMenu->addAction(showDirAct);
+    viewToolBar2->addAction(showDirAct);
+
+    const QIcon showOutlineIcon = QIcon::fromTheme("view-show-outline", QIcon(":/images/brackets-contain.svg"));
+    QAction *showOutlineAct = new QAction(showOutlineIcon, tr("Show Outline Window"), this);
+    showOutlineAct->setStatusTip(tr("ShowOutlineWindow"));
+    showOutlineAct->setCheckable(true);
+    showOutlineAct->setChecked(outlineVisible_);
+    connect(showOutlineAct, &QAction::triggered, this, &MainWindow::SwitchOutlineWindowVisible);
+    viewMenu->addAction(showOutlineAct);
+    viewToolBar2->addAction(showOutlineAct);
+
+    const QIcon showHierarchyIcon = QIcon::fromTheme("view-show-hierarchy", QIcon(":/images/sitemap.svg"));
+    QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
+    showHierarchyAct->setStatusTip(tr("ShowHierarchyWindow"));
+    showHierarchyAct->setCheckable(true);
+    showHierarchyAct->setChecked(outlineVisible_);
+    connect(showHierarchyAct, &QAction::triggered, this, &MainWindow::SwitchHierarchyWindowVisible);
+    viewMenu->addAction(showHierarchyAct);
+    viewToolBar2->addAction(showHierarchyAct);
+
+    // Terminal menu.
+    QMenu *terminalMenu = menuBar()->addMenu(tr("&Terminal"));
+    QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
+    terminalToolBar->setStyleSheet(toolBarStyle);
+
+    const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/terminal.svg"));
+    QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
+    openSshAct->setStatusTip(tr("Open SSH"));
+    connect(openSshAct, &QAction::triggered, this, []() {
+        (new OpenTerminalDialog(&MainWindow::Instance()))->show();
+        return true;
+    });
+    terminalMenu->addAction(openSshAct);
+    terminalToolBar->addAction(openSshAct);
+
+    // Help menu.
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
+    aboutAct->setStatusTip(tr("Show the application's About box"));
+
+#ifndef QT_NO_CLIPBOARD
+    cutAct_->setEnabled(false);
+    copyAct_->setEnabled(false);
+    undoAct_->setEnabled(false);
+    redoAct_->setEnabled(false);
+#endif // !QT_NO_CLIPBOARD
+}
+
 void MainWindow::HandleCurrentTabChanged(int index)
 {
     qDebug() << "MainWindow::tabIndexChanged, " << index;
@@ -119,7 +435,7 @@ DockView *MainWindow::CreateSearchDockView()
     if (searchDockView_ == nullptr) {
         searchDockView_ = new DockView(this);
     }
-    searchDockView_->setWindowTitle("Search result:");
+    searchDockView_->setWindowTitle(tr("Search result:"));
 //    searchDockView_->setFont(QFont("Consolas", 11));
     searchDockView_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::BottomDockWidgetArea, searchDockView_);
@@ -173,7 +489,7 @@ DockView *MainWindow::CreateExplorerDockView()
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         explorerDockView_->setMinimumWidth(0);
     }
-    explorerDockView_->setWindowTitle("EXPLORER");
+    explorerDockView_->setWindowTitle(tr("EXPLORER"));
 //    explorerDockView_->setFont(QFont("Consolas", 11));
     explorerDockView_->setFeatures(/*QDockWidget::DockWidgetClosable | */QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, explorerDockView_);
@@ -247,7 +563,7 @@ DockView *MainWindow::CreateOutlineDockView()
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         outlineDockView_->setMinimumWidth(0);
     }
-    outlineDockView_->setWindowTitle("OUTLINE");
+    outlineDockView_->setWindowTitle(tr("OUTLINE"));
 //    overviewDockView_->setFont(QFont("Consolas", 11));
     outlineDockView_->setFeatures(/*QDockWidget::DockWidgetClosable | */QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, outlineDockView_);
@@ -293,7 +609,7 @@ DockView *MainWindow::CreateHierarchyDockView()
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         hierarchyDockView_->setMinimumWidth(0);
     }
-    hierarchyDockView_->setWindowTitle("FUNCTION HIERARCHY");
+    hierarchyDockView_->setWindowTitle(tr("FUNCTION HIERARCHY"));
     hierarchyDockView_->setFeatures(QDockWidget::DockWidgetMovable);
     addDockWidget(Qt::RightDockWidgetArea, hierarchyDockView_);
     return hierarchyDockView_;
@@ -311,7 +627,7 @@ void MainWindow::UpdateNodeHierarchyDockView(AnfNodeHierarchy *view)
     if (nodeHierarchyDockView_ == nullptr) {
         CreateNodeHierarchyDockView();
     }
-    nodeHierarchyDockView_->setWindowTitle("NODE HIERARCHY  ( " + view->funcName() + " )");
+    nodeHierarchyDockView_->setWindowTitle(tr("NODE HIERARCHY") + "  ( " + view->funcName() + " )");
     if (anfNodeHierarchy_ != nullptr) {
         delete anfNodeHierarchy_;
         anfNodeHierarchy_ = nullptr;
@@ -343,7 +659,7 @@ DockView *MainWindow::CreateNodeHierarchyDockView()
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         nodeHierarchyDockView_->setMinimumWidth(0);
     }
-    nodeHierarchyDockView_->setWindowTitle("NODE HIERARCHY");
+    nodeHierarchyDockView_->setWindowTitle(tr("NODE HIERARCHY"));
     nodeHierarchyDockView_->setFeatures(QDockWidget::DockWidgetMovable);
     addDockWidget(Qt::RightDockWidgetArea, nodeHierarchyDockView_);
     return nodeHierarchyDockView_;
@@ -666,10 +982,10 @@ void MainWindow::About()
                       tr("<font color=\"lightgray\"><b>") + Constants::kAppName +
                       tr("<br/>Version: ") + Constants::kVersionStr + tr("</b><br/>") +
                       tr("----------<br/>The <b>") + Constants::kAppName +
-                      "</b> is a compact text editor "
+                      tr("</b> is a compact text editor "
                       "with common functions, such as search, replace, "
                       "mark, and simple syntax highlighting.<br/><br/>"
-                      "<b>Author: <a href=\"mailto:zhang-qh@hotmail.com\">Q</a></b></font>");
+                      "<b>Author: <a href=\"mailto:zhang-qh@hotmail.com\">Q</a></b></font>"));
 }
 
 void MainWindow::ReadSettings()
@@ -745,7 +1061,7 @@ void MainWindow::UpdateRecentFilesMenu() {
     recentFilesMenu_->addSeparator();
 
     auto clearRecentFilesAction = new QAction(this);
-    clearRecentFilesAction->setText("Clear Recently Opened");
+    clearRecentFilesAction->setText(tr("Clear Recently Opened"));
     connect(clearRecentFilesAction, &QAction::triggered, this, [this](){
         recentFileActions_.clear();
         recentFilesMenu_->clear();
@@ -754,322 +1070,6 @@ void MainWindow::UpdateRecentFilesMenu() {
     });
     recentFilesMenu_->addAction(clearRecentFilesAction);
     recentFileActions_.append(clearRecentFilesAction);
-}
-
-void MainWindow::CreateActions()
-{
-    menuBar()->setStyleSheet("QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
-                             QMenu{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(40, 40, 40); border: none;}\
-                             QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
-
-    auto toolBarStyle = "QToolBar { color: lightGray;" "background-color: rgb(28, 28, 28); }"\
-                        "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
-                        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
-                        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
-                        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
-                        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
-    // File menu.
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    QToolBar *fileToolBar = addToolBar(tr("File"));
-    fileToolBar->setStyleSheet(toolBarStyle);
-
-    // TODO:
-    // Use addPixmap() set on/off icons.
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/file.svg"));
-    QAction *newAct = new QAction(newIcon, tr("&New"), this);
-//    newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new file"));
-    connect(newAct, &QAction::triggered, this, &MainWindow::NewFile);
-    fileMenu->addAction(newAct);
-    fileToolBar->addAction(newAct);
-
-    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/folder-open.svg"));
-    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an existing file"));
-    connect(openAct, &QAction::triggered, this, &MainWindow::Open);
-    fileMenu->addAction(openAct);
-    fileToolBar->addAction(openAct);
-
-    recentFilesMenu_ = fileMenu->addMenu(tr("Open Recent"));
-    UpdateRecentFilesMenu();
-
-    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.svg"));
-    QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
-    saveAct->setShortcuts(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the document to disk"));
-    connect(saveAct, &QAction::triggered, this, &MainWindow::Save);
-    fileMenu->addAction(saveAct);
-    fileToolBar->addAction(saveAct);
-
-    const QIcon saveAllIcon = QIcon::fromTheme("document-save-all");
-    QAction *saveAllAct = fileMenu->addAction(saveAllIcon, tr("Save all"), this, &MainWindow::SaveAll);
-    saveAllAct->setShortcuts(QKeySequence::SaveAs);
-    saveAllAct->setStatusTip(tr("Save all open documents"));
-
-    const QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
-    QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::SaveAs);
-    saveAsAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsAct->setStatusTip(tr("Save the document under a new name"));
-
-    fileMenu->addSeparator();
-
-    const QIcon exitIcon = QIcon::fromTheme("application-exit");
-    QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    exitAct->setStatusTip(tr("Exit the application"));
-
-    // Edit menu.
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-    QToolBar *editToolBar = addToolBar(tr("Edit"));
-    editToolBar->setStyleSheet(toolBarStyle);
-#ifndef QT_NO_CLIPBOARD
-    const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(":/images/cut.svg"));
-    cutAct_ = new QAction(cutIcon, tr("Cu&t"), this);
-    cutAct_->setShortcuts(QKeySequence::Cut);
-    cutAct_->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
-    connect(cutAct_, &QAction::triggered, this, &MainWindow::Cut);
-    editMenu->addAction(cutAct_);
-    editToolBar->addAction(cutAct_);
-
-    const QIcon copyIcon = QIcon::fromTheme("edit-copy", QIcon(":/images/copy.svg"));
-    copyAct_ = new QAction(copyIcon, tr("&Copy"), this);
-    copyAct_->setShortcuts(QKeySequence::Copy);
-    copyAct_->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
-    connect(copyAct_, &QAction::triggered, this, &MainWindow::Copy);
-    editMenu->addAction(copyAct_);
-    editToolBar->addAction(copyAct_);
-
-    const QIcon pasteIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.svg"));
-    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
-    pasteAct->setShortcuts(QKeySequence::Paste);
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
-    connect(pasteAct, &QAction::triggered, this, &MainWindow::Paste);
-    editMenu->addAction(pasteAct);
-    editToolBar->addAction(pasteAct);
-
-    menuBar()->addSeparator();
-#endif // !QT_NO_CLIPBOARD
-
-    // Undo&Redo
-    QToolBar *undoRedoToolBar = addToolBar(tr("Undo&Redo"));
-    undoRedoToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/action-undo.svg"));
-    undoAct_ = new QAction(undoIcon, tr("&Undo"), this);
-    undoAct_->setShortcuts(QKeySequence::Undo);
-    undoAct_->setStatusTip(tr("Undo"));
-    connect(undoAct_, &QAction::triggered, this, &MainWindow::Undo);
-    editMenu->addAction(undoAct_);
-    undoRedoToolBar->addAction(undoAct_);
-
-    const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon(":/images/action-redo.svg"));
-    redoAct_ = new QAction(redoIcon, tr("&Redo"), this);
-    redoAct_->setShortcuts(QKeySequence::Redo);
-    redoAct_->setStatusTip(tr("Redo"));
-    connect(redoAct_, &QAction::triggered, this, &MainWindow::Redo);
-    editMenu->addAction(redoAct_);
-    undoRedoToolBar->addAction(redoAct_);
-
-    // Select menu.
-    QMenu *selectMenu = menuBar()->addMenu(tr("&Select"));
-    QToolBar *searchToolBar = addToolBar(tr("Select"));
-    searchToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon findIcon = QIcon::fromTheme("select-search", QIcon(":/images/search.svg"));
-    QAction *findAct = new QAction(findIcon, tr("&Find..."), this);
-    findAct->setShortcuts(QKeySequence::Find);
-    findAct->setStatusTip(tr("Find"));
-    connect(findAct, &QAction::triggered, this, &MainWindow::Find);
-    selectMenu->addAction(findAct);
-    searchToolBar->addAction(findAct);
-
-    QAction *findNextAct = new QAction(tr("&Find Next"), this);
-    findNextAct->setShortcuts(QKeySequence::FindNext);
-    findNextAct->setStatusTip(tr("Find next"));
-    connect(findNextAct, &QAction::triggered, this, &MainWindow::FindNext);
-    selectMenu->addAction(findNextAct);
-
-    QAction *findPreviousAct = new QAction(tr("&Find Previous"), this);
-    findPreviousAct->setShortcuts(QKeySequence::FindPrevious);
-    findPreviousAct->setStatusTip(tr("Find previous"));
-    connect(findPreviousAct, &QAction::triggered, this, &MainWindow::FindPrevious);
-    selectMenu->addAction(findPreviousAct);
-
-    const QIcon replaceIcon = QIcon::fromTheme("select-replace", QIcon(":/images/replace.svg"));
-    QAction *replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);
-    auto replaceKeySeq = QKeySequence(Qt::CTRL + Qt::Key_H);
-    replaceAct->setShortcut(replaceKeySeq);  // QKeySequence::Replace
-    replaceAct->setStatusTip(tr("Replace"));
-    connect(replaceAct, &QAction::triggered, this, &MainWindow::Replace);
-    selectMenu->addAction(replaceAct);
-    searchToolBar->addAction(replaceAct);
-
-    selectMenu->addSeparator();
-
-    const QIcon gotoLineIcon = QIcon::fromTheme("select-got-line", QIcon(":/images/goto-line.svg"));
-    QAction *gotoLineAct = new QAction(gotoLineIcon, tr("&Go to Line..."), this);
-    auto gotoLineKeySeq = QKeySequence(Qt::CTRL + Qt::Key_G);  // QKeySequence(tr("F3, Ctrl+G"))
-    gotoLineAct->setShortcut(gotoLineKeySeq);
-    gotoLineAct->setStatusTip(tr("GotoLine"));
-    connect(gotoLineAct, &QAction::triggered, this, &MainWindow::GotoLine);
-    selectMenu->addAction(gotoLineAct);
-    searchToolBar->addAction(gotoLineAct);
-
-    const QIcon selectAllIcon = QIcon::fromTheme("select-all-lines", QIcon(":/images/select-all.svg"));
-    QAction *selectAllAct = new QAction(selectAllIcon, tr("&Select All Lines"), this);
-    selectAllAct->setShortcuts(QKeySequence::SelectAll);
-    selectAllAct->setStatusTip(tr("SelectAll"));
-    connect(selectAllAct, &QAction::triggered, this, &MainWindow::SelectAll);
-    selectMenu->addAction(selectAllAct);
-    searchToolBar->addAction(selectAllAct);
-
-    selectMenu->addSeparator();
-
-    QToolBar *markToolBar = addToolBar(tr("Mark"));
-    markToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon markIcon = QIcon::fromTheme("select-mark", QIcon(":/images/highlighter.svg"));
-    QAction *markAct = new QAction(markIcon, tr("&Mark or Unmark"), this);
-    auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
-    markAct->setShortcut(markKeySeq);
-    markAct->setStatusTip(tr("Mark & Unmack"));
-    connect(markAct, &QAction::triggered, this, &MainWindow::MarkUnmarkCursorText);
-    selectMenu->addAction(markAct);
-    markToolBar->addAction(markAct);
-
-    const QIcon unmarkAllIcon = QIcon::fromTheme("select-unmark-all", QIcon(":/images/eraser.svg"));
-    QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
-    auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
-    unmarkAllAct->setShortcut(unmarkAllKeySeq);
-    unmarkAllAct->setStatusTip(tr("Mark"));
-    connect(unmarkAllAct, &QAction::triggered, this, &MainWindow::UnmarkAll);
-    selectMenu->addAction(unmarkAllAct);
-    markToolBar->addAction(unmarkAllAct);
-
-    selectMenu->addSeparator();
-
-    QToolBar *stepToolBar = addToolBar(tr("Step"));
-    stepToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon stepBackIcon = QIcon::fromTheme("step-back", QIcon(":/images/arrow-thick-to-left.svg"));
-    QAction *stepBackAct = new QAction(stepBackIcon, tr("&Step Back"), this);
-    auto stepBackSeq = QKeySequence(Qt::ALT + Qt::Key_Left);
-    stepBackAct->setShortcut(stepBackSeq);
-    stepBackAct->setStatusTip(tr("Step back"));
-    connect(stepBackAct, &QAction::triggered, this, &MainWindow::StepBack);
-    selectMenu->addAction(stepBackAct);
-    stepToolBar->addAction(stepBackAct);
-
-    const QIcon stepForwardIcon = QIcon::fromTheme("step-forward", QIcon(":/images/arrow-thick-to-right.svg"));
-    QAction *stepForwardAct = new QAction(stepForwardIcon, tr("&Step Forward"), this);
-    auto stepForwardSeq = QKeySequence(Qt::ALT + Qt::Key_Right);
-    stepForwardAct->setShortcut(stepForwardSeq);
-    stepForwardAct->setStatusTip(tr("Step forward"));
-    connect(stepForwardAct, &QAction::triggered, this, &MainWindow::StepForward);
-    selectMenu->addAction(stepForwardAct);
-    stepToolBar->addAction(stepForwardAct);
-
-    // View menu.
-    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-    QToolBar *viewToolBar = addToolBar(tr("View"));
-    viewToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon zoomInIcon = QIcon::fromTheme("view-zoomin", QIcon(":/images/zoom-in.svg"));
-    QAction *zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
-    zoomInAct->setStatusTip(tr("ZoomIn"));
-    connect(zoomInAct, &QAction::triggered, this, &MainWindow::ZoomIn);
-    viewMenu->addAction(zoomInAct);
-    viewToolBar->addAction(zoomInAct);
-
-    const QIcon zoomOutIcon = QIcon::fromTheme("view-zoomout", QIcon(":/images/zoom-out.svg"));
-    QAction *zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
-    zoomOutAct->setStatusTip(tr("ZoomOut"));
-    connect(zoomOutAct, &QAction::triggered, this, &MainWindow::ZoomOut);
-    viewMenu->addAction(zoomOutAct);
-    viewToolBar->addAction(zoomOutAct);
-
-    viewMenu->addSeparator();
-
-    const QIcon wrapTextIcon = QIcon::fromTheme("view-wrap-text", QIcon(":/images/wrap-text.svg"));
-    QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
-    wrapTextAct->setStatusTip(tr("WrapText"));
-    wrapTextAct->setCheckable(true);
-    wrapTextAct->setChecked(shouldWrapText_);
-    connect(wrapTextAct, &QAction::triggered, this, &MainWindow::SwitchWrapText);
-    viewMenu->addAction(wrapTextAct);
-    viewToolBar->addAction(wrapTextAct);
-
-    const QIcon showAllCharsIcon = QIcon::fromTheme("view-show-chars", QIcon(":/images/show-all-chars.svg"));
-    QAction *showAllCharsAct = new QAction(showAllCharsIcon, tr("Show All Chars"), this);
-    showAllCharsAct->setStatusTip(tr("ShowSpecialChars"));
-    showAllCharsAct->setCheckable(true);
-    showAllCharsAct->setChecked(specialCharsVisible_);
-    connect(showAllCharsAct, &QAction::triggered, this, &MainWindow::SwitchSpecialCharsVisible);
-    viewMenu->addAction(showAllCharsAct);
-    viewToolBar->addAction(showAllCharsAct);
-
-    viewMenu->addSeparator();
-
-    QToolBar *viewToolBar2 = addToolBar(tr("View addin"));
-    viewToolBar2->setStyleSheet(toolBarStyle);
-
-    const QIcon showDirIcon = QIcon::fromTheme("view-show-dir", QIcon(":/images/folder.svg"));
-    QAction *showDirAct = new QAction(showDirIcon, tr("Show Explorer Window"), this);
-    showDirAct->setStatusTip(tr("ShowExplorerWindow"));
-    showDirAct->setCheckable(true);
-    showDirAct->setChecked(explorerVisible_);
-    connect(showDirAct, &QAction::triggered, this, &MainWindow::SwitchExplorerWindowVisible);
-    viewMenu->addAction(showDirAct);
-    viewToolBar2->addAction(showDirAct);
-
-    const QIcon showOutlineIcon = QIcon::fromTheme("view-show-outline", QIcon(":/images/brackets-contain.svg"));
-    QAction *showOutlineAct = new QAction(showOutlineIcon, tr("Show Outline Window"), this);
-    showOutlineAct->setStatusTip(tr("ShowOutlineWindow"));
-    showOutlineAct->setCheckable(true);
-    showOutlineAct->setChecked(outlineVisible_);
-    connect(showOutlineAct, &QAction::triggered, this, &MainWindow::SwitchOutlineWindowVisible);
-    viewMenu->addAction(showOutlineAct);
-    viewToolBar2->addAction(showOutlineAct);
-
-    const QIcon showHierarchyIcon = QIcon::fromTheme("view-show-hierarchy", QIcon(":/images/sitemap.svg"));
-    QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
-    showHierarchyAct->setStatusTip(tr("ShowHierarchyWindow"));
-    showHierarchyAct->setCheckable(true);
-    showHierarchyAct->setChecked(outlineVisible_);
-    connect(showHierarchyAct, &QAction::triggered, this, &MainWindow::SwitchHierarchyWindowVisible);
-    viewMenu->addAction(showHierarchyAct);
-    viewToolBar2->addAction(showHierarchyAct);
-
-    // Terminal menu.
-    QMenu *terminalMenu = menuBar()->addMenu(tr("&Terminal"));
-    QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
-    terminalToolBar->setStyleSheet(toolBarStyle);
-
-    const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/terminal.svg"));
-    QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
-    openSshAct->setStatusTip(tr("Open SSH"));
-    connect(openSshAct, &QAction::triggered, this, []() {
-        (new OpenTerminalDialog(&MainWindow::Instance()))->show();
-        return true;
-    });
-    terminalMenu->addAction(openSshAct);
-    terminalToolBar->addAction(openSshAct);
-
-    // Help menu.
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-
-#ifndef QT_NO_CLIPBOARD
-    cutAct_->setEnabled(false);
-    copyAct_->setEnabled(false);
-    undoAct_->setEnabled(false);
-    redoAct_->setEnabled(false);
-#endif // !QT_NO_CLIPBOARD
 }
 
 void MainWindow::SelectAll()
@@ -1361,7 +1361,7 @@ void MainWindow::CreateStatusBar()
     connect(encoding_, QOverload<int>::of(&QComboBox::currentIndexChanged),
             [=](int index){ HandleEncodingChanged(index); });
 
-    insertMode_ = new QLabel("INS", this);  // INS/OVR
+    insertMode_ = new QLabel(tr("INS"), this);  // INS/OVR
     insertMode_->setStyleSheet(small_qss);
     statusBar()->addPermanentWidget(insertMode_);
 
@@ -1392,7 +1392,7 @@ void MainWindow::HandleEncodingChanged(int index)
         return;
     }
     if (editView->ShouldSave()) {
-        Toast::Instance().Show(Toast::kError, "Can't convert the encoding since the text is modified.");
+        Toast::Instance().Show(Toast::kError, tr("Can't convert the encoding since the text is modified."));
         return;
     }
     auto mib = FileEncoding::GetMibByName(encoding_->currentText());

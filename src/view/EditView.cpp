@@ -193,7 +193,7 @@ void EditView::ChangeFileEncoding(FileEncoding &&fileEncoding)
     qDebug() << "Change codec from " << oldFileEncoding.codec()->name() << " to " << fileEncoding_.codec()->name();
 #else
     if (!tabView()->LoadFile(this, filePath_, std::move(fileEncoding), true)) {
-        Toast::Instance().Show(Toast::kError, "Load file failed, can't change encoding.");
+        Toast::Instance().Show(Toast::kError, tr("Load file failed, can't change encoding."));
         return;
     }
     SetModified(false);
@@ -340,7 +340,7 @@ void EditView::SetCurrentFile(const QString &filePath)
 
     QString shownName = filePath_;
     if (filePath_.isEmpty()) {
-        shownName = "untitled";
+        shownName = tr("untitled");
     }
     setWindowFilePath(shownName);
 }
@@ -549,7 +549,7 @@ void EditView::HighlightVisibleChars(const QString &text, const QColor &foregrou
                 return;
             }
             if (!HighlightChars(posInText, text.size(), foreground, background)) {
-                auto error = QString("Hightlight selected text failed. The texts count to mark exceed %1").arg(
+                auto error = QString(tr("Hightlight selected text failed. The texts count to mark exceed %1")).arg(
                                      Constants::kMaxExtraSelectionsMarkCount);
                 qCritical() << error;
                 Toast::Instance().Show(Toast::kError, error);
@@ -570,16 +570,16 @@ void EditView::UpdateStatusBarWithCursor()
     const QTextCursor &cursor = textCursor();
     QString posOrSel;
     if (cursor.hasSelection()) {
-        posOrSel = "Sel: " + QString::number(cursor.selectedText().length());
+        posOrSel = tr("Sel: ") + QString::number(cursor.selectedText().length());
     } else {
-        posOrSel = "Pos: " + QString::number(cursor.position() + 1);
+        posOrSel = tr("Pos: ") + QString::number(cursor.position() + 1);
     }
     MainWindow::Instance().UpdateStatusBarFrequentInfo(
-                "Ln: " + QString::number(cursor.blockNumber() + 1),
-                "Col: " + QString::number(cursor.columnNumber() + 1),
+                tr("Ln: ") + QString::number(cursor.blockNumber() + 1),
+                tr("Col: ") + QString::number(cursor.columnNumber() + 1),
                 posOrSel,
-                "Lines: " + QString::number(blockCount()),
-                "Length: " + QString::number(document()->characterCount()));
+                tr("Lines: ") + QString::number(blockCount()),
+                tr("Length: ") + QString::number(document()->characterCount()));
 
     // Update the rarely change information.
     MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.name(), 0);
@@ -827,7 +827,7 @@ void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCurso
     QList<QTextEdit::ExtraSelection> markExtraSelections = this->extraSelections();
     if (markExtraSelections.size() > Constants::kMaxExtraSelectionsMarkCount) {
         Toast::Instance().Show(Toast::kError,
-                               QString("Highlight brackets failed. The texts count to mark exceed %1").arg(
+                               QString(tr("Highlight brackets failed. The texts count to mark exceed %1")).arg(
                                    Constants::kMaxExtraSelectionsMarkCount));
         return;
     }
@@ -1250,33 +1250,33 @@ void EditView::contextMenuEvent(QContextMenuEvent *event)
                       ");
 
     if (!selectedText_.isEmpty()) {
-        QAction *findAction = new QAction("Find...");
+        QAction *findAction = new QAction(tr("Find..."));
         connect(findAction, &QAction::triggered, this, &EditView::Find);
         menu->insertAction(menu->actions()[0], findAction);
-        QAction *replaceAction = new QAction("Replace...");
+        QAction *replaceAction = new QAction(tr("Replace..."));
         connect(replaceAction, &QAction::triggered, this, &EditView::Replace);
         menu->insertAction(menu->actions()[1], replaceAction);
 
         menu->insertSeparator(menu->actions()[2]);
-        QAction *markUnmarkAction = new QAction("Mark or Unmark");
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"));
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu->insertAction(menu->actions()[3], markUnmarkAction);
-        QAction *unmarkAllAction = new QAction("Unmark All");
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"));
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
         menu->insertAction(menu->actions()[4], unmarkAllAction);
 
         menu->insertSeparator(menu->actions()[5]);
-        QAction *selectTextToDiffAction = new QAction("Select Text for View Diff");
+        QAction *selectTextToDiffAction = new QAction(tr("Select Text for View Diff"));
         connect(selectTextToDiffAction, &QAction::triggered, this, [this]() {
             tabView()->setFormerDiffStr(selectedText_);
         });
         menu->insertAction(menu->actions()[6], selectTextToDiffAction);
         if (!tabView()->formerDiffStr().isEmpty()) {
-            QAction *diffWithPreviousAction = new QAction("View Diff with Previous Selection");
+            QAction *diffWithPreviousAction = new QAction(tr("View Diff with Previous Selection"));
             connect(diffWithPreviousAction, &QAction::triggered, this, [this]() {
                 tabView()->ViewDiff(tabView()->formerDiffStr(), selectedText_);
                 tabView()->setFormerDiffStr("");
@@ -1287,12 +1287,12 @@ void EditView::contextMenuEvent(QContextMenuEvent *event)
             menu->insertSeparator(menu->actions()[7]);
         }
     } else {
-        QAction *markUnmarkAction = new QAction("Mark or Unmark");
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"));
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu->insertAction(menu->actions()[0], markUnmarkAction);
-        QAction *unmarkAllAction = new QAction("Unmark All");
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"));
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);

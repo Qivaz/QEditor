@@ -226,20 +226,20 @@ bool SearchResultList::event(QEvent *event)
 void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
 {
     menu_->clear();
-    QAction *collapseAllAction = new QAction("Collapse All");
+    QAction *collapseAllAction = new QAction(tr("Collapse All"));
     connect(collapseAllAction, &QAction::triggered, this, [this]() {
         collapseAll();
         topItem()->setExpanded(true);
     });
     menu_->addAction(collapseAllAction);
-    QAction *expandAllAction = new QAction("Expand All");
+    QAction *expandAllAction = new QAction(tr("Expand All"));
     connect(expandAllAction, &QAction::triggered, this, [this]() {
         expandAll();
     });
     menu_->addAction(expandAllAction);
 
     menu_->addSeparator();
-    QAction *copySelectedAction = new QAction("Copy Selected");
+    QAction *copySelectedAction = new QAction(tr("Copy Selected"));
     connect(copySelectedAction, &QAction::triggered, this, [this]() {
 //        const auto rows = selectionModel()->selectedRows(0);
 //        for (const auto &row : rows) {
@@ -254,7 +254,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
         clipboard->setText(text);
     });
     menu_->addAction(copySelectedAction);
-    QAction *copyAllAction = new QAction("Copy All");
+    QAction *copyAllAction = new QAction(tr("Copy All"));
     connect(copyAllAction, &QAction::triggered, this, [this]() {
         QString text;
         for (int i = 0; i < topItem()->childCount(); ++i) {
@@ -273,7 +273,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
     menu_->addAction(copyAllAction);
 
     menu_->addSeparator();
-    QAction *clearSelectedItemAction = new QAction("Clear Selected Item");
+    QAction *clearSelectedItemAction = new QAction(tr("Clear Selected"));
     connect(clearSelectedItemAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
         if (item->parent() != nullptr) {
@@ -281,7 +281,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
         }
     });
     menu_->addAction(clearSelectedItemAction);
-    QAction *clearSelectedResultAction = new QAction("Clear Selected Result Belonging to");
+    QAction *clearSelectedResultAction = new QAction(tr("Clear Containing Result"));
     connect(clearSelectedResultAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
         qCritical() << "item: " << item->toolTip(0);
@@ -292,7 +292,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
         topItem()->removeChild(item);
     });
     menu_->addAction(clearSelectedResultAction);
-    QAction *clearAllAction = new QAction("Clear All");
+    QAction *clearAllAction = new QAction(tr("Clear All"));
     connect(clearAllAction, &QAction::triggered, this, [this]() {
         clear();
         setTopItem(nullptr);
@@ -343,7 +343,7 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
 {
     // Update current session's search info.
     const auto name = sessionItem->text(0);
-    const auto title = name + " " + QString("(Search \"") + target + "\": " + QString::number(matchCount) + " hits)";
+    const auto title = name + " " + QString(tr("(Search ")) + "\"" + target + "\": " + QString::number(matchCount) + tr(" hits)");
     const auto html = QString("<div style=\"font-size:14px;font-family:Consolas;color:#E3CEAB\">") + title + QString("</div>");
     sessionItem->setToolTip(0, title);
     sessionItem->setText(0, html);
@@ -351,7 +351,7 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
     setCurrentItem(sessionItem);
 
     // Update header's total result count.
-    auto info = QString::number(topItem()->childCount()) + " results:";
+    auto info = QString::number(topItem()->childCount()) + tr(" results:");
     auto htmlText = QString("<div style=\"font-size:15px;font-family:Consolas;color:#C3AE8B\">") + info + QString("</div>");
     topItem()->setText(0, htmlText);
 }

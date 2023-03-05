@@ -39,6 +39,7 @@ protected:
 
 class SearchResultList : public QTreeWidget
 {
+    Q_OBJECT
 public:
     SearchResultList(TabView *tabView);
     ~SearchResultList()

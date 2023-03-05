@@ -118,7 +118,7 @@ public slots:
             ShowWindow();
 
             // Toast::Instance().Show(Toast::kError, QString("Can't open %1").arg(fileInfo.canonicalFilePath()));
-            Toast::Instance().Show(Toast::kError, QString("Can't open multiple window."));
+            Toast::Instance().Show(Toast::kError, QString(tr("Can't open multiple window.")));
         }
 
         QString response = "FIN";

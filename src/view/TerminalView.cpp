@@ -150,7 +150,7 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
             // It the cursor is not in command input area, move cursor to end and append input char to inputed cmd's tail.
             moveCursor(QTextCursor::End);
             pos = cmdBuffer_.length();
-            Toast::Instance().Show(Toast::kInfo, QString("Append \'%1\' in command line tail.").arg(event->text()));
+            Toast::Instance().Show(Toast::kInfo, QString(tr("Append \'%1\' in command line tail.")).arg(event->text()));
         } else {
             pos = cmdBuffer_.length() - offset;
         }
@@ -207,17 +207,17 @@ void TerminalView::HandleConnectStateChanged(bool state, const QString &ip, int 
 
     qDebug() << "state: " << state;
     if(state) {
-        Toast::Instance().Show(Toast::kInfo, QString("Try to connecting %1:%2.").arg(ip).arg(port));
+        Toast::Instance().Show(Toast::kInfo, QString(tr("Try to connecting %1:%2.")).arg(ip).arg(port));
     } else {
         connectState_ = state;
-        Toast::Instance().Show(Toast::kWarning, QString("%1:%2 is disconnected.").arg(ip).arg(port));
+        Toast::Instance().Show(Toast::kWarning, QString(tr("%1:%2 is disconnected.")).arg(ip).arg(port));
     }
 }
 
 void TerminalView::HandleShellConnected(const QString &ip, int port)
 {
     connectState_ = true;
-    Toast::Instance().Show(Toast::kInfo, QString("%1:%2 is connected.").arg(ip).arg(port));
+    Toast::Instance().Show(Toast::kInfo, QString(tr("%1:%2 is connected.")).arg(ip).arg(port));
 }
 
 void TerminalView::HandleAnsiEscapeCode(const QString &constMsg, QTextCursor &cursor) {

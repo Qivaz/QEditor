@@ -65,20 +65,20 @@ void IrParser::ParseFuncGraph(){
         // Match subgraph Return node.
         auto returnStartCursor = editView_->document()->find(kSubGraphReturnStart, subgraphDefNameCursor);
         if (returnStartCursor.isNull()) {
-            Toast::Instance().Show(Toast::kError, QString("No Return node found in subgraph @%1").arg(subgraphName));
+            Toast::Instance().Show(Toast::kError, QString(tr("No Return node found in subgraph @%1")).arg(subgraphName));
             break;
         }
         // Return variable name
         const auto &returnLineText = returnStartCursor.block().text();
         auto returnVariableStart = returnLineText.indexOf(kSubGraphReturnStart);
         if (returnVariableStart == -1) {
-            Toast::Instance().Show(Toast::kError, QString("Invalid Return node found in subgraph @%1").arg(subgraphName));
+            Toast::Instance().Show(Toast::kError, QString(tr("Invalid Return node found in subgraph @%1")).arg(subgraphName));
             break;
         }
         returnVariableStart += strlen(kSubGraphReturnStart) + 1;
         auto returnVariableEnd = returnLineText.indexOf(")", returnVariableStart);
         if (returnVariableEnd == -1) {
-            Toast::Instance().Show(Toast::kError, QString("Invalid Return node found in subgraph @%1").arg(subgraphName));
+            Toast::Instance().Show(Toast::kError, QString(tr("Invalid Return node found in subgraph @%1")).arg(subgraphName));
             break;
         }
         auto returnVariable = returnLineText.mid(returnVariableStart, returnVariableEnd - returnVariableStart);
@@ -87,7 +87,7 @@ void IrParser::ParseFuncGraph(){
         // Return value
         auto returnValueStartCursor = editView_->document()->find(kSubGraphReturnValueStart, returnStartCursor);
         if (returnValueStartCursor.isNull()) {
-            Toast::Instance().Show(Toast::kError, QString("Invalid Return node found in subgraph @%1").arg(subgraphName));
+            Toast::Instance().Show(Toast::kError, QString(tr("Invalid Return node found in subgraph @%1")).arg(subgraphName));
             break;
         }
 
@@ -95,7 +95,7 @@ void IrParser::ParseFuncGraph(){
         const QRegExp subGraphDefEnd = QRegExp(kSubGraphDefEndRe);
         auto funcEndCursor = editView_->document()->find(subGraphDefEnd, returnValueStartCursor);
         if (funcEndCursor.isNull()) {
-            Toast::Instance().Show(Toast::kError, QString("Incomplete subgraph @%1").arg(subgraphName));
+            Toast::Instance().Show(Toast::kError, QString(tr("Incomplete subgraph @%1")).arg(subgraphName));
             break;
         }
         int funcEnd = funcEndCursor.selectionEnd() + 1;  // Set the end after '}'.

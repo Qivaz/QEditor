@@ -27,7 +27,7 @@ FunctionHierarchy::FunctionHierarchy(IParser *parser, QWidget *parent)
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
-                  "selection-background-color: rgb(76, 76, 167);"
+                  "selection-background-color: rgb(9, 71, 113);"
                   "border: none;");
 
     verticalScrollBar()->setStyleSheet("QScrollBar {border: none;}"

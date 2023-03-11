@@ -74,7 +74,7 @@ void EditView::Init()
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
-                  "selection-background-color: rgb(76, 76, 167);"
+                  "selection-background-color: rgb(9, 71, 113);"  // rgb(76, 76, 167)
                   "border: none;"
                   /*"font-family: '文泉驿等宽正黑';"*/);
 
@@ -845,7 +845,7 @@ void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCurso
         }
     }
     QTextEdit::ExtraSelection selection;
-    QColor markColor = QColor(60, 60, 90);
+    QColor markColor = QColor(52, 58, 64);  // QColor(60, 60, 90);
     selection.format.setBackground(markColor);
     // TODO: Why setFontItalic() not work, but setFontUnderline works ok?
     // selection.format.setFontItalic(true);

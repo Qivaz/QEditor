@@ -83,6 +83,8 @@ private:
     int promptPos_{-1};
 
     bool connectState_{false};
+
+    QTextCharFormat savedCharFormat_;
 };
 }  // namespace QEditor
 

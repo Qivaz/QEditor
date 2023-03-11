@@ -11,19 +11,45 @@
 #endif
 
 #include "MainWindow.h"
+#include "Settings.h"
 #include "TerminalView.h"
 #include "Toast.h"
+
+#ifdef Q_OS_WIN
+namespace WinTheme {
+extern bool IsDarkTheme();
+extern void SetDark_qApp();
+extern void SetDarkTitleBar(HWND hwnd);
+}
+#endif
 
 namespace QEditor {
 OpenTerminalDialog::OpenTerminalDialog(QWidget *parent) :
     QDialog(parent),
     ui_(new Ui::OpenTerminalDialog)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
     ui_->setupUi(this);
     if (ui_->lineEditIp->text().isEmpty()) {
         ui_->lineEditIp->setFocus();
     }
+
+#define FORCE_DARK_THEME
+#ifdef Q_OS_WIN
+#ifdef FORCE_DARK_THEME
+    WinTheme::SetDarkTitleBar(reinterpret_cast<HWND>(winId()));
+#else
+    if (WinTheme::IsDarkTheme()) {
+        WinTheme::SetDarkTitleBar(reinterpret_cast<HWND>(winId()));
+    }
+#endif
+#endif
+
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_DeleteOnClose);
+    qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
+    setWindowOpacity(opa * 0.8);
+
+    setWindowModality(Qt::WindowModal);
 }
 
 OpenTerminalDialog::~OpenTerminalDialog()

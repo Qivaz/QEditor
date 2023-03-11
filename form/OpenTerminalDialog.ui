@@ -25,6 +25,9 @@
      <height>18</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
+   </property>
    <property name="text">
     <string>IP Address:</string>
    </property>
@@ -37,6 +40,9 @@
      <width>55</width>
      <height>18</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
    </property>
    <property name="text">
     <string>Port:</string>
@@ -70,6 +76,9 @@
      <height>18</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
+   </property>
    <property name="text">
     <string>User Name:</string>
    </property>
@@ -82,6 +91,9 @@
      <width>71</width>
      <height>18</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
    </property>
    <property name="text">
     <string>Password:</string>

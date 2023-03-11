@@ -722,7 +722,7 @@ SearchResultList *MainWindow::GetSearchResultList()
         searchResultList_ = new SearchResultList(tabView());
         auto dockView = MainWindow::Instance().CreateSearchDockView();
         dockView->setWidget(searchResultList_);
-        searchResultList_->setParent(dockView);
+//        searchResultList_->setParent(dockView);
         searchResultList_->setFont(QFont("Consolas", 11));
     }
     return searchResultList_;
@@ -830,7 +830,10 @@ bool MainWindow::Save()
 bool MainWindow::Find()
 {
     qDebug() << "MainWindow::find()";
-    (new SearchDialog(this))->Start(0);
+    if (searchDialog_ == nullptr) {
+        searchDialog_ = new SearchDialog(this);
+    }
+    searchDialog_->Start(0);
     return true;
 }
 
@@ -863,7 +866,10 @@ bool MainWindow::FindPrevious()
 bool MainWindow::Replace()
 {
     qDebug() << "MainWindow::find()";
-    (new SearchDialog(this))->Start(1);
+    if (searchDialog_ == nullptr) {
+        searchDialog_ = new SearchDialog(this);
+    }
+    searchDialog_->Start(1);
     return true;
 }
 

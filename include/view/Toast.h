@@ -41,7 +41,7 @@ public:
 
 private:
     Toast();
-    void timerEvent(QTimerEvent *event) override;
+    void timerEvent(QTimerEvent *) override;
 
     ToastDialog *dialog_{nullptr};
     int timerId_{0};
@@ -52,60 +52,9 @@ class ToastDialog: public QDialog
 {
     Q_OBJECT
 public:
-    ToastDialog()
-    {
-        auto layout = new QHBoxLayout(this);
-        label_ = new QLabel(this);
-        label_->setStyleSheet("color: white; background: transparent");
-        label_->setAlignment(Qt::AlignCenter);
-        layout->addWidget(label_, 1);
+    ToastDialog();
 
-#ifdef FRAME_RADIUS
-        frame_ = new QFrame(this);
-        frame_->setLayout(layout);
-        auto dialogLayout = new QHBoxLayout(this);
-        dialogLayout->addWidget(frame_, 1);
-        setLayout(dialogLayout);
-#else
-        setLayout(layout);
-#endif
-        setWindowFlag(Qt::FramelessWindowHint);
-        setAttribute(Qt::WA_ShowWithoutActivating);
-#ifdef FRAME_RADIUS
-        setAttribute(Qt::WA_TranslucentBackground);
-#endif
-        setAttribute(Qt::WA_DeleteOnClose);
-    }
-
-    void Show(Toast::Level level, const QString& text)
-    {
-#ifdef FRAME_RADIUS
-        const QString qss("QFrame{background-color:%1; border:none;"
-                          "border-top-left-radius:10px; border-top-right-radius:10px;"
-                          "border-bottom-left-radius:10px;border-bottom-right-radius:10px;}");
-        if (level == Toast::kInfo) {
-            frame_->setStyleSheet(qss.arg("#000000"));
-        } else if (level == Toast::kWarning) {
-            frame_->setStyleSheet(qss.arg("#001166"));
-        } else {
-            frame_->setStyleSheet(qss.arg("#660000"));
-        }
-#else
-        QPalette pal = palette();
-        pal.setColor(QPalette::Window, QColor(0, 0, 0, 200));
-        if (level == Toast::kInfo) {
-            pal.setColor(QPalette::Window, QColor(0, 0, 0, 200));
-        } else if (level == Toast::kWarning) {
-            pal.setColor(QPalette::Window, QColor(0, 0, 255, 200));
-        } else {
-            pal.setColor(QPalette::Window, QColor(255, 0, 0, 200));
-        }
-        setPalette(pal);
-#endif
-        label_->setText(text);
-        setWindowFlag(Qt::WindowStaysOnTopHint);
-        show();
-    }
+    void Show(Toast::Level level, const QString& text);
 
 private:
     QLabel *label_;

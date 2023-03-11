@@ -22,7 +22,7 @@
 namespace QEditor {
 namespace Constants {
 constexpr auto kAppName = "QEditor";
-constexpr auto kVersionStr = "0.0.2 (V22R10 alpha)";
+constexpr auto kVersionStr = "0.0.3 (V22R10 alpha)";
 constexpr auto kOrgName = "Q";
 
 constexpr auto kAppInternalRelativePath = ".Q/data/internal/.files/";

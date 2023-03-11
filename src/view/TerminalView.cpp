@@ -16,11 +16,11 @@
 
 #include "TerminalView.h"
 
+#include <MainWindow.h>
 #include <QScrollBar>
 
 #include "ansiescapecodehandler.h"
 
-#include "Toast.h"
 #include "Logger.h"
 
 using Utils::AnsiEscapeCodeHandler;
@@ -28,7 +28,9 @@ using Utils::FormattedText;
 
 namespace QEditor {
 TerminalView::TerminalView(const QString &ip, int port, const QString &user, const QString &pwd, QWidget *parent)
-    : EditView(user + "@" + ip + ":" + QString::number(port), parent), ip_(ip), port_(port), user_(user), pwd_(pwd)
+    : EditView(user + "@" + ip + ":" + QString::number(port), parent),
+      ip_(ip), port_(port), user_(user), pwd_(pwd),
+      savedCharFormat_(currentCharFormat())
 {
 //    setCenterOnScroll(true);
     CreateConnection();
@@ -150,7 +152,7 @@ void TerminalView::keyPressEvent(QKeyEvent *event)
             // It the cursor is not in command input area, move cursor to end and append input char to inputed cmd's tail.
             moveCursor(QTextCursor::End);
             pos = cmdBuffer_.length();
-            Toast::Instance().Show(Toast::kInfo, QString(tr("Append \'%1\' in command line tail.")).arg(event->text()));
+            MainWindow::Instance().statusBar()->showMessage(QString(tr("Append \'%1\' in command line tail.")).arg(event->text()), 10000);
         } else {
             pos = cmdBuffer_.length() - offset;
         }
@@ -207,17 +209,17 @@ void TerminalView::HandleConnectStateChanged(bool state, const QString &ip, int 
 
     qDebug() << "state: " << state;
     if(state) {
-        Toast::Instance().Show(Toast::kInfo, QString(tr("Try to connecting %1:%2.")).arg(ip).arg(port));
+        MainWindow::Instance().statusBar()->showMessage(QString(tr("Try to connecting %1:%2.")).arg(ip).arg(port), 10000);
     } else {
         connectState_ = state;
-        Toast::Instance().Show(Toast::kWarning, QString(tr("%1:%2 is disconnected.")).arg(ip).arg(port));
+        MainWindow::Instance().statusBar()->showMessage(QString(tr("%1:%2 is disconnected.")).arg(ip).arg(port), 10000);
     }
 }
 
 void TerminalView::HandleShellConnected(const QString &ip, int port)
 {
     connectState_ = true;
-    Toast::Instance().Show(Toast::kInfo, QString(tr("%1:%2 is connected.")).arg(ip).arg(port));
+    MainWindow::Instance().statusBar()->showMessage(QString(tr("%1:%2 is connected.")).arg(ip).arg(port), 10000);
 }
 
 void TerminalView::HandleAnsiEscapeCode(const QString &constMsg, QTextCursor &cursor) {
@@ -318,7 +320,6 @@ void TerminalView::HandleShellDataArrived(const QString &msg, const QString &ip,
     auto cursor = textCursor();
     cursor.movePosition(QTextCursor::End);
     HandleAnsiEscapeCode(strippedMsg, cursor);
-    auto savedCharFormat = currentCharFormat();
     AnsiEscapeCodeHandler handler;
     auto fts = handler.parseText(FormattedText(strippedMsg, currentCharFormat()));
     foreach (auto &ft, fts) {
@@ -326,7 +327,7 @@ void TerminalView::HandleShellDataArrived(const QString &msg, const QString &ip,
         cursor.insertText(ft.text, ft.format);
         HandleAnsiEscapeCode(strippedMsg, cursor);
     }
-    setCurrentCharFormat(savedCharFormat);
+    setCurrentCharFormat(savedCharFormat_);
     if (textCursor().position() == document()->characterCount() - 1) {
         ensureCursorVisible();  // verticalScrollBar()->setValue(verticalScrollBar()->maximum());
     }

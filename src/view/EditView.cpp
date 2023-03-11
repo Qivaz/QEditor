@@ -46,7 +46,7 @@ EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
       filePath_(fileInfo.canonicalFilePath()),
       fileType_(filePath_)
 {
-    if (!fileType_.IsUnknown()) {
+    if (!fileType_.IsUnknown() && CanParse()) {
         highlighter_ = new TextHighlighter(fileType_, document(), "");
     }
 
@@ -700,7 +700,7 @@ void EditView::HandleRedoAvailable(bool avail)
 void EditView::TrigerParser()
 {
     // TODO: Add more lang.
-    if (!fileType_.IsIr()) {
+    if (!fileType_.IsIr() || !CanParse()) {
         if (parser_ == nullptr) {
             parser_ = new DummyParser(this);
             overviewList_ = new OutlineList(parser_);

@@ -179,6 +179,16 @@ public:
     void JumpHint(QTextCursor &cursor);
     void Jump();
 
+    bool CanParse() {
+        QFile file(filePath_);
+        qCritical() << file.size();
+        if (file.size() > Constants::kMaxParseFileSize) {
+            return false;
+        }
+        return (blockCount() <= Constants::kMaxParseLineNum &&
+                document()->characterCount() <= Constants::kMaxParseCharNum);
+    }
+
 protected:
     void showEvent(QShowEvent *) override;
     void paintEvent(QPaintEvent *event) override;

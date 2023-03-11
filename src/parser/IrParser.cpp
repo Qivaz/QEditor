@@ -140,6 +140,7 @@ void IrParser::ParseFuncGraph(){
                     QStringList args = switchCalleeArgs.split(argsSeparator);
                     if (args.size() != 3) {
                         qDebug() << "Switch call argument size should be 3, but got " << startBlockText;
+                        startBlock = startBlock.next();
                         continue;
                     }
                     if (args[1].startsWith("@")) {
@@ -176,6 +177,7 @@ void IrParser::ParseFuncGraph(){
                     QStringList args = cnodeUnionCalleeArgs.split(argsSeparator);
                     if (args.size() != 2) {
                         qDebug() << "Union call argument size should be 2, but got " << startBlockText;
+                        startBlock = startBlock.next();
                         continue;
                     }
                     if (args[0].startsWith("@")) {

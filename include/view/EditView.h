@@ -119,6 +119,7 @@ public:
     void GotoCursor(const QTextCursor &cursor);
     int GotoBlock(int blockNumber);
     void SelectCurrentBlock(int lineCount);
+    void SelectBlocks(int startBlockNumber, int endBlockNumber);
 
     QVector<QString> markTexts() const { return markTexts_; }
     void setMarkTexts(const QVector<QString> strs) { markTexts_ = strs; }
@@ -280,11 +281,15 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     EditView *editView_{nullptr};
+
+    int startBlockNumber_{-1};
 };
 }  // namespace QEditor
 

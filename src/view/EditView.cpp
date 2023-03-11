@@ -221,7 +221,52 @@ int EditView::GotoBlock(int blockNumber)
 }
 
 // Select the lines of current block.
-void EditView::SelectCurrentBlock(const int lineCount)
+void EditView::SelectBlocks(int startBlockNumber, int endBlockNumber)
+{
+    qDebug() << startBlockNumber << endBlockNumber;
+//    if (endBlockNumber == startBlockNumber) {
+//        return;
+//    }
+    QTextCursor cursor = textCursor();
+    QTextBlock block = document()->findBlockByNumber(startBlockNumber);
+    cursor.setPosition(block.position());
+    if (endBlockNumber > startBlockNumber) {
+        cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    } else {
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+        // Including \n
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+    }
+    while (true) {
+        if (endBlockNumber > startBlockNumber) {
+            for (int i = 0; i < block.lineCount() - 1; ++i) {
+                cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor);
+            }
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            // Including \n
+            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+
+            if (block.blockNumber() == endBlockNumber) {
+                break;
+            }
+            block = block.next();
+        } else {
+            for (int i = 0; i < block.lineCount(); ++i) {
+                cursor.movePosition(QTextCursor::Up, QTextCursor::KeepAnchor);
+            }
+            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+
+            if (block.blockNumber() == endBlockNumber) {
+                break;
+            }
+            block = block.previous();
+        }
+    }
+    setTextCursor(cursor);
+}
+
+// Select the lines of current block.
+void EditView::SelectCurrentBlock(int lineCount)
 {
     QTextCursor cursor = textCursor();
     cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
@@ -1303,26 +1348,42 @@ void EditView::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void LineNumberArea::paintEvent(QPaintEvent *event)
-{
-    editView_->HandleLineNumberAreaPaintEvent(event);
-}
-
 QSize LineNumberArea::sizeHint() const
 {
     return QSize(editView_->GetLineNumberAreaWidth(), 0);
 }
 
-void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event)
+void LineNumberArea::paintEvent(QPaintEvent *event)
 {
+    editView_->HandleLineNumberAreaPaintEvent(event);
+}
+
+void LineNumberArea::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << event;
     if (event->button() == Qt::LeftButton) {
         auto blockNumber = editView_->GetBlockNumber(event->pos().ry());
         auto lineCount = editView_->GotoBlock(blockNumber);
         editView_->SelectCurrentBlock(lineCount);
+        startBlockNumber_ = blockNumber;
+    }
+}
+
+void LineNumberArea::mouseMoveEvent(QMouseEvent *event)
+{
+    qDebug() << event;
+    if (startBlockNumber_ != -1) {
+        auto blockNumber = editView_->GetBlockNumber(event->pos().ry());
+        editView_->SelectBlocks(startBlockNumber_, blockNumber);
     }
 }
 
 void LineNumberArea::mouseReleaseEvent(QMouseEvent *event)
+{
+    startBlockNumber_ = -1;
+}
+
+void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         auto blockNumber = editView_->GetBlockNumber(event->pos().ry());

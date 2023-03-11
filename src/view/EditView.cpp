@@ -676,21 +676,23 @@ void EditView::HandleContentsChange(int from, int charsRemoved, int charsAdded)
 
 void EditView::HandleCopyAvailable(bool avail)
 {
-    qDebug();
+    qDebug() << avail;
     copyAvail_ = avail;
     MainWindow::Instance().SetCopyAvailable(avail);
 }
 
 void EditView::HandleUndoAvailable(bool avail)
 {
-    qDebug();
+    qDebug() << avail;
     undoAvail_ = avail;
     MainWindow::Instance().SetUndoAvailable(avail);
+    // If undo available, there must be modification. vice versa.
+    SetModified(avail);
 }
 
 void EditView::HandleRedoAvailable(bool avail)
 {
-    qDebug();
+    qDebug() << avail;
     redoAvail_ = avail;
     MainWindow::Instance().SetRedoAvailable(avail);
 }

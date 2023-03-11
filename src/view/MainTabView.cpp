@@ -329,10 +329,10 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
     if (editView->filePath().isEmpty()) {  // New file.
         if (editView->document()->isEmpty()) {
             // Close tab.
-            DeleteWidget(editView);
             if (editView->newFileNum() != 0) {
                 NewFileNum::SetNumber(editView->newFileNum(), false);
             }
+            DeleteWidget(editView);
             return true;
         }
         const QMessageBox::StandardButton res
@@ -343,10 +343,10 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
         if (res == QMessageBox::Discard ||
             (res == QMessageBox::Save && editView->SaveAs())) {
             // Close tab.
-            DeleteWidget(editView);
             if (editView->newFileNum() != 0) {
                 NewFileNum::SetNumber(editView->newFileNum(), false);
             }
+            DeleteWidget(editView);
         }
     } else {  // Open file.
         if (editView->MaybeSave()) {
@@ -364,10 +364,10 @@ bool TabView::TabForceClose()
     auto currentEditView = CurrentEditView();
     if (currentEditView != nullptr) {
         openFiles().remove(currentEditView->filePath());  // Just force remove.
-        DeleteWidget(currentEditView);
         if (currentEditView->newFileNum() != 0) {
             NewFileNum::SetNumber(currentEditView->newFileNum(), false);
         }
+        DeleteWidget(currentEditView);
     } else {
         DeleteWidget(currentWidget());
     }

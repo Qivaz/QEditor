@@ -25,7 +25,9 @@ class DockView : public QDockWidget
     Q_OBJECT
 public:
     DockView(QWidget *parent = nullptr);
-    ~DockView() = default;
+    ~DockView() {
+        setWidget(nullptr);
+    }
 
     void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
                     const QString &backColor, const QString &leftPadding, const QString &topPadding);

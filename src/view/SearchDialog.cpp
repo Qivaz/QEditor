@@ -39,7 +39,7 @@ SearchDialog::SearchDialog(QWidget *parent, int index) :
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_DeleteOnClose);
+//    setAttribute(Qt::WA_DeleteOnClose);
 
     qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);

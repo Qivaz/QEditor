@@ -62,6 +62,13 @@ public:
         if (editView == nullptr) {
             return nullptr;
         }
+#if defined (USE_DIFF_TEXT_VIEW)
+        // DiffView is sub class of EditView. Ignore.
+        auto diffView = qobject_cast<DiffView*>(currentWidget());
+        if (diffView != nullptr) {
+            return nullptr;
+        }
+#endif
         return editView;
     }
 
@@ -72,6 +79,13 @@ public:
         if (editView == nullptr) {
             return nullptr;
         }
+#if defined (USE_DIFF_TEXT_VIEW)
+        // DiffView is sub class of EditView. Ignore.
+        auto diffView = qobject_cast<DiffView*>(widget(index));
+        if (diffView != nullptr) {
+            return nullptr;
+        }
+#endif
         return editView;
     }
 

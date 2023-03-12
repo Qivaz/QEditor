@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(OutputMessageOutput);
 #endif
 
-    qCritical() << "currentPath: " << QDir::currentPath();
+    qDebug() << "currentPath: " << QDir::currentPath();
     QTranslator translator;
     translator.load("zh_CN");
     app.installTranslator(&translator);

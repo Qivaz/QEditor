@@ -23,9 +23,6 @@
 
 #include "Logger.h"
 
-using Utils::AnsiEscapeCodeHandler;
-using Utils::FormattedText;
-
 namespace QEditor {
 TerminalView::TerminalView(const QString &ip, int port, const QString &user, const QString &pwd, QWidget *parent)
     : EditView(user + "@" + ip + ":" + QString::number(port), parent),
@@ -320,8 +317,8 @@ void TerminalView::HandleShellDataArrived(const QString &msg, const QString &ip,
     auto cursor = textCursor();
     cursor.movePosition(QTextCursor::End);
     HandleAnsiEscapeCode(strippedMsg, cursor);
-    AnsiEscapeCodeHandler handler;
-    auto fts = handler.parseText(FormattedText(strippedMsg, currentCharFormat()));
+    ::Utils::AnsiEscapeCodeHandler handler;
+    auto fts = handler.parseText(::Utils::FormattedText(strippedMsg, currentCharFormat()));
     foreach (auto &ft, fts) {
         qCritical() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
         cursor.insertText(ft.text, ft.format);

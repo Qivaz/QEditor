@@ -27,7 +27,6 @@ class TerminalView : public EditView
 public:
     TerminalView(const QString &ip, int port, const QString &user, const QString &pwd, QWidget *parent = nullptr);
     ~TerminalView() {
-        qCritical();
         if (sshClient_ != nullptr) {
             delete sshClient_;
         }

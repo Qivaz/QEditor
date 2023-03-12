@@ -101,21 +101,36 @@ void TabView::UpdateWindowTitle(int index)
     } else {
         editView = GetEditView(index);
     }
-    if (editView == nullptr) {
-        return;
+    QString title;
+    if (editView != nullptr) {
+        title = editView->fileName();
+        if (editView->ShouldSave()) {
+            title = "* " + title;
+        }
+    } else {
+        if (index == -1) {
+            title = tabText(currentIndex());
+        } else {
+            title = tabText(index);
+        }
     }
+
+    title += " - " + QCoreApplication::applicationName();
     MainWindow *win = (MainWindow*)(this->parent());
-    auto title = editView->fileName() + " - " + QCoreApplication::applicationName();
-    if (editView->ShouldSave()) {
-        title = "* " + title;
-    }
     win->setWindowTitle(title);
 }
 
 void TabView::HandleCurrentIndexChanged(int index)
 {
     qDebug() << "index: " << index;
+    UpdateWindowTitle(index);
+
     auto editView = GetEditView(index);
+#if defined (USE_DIFF_TEXT_VIEW)
+    if (editView == nullptr) {
+        editView = GetDiffView(index);
+    }
+#endif
     if (editView == nullptr) {
         return;
     }
@@ -128,10 +143,8 @@ void TabView::HandleCurrentIndexChanged(int index)
         MainWindow::Instance().SetExplorerDockViewPosition(editView->filePath());
     }
 
-    UpdateWindowTitle();
-
     // Update status bar info. if file encoding changes.
-    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", CurrentEditView()->fileEncoding().name(), 0);
+    MainWindow::Instance().UpdateStatusBarRareInfo("Unix", editView->fileEncoding().name(), 0);
 }
 
 void TabView::HandleTabBarClicked(int index)
@@ -515,8 +528,12 @@ void TabView::NewFile()
 void TabView::ViewDiff(const QString &former, const QString &latter)
 {
     diff_.Impose(former, latter);
-    const QString html = diff_.ToLineHtml();
+#if defined (USE_DIFF_TEXT_VIEW)
+    const auto &formattedTexts = diff_.ToFormattedText();
+#else
+    const QString &html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
+#endif
     QString diffName = former.left(20) + "... → " + latter.left(20) + "...";
     auto diffView = new DiffView(this);
     addTab(diffView, diffName);
@@ -524,18 +541,29 @@ void TabView::ViewDiff(const QString &former, const QString &latter)
     setCurrentIndex(count() - 1);
     QString diffTip = QString(tr("Diff: ")) + diffName;
     setTabToolTip(count() - 1, diffTip);
-    diffView->setReadOnly(true);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
-    diffView->insertHtml(html);
-    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
+#if defined (USE_DIFF_TEXT_VIEW)
+    auto cursor = diffView->textCursor();
+    foreach (auto &ft, formattedTexts) {
+        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
+        cursor.insertText(ft.text, ft.format);
+    }
+#else
+    diffView->appendHtml(html);
+    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+#endif
 }
 
 void TabView::ViewDiff(const EditView *former, const EditView *latter)
 {
     diff_.Impose(former->toPlainText(), latter->toPlainText());
-    const QString html = diff_.ToLineHtml();
+#if defined (USE_DIFF_TEXT_VIEW)
+    const auto &formattedTexts = diff_.ToFormattedText();
+#else
+    const QString &html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
+#endif
     QString diffName = former->fileName() + QString(" → ") + latter->fileName();
     auto diffView = new DiffView(this);
     diffView->setDiffFormerEditView(former);
@@ -547,11 +575,18 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter)
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
     QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(count() - 1, diffTip);
-    diffView->setReadOnly(true);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
-    diffView->insertHtml(html);
-    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
+#if defined (USE_DIFF_TEXT_VIEW)
+    auto cursor = diffView->textCursor();
+    foreach (auto &ft, formattedTexts) {
+        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
+        cursor.insertText(ft.text, ft.format);
+    }
+#else
+    diffView->appendHtml(html);
+    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+#endif
 }
 
 void TabView::SwapDiff(int index)
@@ -573,8 +608,12 @@ void TabView::SwapDiff(int index)
     auto former = diffView->diffFormerEditView();
     auto latter = diffView->diffLatterEditView();
     diff_.Impose(former->toPlainText(), latter->toPlainText());
-    const QString html = diff_.ToLineHtml();
+#if defined (USE_DIFF_TEXT_VIEW)
+    const auto &formattedTexts = diff_.ToFormattedText();
+#else
+    const QString &html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
+#endif
     QString diffName = former->fileName() + QString(" → ") + latter->fileName();
     setTabText(index, diffName);
     setTabIcon(index, QIcon::fromTheme("diff", QIcon(":/images/diff.svg")));
@@ -582,8 +621,16 @@ void TabView::SwapDiff(int index)
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
     QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(index, diffTip);
-    diffView->insertHtml(html);
-    qDebug() << ", html: " << diffView->toHtml() << ", text: " << diffView->toPlainText();
+#if defined (USE_DIFF_TEXT_VIEW)
+    auto cursor = diffView->textCursor();
+    foreach (auto &ft, formattedTexts) {
+        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
+        cursor.insertText(ft.text, ft.format);
+    }
+#else
+    diffView->appendHtml(html);
+    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+#endif
 }
 
 void TabView::OpenFile()

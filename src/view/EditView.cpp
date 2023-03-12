@@ -58,14 +58,20 @@ EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
 EditView::EditView(const QString &fileName, QWidget *parent)
     : tabView_((TabView*)parent),
       fileName_(fileName),
-      filePath_("")
+      filePath_(""),
+      menu_(new QMenu(parent))
 {
     Init();
 }
 
 EditView::EditView(QWidget *parent)
+    : tabView_((TabView*)parent),
+      fileName_(""),
+      filePath_(""),
+      menu_(new QMenu(parent))
 {
     EditView("", parent);
+    Init();
 }
 
 void EditView::Init()
@@ -441,7 +447,8 @@ bool EditView::SaveFile(const QString &filePath)
     QFileInfo fileInfo = QFileInfo(filePath);
     auto fileName = fileInfo.fileName();
     setFileName(fileName);
-    tabView()->ChangeTabDescription(fileInfo, tabView()->indexOf(this));
+    auto index = tabView()->indexOf(this);
+    tabView()->ChangeTabDescription(fileInfo, index);
     tabView()->UpdateWindowTitle();
 
     MainWindow::Instance().statusBar()->showMessage(tr("File saved"), 2000);
@@ -862,7 +869,7 @@ std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(
 
 bool EditView::HighlightChars(int startPos, int count, const QColor &foreground, const QColor &background, bool underline)
 {
-    QList<QTextEdit::ExtraSelection> markExtraSelections = this->extraSelections();
+    QList<QTextEdit::ExtraSelection> markExtraSelections = extraSelections();
     qDebug() << ", startPos: " << startPos << ", count: " << count << ", char: " << document()->characterAt(startPos) << ", extras: " << markExtraSelections.size() << ", " << (markExtraSelections.size() > Constants::kMaxExtraSelectionsMarkCount);
     if (markExtraSelections.size() > Constants::kMaxExtraSelectionsMarkCount) {
         return false;
@@ -1103,7 +1110,7 @@ int EditView::GetBlockNumber(int y)
     }
     auto res = --blockNumber;
     if (res < 0) {
-        qCritical() << ", the block number should not be less than 0.";
+        qCritical() << "Block number should not be less than 0.";
     }
     qDebug() << ", number: " << res;
     return res;
@@ -1206,7 +1213,7 @@ void EditView::wheelEvent(QWheelEvent *event) {
             timerId_ = 0;
         }
         timerId_ = startTimer(500);
-        qCritical() << "Timeout, timerId_: " << timerId_;
+        qDebug() << "Timeout, timerId_: " << timerId_;
     } else {
         highlighterInvalid_ = true;
     }

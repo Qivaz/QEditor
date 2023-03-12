@@ -3,9 +3,23 @@
 
 #include "diff_match_patch.h"
 
+#include <QTextCharFormat>
+
 using _Diff = Diff;
 
 namespace QEditor {
+class FormattedText {
+public:
+    FormattedText() = default;
+    FormattedText(const QString &txt, const QTextCharFormat &fmt = QTextCharFormat())
+        : text(txt), format(fmt) {}
+
+    QString text;
+    QTextCharFormat format;
+
+    bool operator==(const FormattedText &other) const { return text == other.text && format == other.format; }
+};
+
 class Diff
 {
 public:
@@ -15,6 +29,7 @@ public:
 
     QString ToHtml();
     QString ToLineHtml();
+    QList<FormattedText> ToFormattedText();
 
 private:
     diff_match_patch diffMatchPatch_;

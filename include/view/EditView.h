@@ -145,9 +145,9 @@ public:
     bool ShouldSave() { return contentChanged_; }
     void SetShouldSave(bool saved) { contentChanged_ = saved; }
     // Should call after addTab().
-    void SetModifiedIcon(bool modified);
+    virtual void SetModifiedIcon(bool modified);
     // Should call after addTab().
-    void SetModified(bool modified);
+    virtual void SetModified(bool modified);
 
     bool fileLoaded() { return fileLoaded_; };
     void setFileLoaded(bool fileLoaded) { fileLoaded_ = fileLoaded; }
@@ -171,7 +171,7 @@ public:
 
     void TrigerParser();
 
-    void Hover(QTextCursor &cursor);
+    virtual void Hover(QTextCursor &cursor);
 
     QString GetCursorText();
     QString GetCursorText(QTextCursor &cursor);
@@ -181,7 +181,6 @@ public:
 
     bool CanParse() {
         QFile file(filePath_);
-        qCritical() << file.size();
         if (file.size() > Constants::kMaxParseFileSize) {
             return false;
         }
@@ -200,6 +199,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
+
+    virtual void UnderpaintCurrentBlock();
 
 private slots:
     void HandleBlockCountChanged(int newBlockCount);
@@ -224,7 +225,6 @@ private:
 
     void HighlightFocusChars();
     void HighlightFocusNearBracket();
-    void UnderpaintCurrentBlock();
     void HighlightBrackets(const QTextCursor &leftCursor, const QTextCursor &rightCursor);
 
     void HighlightVisibleChars(const QString &text,

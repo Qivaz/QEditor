@@ -208,13 +208,13 @@ void SearchResultList::HandleItemClicked(QTreeWidgetItem *item, int column)
 
 bool SearchResultList::event(QEvent *event)
 {
-//    qCritical() << event->type();
+    qDebug() << event->type();
     if (event->type() == QEvent::ToolTip) {
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
         auto item = itemAt(helpEvent->pos());
-        qCritical() << helpEvent->pos();
+        qDebug() << helpEvent->pos();
         if (item != nullptr) {
-            qCritical() << item->toolTip(0);
+            qDebug() << item->toolTip(0);
             QToolTip::showText(helpEvent->globalPos(), item->toolTip(0));
         } else {
             event->ignore();
@@ -241,10 +241,6 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
     menu_->addSeparator();
     QAction *copySelectedAction = new QAction(tr("Copy Selected"));
     connect(copySelectedAction, &QAction::triggered, this, [this]() {
-//        const auto rows = selectionModel()->selectedRows(0);
-//        for (const auto &row : rows) {
-//            qCritical() << row.row();
-//        }
         QString text;
         const auto items = selectedItems();
         for (const auto &item : items) {
@@ -262,7 +258,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
             text += sessionItem->toolTip(0) + "\n";
             for (int j = 0; j < sessionItem->childCount(); ++j) {
                 const auto item = sessionItem->child(j);
-                qCritical() << item->toolTip(0);
+                qDebug() << item->toolTip(0);
                 text += "    " + item->toolTip(0) + '\n';
             }
             text += '\n';
@@ -284,10 +280,10 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
     QAction *clearSelectedResultAction = new QAction(tr("Clear Containing Result"));
     connect(clearSelectedResultAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
-        qCritical() << "item: " << item->toolTip(0);
+        qDebug() << "item: " << item->toolTip(0);
         while (item->parent() != topItem()) {
             item = item->parent();
-            qCritical() << "item: " << item->toolTip(0);
+            qDebug() << "item: " << item->toolTip(0);
         }
         topItem()->removeChild(item);
     });

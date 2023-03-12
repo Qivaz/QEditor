@@ -170,7 +170,7 @@ public:
     const QString GetText(int index)
     {
         if ((size_t)index >= texts_.size()) {
-            qCritical() << " index: " << index << ", text size: " << texts_.size();
+            qCritical() << "Wrong index: " << index << ", text size: " << texts_.size();
             return "";
         }
         return texts_[index];
@@ -178,7 +178,7 @@ public:
     int GetMibEnum(int index)
     {
         if ((size_t)index >= mibEnums_.size()) {
-            qCritical() << " index: " << index << ", mib enum size: " << mibEnums_.size();
+            qCritical() << "Wrong index: " << index << ", mib enum size: " << mibEnums_.size();
             return 106;  // UTF-8 in default.
         }
         return mibEnums_[index];

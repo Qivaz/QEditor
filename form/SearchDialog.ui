@@ -26,12 +26,15 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">QTabBar::tab { color: gray; } QTabBar::tab:selected { color: lightGray; }</string>
+    <string notr="true">background-color: transparent; QTabBar::tab { color: gray; background-color: transparent; } QTabBar::tab:selected { color: lightGray; }</string>
    </property>
    <property name="currentIndex">
     <number>0</number>
    </property>
    <widget class="QWidget" name="tabFind">
+    <property name="styleSheet">
+     <string notr="true">background-color: transparent; color: lightGray; background-color: rgb(68, 68, 68); font: 11pt;</string>
+    </property>
     <attribute name="title">
      <string>    Find    </string>
     </attribute>
@@ -130,6 +133,9 @@
     </widget>
    </widget>
    <widget class="QWidget" name="tabReplace">
+    <property name="styleSheet">
+     <string notr="true">background-color: transparent; color: lightGray; background-color: rgb(68, 68, 68); font: 11pt;</string>
+    </property>
     <attribute name="title">
      <string>Replace</string>
     </attribute>
@@ -279,6 +285,9 @@
      <height>101</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent; </string>
+   </property>
    <property name="title">
     <string>Search mode</string>
    </property>
@@ -334,6 +343,9 @@
      <height>24</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent; </string>
+   </property>
    <property name="text">
     <string>Whole word</string>
    </property>
@@ -346,6 +358,9 @@
      <width>111</width>
      <height>24</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent; </string>
    </property>
    <property name="text">
     <string>Backward</string>
@@ -360,6 +375,9 @@
      <height>24</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent; </string>
+   </property>
    <property name="text">
     <string>Match case</string>
    </property>
@@ -372,6 +390,9 @@
      <width>111</width>
      <height>24</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent; </string>
    </property>
    <property name="text">
     <string>Wrap around</string>

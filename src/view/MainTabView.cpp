@@ -38,7 +38,7 @@
 #include "Logger.h"
 
 namespace QEditor {
-TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu())
+TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
 {
     setAttribute(Qt::WA_StyledBackground);
     setMovable(true);
@@ -187,7 +187,7 @@ void TabView::HandleTabBarClicked(int index)
 
             auto folderPath = QFileInfo(filePath).canonicalPath();
 #if defined(Q_OS_WIN)
-            QAction *openExplorerAction = new QAction("Reveal in File Explorer");
+            QAction *openExplorerAction = new QAction(tr("Reveal in File Explorer"));
 #else
             QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif

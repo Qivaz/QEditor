@@ -1,0 +1,3 @@
+[submodule "qssh-test"]
+	path = qssh-test
+	url = https://gitee.com/zh_qh/qssh-test.git

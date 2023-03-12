@@ -187,7 +187,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
 
     auto folderPath = fileInfo.canonicalPath();
 #if defined(Q_OS_WIN)
-    QAction *openExplorerAction = new QAction("Reveal in File Explorer");
+    QAction *openExplorerAction = new QAction(tr("Reveal in File Explorer"));
 #else
     QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif

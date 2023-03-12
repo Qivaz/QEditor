@@ -279,6 +279,7 @@ private:
     FuncGraphInfo funcGraphInfo_;
 
     int timerId_{0};
+    QMenu *menu_;
 };
 
 class LineNumberArea : public QWidget

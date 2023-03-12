@@ -135,6 +135,7 @@ void MainWindow::CreateActions()
     fileToolBar->addAction(openAct);
 
     recentFilesMenu_ = fileMenu->addMenu(tr("Open Recent"));
+    RecentFiles::LoadFiles();
     UpdateRecentFilesMenu();
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.svg"));
@@ -689,7 +690,6 @@ void MainWindow::showEvent(QShowEvent *event)
     QMainWindow::showEvent(event);
     if (!init_) {
         init_ = true;
-        RecentFiles::LoadFiles();
         (void)tabView_->AutoLoad();
         auto ev = editView();
         if (ev != nullptr) {

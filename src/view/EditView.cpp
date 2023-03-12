@@ -44,7 +44,8 @@ EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
     : tabView_((TabView*)parent),
       fileName_(fileInfo.fileName()),
       filePath_(fileInfo.canonicalFilePath()),
-      fileType_(filePath_)
+      fileType_(filePath_),
+      menu_(new QMenu(parent))
 {
     if (!fileType_.IsUnknown() && CanParse()) {
         highlighter_ = new TextHighlighter(fileType_, document(), "");
@@ -96,6 +97,27 @@ void EditView::Init()
                                             border: none; \
                                             background: none; \
                                           }");
+    menu_->setStyleSheet("\
+                     QMenu {\
+                         color: lightGray;\
+                         background-color: rgb(40, 40, 40);\
+                         margin: 2px 2px;\
+                         border: none;\
+                     }\
+                     QMenu::item {\
+                         color: rgb(225, 225, 225);\
+                         background-color: rgb(40, 40, 40);\
+                         padding: 5px 5px;\
+                     }\
+                     QMenu::item:selected {\
+                         background-color: rgb(9, 71, 113);\
+                     }\
+                     QMenu::item:pressed {\
+                         border: 1px solid rgb(60, 60, 60); \
+                         background-color: rgb(29, 91, 133); \
+                     }\
+                     QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
+                    ");
 
     setFont(QFont("Consolas", 11));
     currentFontSize_ = font().pointSize();
@@ -1273,81 +1295,109 @@ bool EditView::UnmarkAll()
 
 void EditView::contextMenuEvent(QContextMenuEvent *event)
 {
-    auto menu = createStandardContextMenu();
-    menu->setStyleSheet("\
-                       QMenu {\
-                           color: lightGray;\
-                           background-color: rgb(40, 40, 40);\
-                           margin: 2px 2px;\
-                           border: none;\
-                       }\
-                       QMenu::item {\
-                           color: rgb(225, 225, 225);\
-                           background-color: rgb(40, 40, 40);\
-                           padding: 5px 5px;\
-                       }\
-                       QMenu::item:selected {\
-                           background-color: rgb(9, 71, 113);\
-                       }\
-                       QMenu::item:pressed {\
-                           border: 1px solid rgb(60, 60, 60); \
-                           background-color: rgb(29, 91, 133); \
-                       }\
-                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
-                      ");
-
+    menu_->clear();
     if (!selectedText_.isEmpty()) {
-        QAction *findAction = new QAction(tr("Find..."));
+        QAction *findAction = new QAction(tr("Find..."), this);
         connect(findAction, &QAction::triggered, this, &EditView::Find);
-        menu->insertAction(menu->actions()[0], findAction);
-        QAction *replaceAction = new QAction(tr("Replace..."));
+        menu_->addAction(findAction);
+        QAction *replaceAction = new QAction(tr("Replace..."), this);
         connect(replaceAction, &QAction::triggered, this, &EditView::Replace);
-        menu->insertAction(menu->actions()[1], replaceAction);
+        menu_->addAction(replaceAction);
 
-        menu->insertSeparator(menu->actions()[2]);
-        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"));
+        menu_->addSeparator();
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
-        menu->insertAction(menu->actions()[3], markUnmarkAction);
-        QAction *unmarkAllAction = new QAction(tr("Unmark All"));
+        menu_->addAction(markUnmarkAction);
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
-        menu->insertAction(menu->actions()[4], unmarkAllAction);
+        menu_->addAction(unmarkAllAction);
 
-        menu->insertSeparator(menu->actions()[5]);
-        QAction *selectTextToDiffAction = new QAction(tr("Select Text for View Diff"));
+        menu_->addSeparator();
+        QAction *selectTextToDiffAction = new QAction(tr("Select Text for View Diff"), this);
         connect(selectTextToDiffAction, &QAction::triggered, this, [this]() {
             tabView()->setFormerDiffStr(selectedText_);
         });
-        menu->insertAction(menu->actions()[6], selectTextToDiffAction);
+        menu_->addAction(selectTextToDiffAction);
         if (!tabView()->formerDiffStr().isEmpty()) {
-            QAction *diffWithPreviousAction = new QAction(tr("View Diff with Previous Selection"));
+            QAction *diffWithPreviousAction = new QAction(tr("View Diff with Previous Selection"), this);
             connect(diffWithPreviousAction, &QAction::triggered, this, [this]() {
                 tabView()->ViewDiff(tabView()->formerDiffStr(), selectedText_);
                 tabView()->setFormerDiffStr("");
             });
-            menu->insertAction(menu->actions()[7], diffWithPreviousAction);
-            menu->insertSeparator(menu->actions()[8]);
-        } else {
-            menu->insertSeparator(menu->actions()[7]);
+            menu_->addAction(diffWithPreviousAction);
         }
     } else {
-        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"));
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
-        menu->insertAction(menu->actions()[0], markUnmarkAction);
-        QAction *unmarkAllAction = new QAction(tr("Unmark All"));
+        menu_->addAction(markUnmarkAction);
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
-        menu->insertAction(menu->actions()[1], unmarkAllAction);
-        menu->insertSeparator(menu->actions()[2]);
+        menu_->addAction(unmarkAllAction);
     }
-    menu->exec(event->globalPos());
-    delete menu;
+    menu_->addSeparator();
+    if (undoAvail_) {
+        auto undoAction = new QAction(tr("&Undo"), this);
+        undoAction->setStatusTip(tr("Undo"));
+        connect(undoAction, &QAction::triggered, this, [this]() {
+            undo();
+        });
+        menu_->addAction(undoAction);
+    }
+    if (redoAvail_) {
+        auto redoAction = new QAction(tr("&Redo"), this);
+        redoAction->setStatusTip(tr("Redo"));
+        connect(redoAction, &QAction::triggered, this, [this]() {
+            redo();
+        });
+        menu_->addAction(redoAction);
+    }
+    menu_->addSeparator();
+    if (copyAvail_) {
+        auto copyAction = new QAction(tr("&Copy"), this);
+        copyAction->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
+        connect(copyAction, &QAction::triggered, this, [this]() {
+            copy();
+        });
+        menu_->addAction(copyAction);
+
+        auto cutAction = new QAction(tr("Cu&t"), this);
+        cutAction->setStatusTip(tr("Cut the current selection's contents to the clipboard"));
+        connect(cutAction, &QAction::triggered, this, [this]() {
+            cut();
+        });
+        menu_->addAction(cutAction);
+    }
+    auto pasteAction = new QAction(tr("&Paste"), this);
+    pasteAction->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
+    connect(pasteAction, &QAction::triggered, this, [this]() {
+        paste();
+    });
+    menu_->addAction(pasteAction);
+    if (copyAvail_) {
+        auto deleteAction = new QAction(tr("Delete"), this);
+        deleteAction->setStatusTip(tr("Delete the current selection's contents"));
+        connect(deleteAction, &QAction::triggered, this, [this]() {
+            textCursor().removeSelectedText();
+        });
+        menu_->addAction(deleteAction);
+    }
+    menu_->addSeparator();
+    auto selectAllAction = new QAction(tr("Select All"), this);
+    selectAllAction->setStatusTip(tr("Select all"));
+    connect(selectAllAction, &QAction::triggered, this, [this]() {
+        selectAll();
+    });
+    menu_->addAction(selectAllAction);
+
+    menu_->exec(event->globalPos());
 }
 
 QSize LineNumberArea::sizeHint() const

@@ -110,6 +110,9 @@ void SearchDialog::setCurrentTabIndex(int index)
 
 const QString SearchDialog::GetSelectedText()
 {
+    if (editView() == nullptr) {
+        return "";
+    }
     auto textCursor = editView()->textCursor();
     if (!textCursor.hasSelection()) {
         textCursor.select(QTextCursor::WordUnderCursor);
@@ -121,6 +124,9 @@ const QString SearchDialog::GetSelectedText()
 
 void SearchDialog::on_pushButtonFindFindNext_clicked()
 {
+    if (editView() == nullptr) {
+        return;
+    }
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
     auto cursor = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
@@ -139,6 +145,9 @@ void SearchDialog::on_radioButtonFindRe_toggled(bool checked)
 
 void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
 {
+    if (editView() == nullptr) {
+        return;
+    }
     if (searchResultList_ == nullptr) {
         searchResultList_ = MainWindow::Instance().GetSearchResultList();
     }
@@ -180,6 +189,9 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
 
 void SearchDialog::on_pushButtonFindCount_clicked()
 {
+    if (editView() == nullptr) {
+        return;
+    }
     std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
@@ -201,6 +213,9 @@ void SearchDialog::on_pushButtonReplaceCancel_clicked()
 
 void SearchDialog::on_pushButtonReplaceFindNext_clicked()
 {
+    if (editView() == nullptr) {
+        return;
+    }
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     InitSetting();
     auto res = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
@@ -221,6 +236,9 @@ void SearchDialog::on_pushButtonReplaceReplace_clicked()
 
 void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
 {
+    if (editView() == nullptr) {
+        return;
+    }
     int count;
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     auto const &text = ui_->lineEditReplaceReplaceWith->text();
@@ -256,6 +274,9 @@ void Searcher::setInfo(const QString &info)
 }
 
 bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+    if (editView() == nullptr) {
+        return false;
+    }
     int firstStart = -1;
     QTextCursor currentCursor = startCursor;
     while (true) {
@@ -342,6 +363,9 @@ bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, Q
 
 template <class T>
 bool Searcher::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+    if (editView() == nullptr) {
+        return false;
+    }
     int flag = 0;
     if (backward) {
         flag |= QTextDocument::FindFlag::FindBackward;
@@ -458,6 +482,9 @@ QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCurs
 
 std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
     std::vector<QTextCursor> cursors;
+    if (editView() == nullptr) {
+        return cursors;
+    }
     QTextCursor savedCursor = editView()->textCursor();
     QTextCursor cursor = editView()->textCursor();
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
@@ -483,6 +510,9 @@ std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
 
 // Replace 'target' with 'text'.
 void Searcher::Replace(const QString &target, const QString &text, bool backward) {
+    if (editView() == nullptr) {
+        return;
+    }
     // Check find options.
     bool wrapAround = (checkBoxFindWrapAround);
     QString startStr;
@@ -555,6 +585,9 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
 
 // Replace all 'target' with 'text'.
 int Searcher::ReplaceAll(const QString &target, const QString &text) {
+    if (editView() == nullptr) {
+        return 0;
+    }
     // Move the search start pos to the start of selection if has selection.
     if (editView()->textCursor().hasSelection()) {
         int start = editView()->textCursor().selectionStart();

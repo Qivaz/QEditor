@@ -129,7 +129,7 @@ void SearchDialog::on_pushButtonFindFindNext_clicked()
     }
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
-    auto cursor = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
+    auto cursor = searcher_->FindNext(target, editView()->textCursor());
     if (!cursor.isNull()) {
         editView()->setTextCursor(cursor);
     }
@@ -218,7 +218,7 @@ void SearchDialog::on_pushButtonReplaceFindNext_clicked()
     }
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     InitSetting();
-    auto res = searcher_->FindNext(target, editView()->textCursor(), ui_->checkBoxFindBackward->isChecked());
+    auto res = searcher_->FindNext(target, editView()->textCursor());
     if (!res.isNull()) {
         editView()->setTextCursor(res);
     }
@@ -273,7 +273,8 @@ void Searcher::setInfo(const QString &info)
     info_ = info;
 }
 
-bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+// Find for Extended Option.
+bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
     if (editView() == nullptr) {
         return false;
     }
@@ -281,44 +282,66 @@ bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, Q
     QTextCursor currentCursor = startCursor;
     while (true) {
         // The first block.
+        int start;
+        int end;
         int count = 0;
         QTextCursor cursor;
-        if (!Find(target[0], currentCursor, cursor, backward)) {
-            qDebug();
+        const auto &firstTarget = target[0];
+        if (!_Find(firstTarget, currentCursor, cursor, backward)) {
+            qDebug() << "Not found: " << firstStart;
             return false;
         }
         if (!cursor.hasSelection()) {
-            qDebug();
+            qDebug() << "Has no selection: " << firstStart;
             return false;
         }
-        count += target[0].length();
+        start = cursor.selectionStart();
+        end = cursor.selectionEnd();
+
+        count += firstTarget.length();
 
         // Have searched all content, finish.
-        if (cursor.selectionStart() == firstStart) {
-            qDebug();
+        if (cursor.position() == firstStart) {
             break;
         }
         if (firstStart == -1) {
-            firstStart = cursor.selectionStart();
+            firstStart = cursor.position();
         }
 
-        int start = cursor.selectionStart();
-        int end = cursor.selectionEnd();
-        qDebug() << "start: " << start << editView()->document()->characterAt(start)
-                    << ", end: " << end << editView()->document()->characterAt(end);
-        if (target.length() > 1 &&
-            editView()->document()->characterAt(end) != '\n' &&
-            editView()->document()->characterAt(end) != "\u2029") {
-            qDebug();
-            currentCursor = cursor;
-            continue;
+        const auto &firstChar = editView()->document()->characterAt(start);
+        const auto &lastChar = editView()->document()->characterAt(end);
+        qDebug() << "start: " << start << firstChar << ", end: " << end << lastChar << ", selection: " << cursor.selectedText();
+        if (target.length() > 1) {  // Multiple lines, not one line.
+            if (firstChar == '\n' || firstChar == "\u2029") {  // Multiple lines target. Starts with '\n'.
+                ++count;  // Include '\n'
+            } else {
+                // Check if ends with '\n'.
+                if (lastChar == '\0') {  // EOF
+                    qDebug() << "Reach end of file.";
+                } else if (lastChar != '\n' && lastChar != "\u2029") {
+                    qDebug() << "lastChar: " << lastChar;
+                    int newStart;
+                    if (backward) {
+                        newStart = start - 1;
+                    } else {
+                        newStart = start + 1;
+                    }
+                    qDebug() << "newStart: " << newStart;
+                    currentCursor.setPosition(newStart, QTextCursor::MoveAnchor);
+                    continue;
+                } else {
+                    ++count;  // Include '\n'
+                }
+            }
         }
-        ++count;
 
         // The middle blocks.
         auto block = cursor.block();
         bool match = true;
-        block = block.next();
+        // If multiple lines target && starts with '\n', use current block firstly.
+        if (firstChar != '\n' && firstChar != "\u2029") {
+            block = block.next();
+        }
         for (int i = 1; i < target.length() - 1; ++i) {
             qDebug() << "block text: " << block.text() << ", " << block.blockNumber();
             qDebug() << "target[i]: " << target[i];
@@ -326,32 +349,59 @@ bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, Q
                 match = false;
                 break;
             }
-            count += target[i].length() + 1;
+            count += target[i].length() + 1;  // "+ 1" to include '\n'
             block = block.next();
         }
         if (!match) {
-            qDebug();
-            currentCursor = cursor;
+            int newStart;
+            if (backward) {
+                newStart = start - 1;
+            } else {
+                newStart = start + 1;
+            }
+            qDebug() << "newStart: " << newStart;
+            currentCursor.setPosition(newStart, QTextCursor::MoveAnchor);
             continue;
         }
 
         // The last block.
         if (target.length() > 1) {
-            if (!block.text().startsWith(target[target.length() - 1])) {
-                qDebug();
-                currentCursor = cursor;
-                continue;
+            const auto &lastTarget = target[target.length() - 1];
+            if (!lastTarget.isEmpty()) {  // Not ends with '\n'.
+                if (!block.text().startsWith(lastTarget)) {
+                    qDebug() << "Match last block failed, lastTarget: " << lastTarget << ", block: " << block.text();
+                    int newStart;
+                    if (backward) {
+                        newStart = start - 1;
+                    } else {
+                        newStart = start + 1;
+                    }
+                    qDebug() << "newStart: " << newStart;
+                    currentCursor.setPosition(newStart, QTextCursor::MoveAnchor);
+                    continue;
+                }
+                count += lastTarget.length();
             }
-            count += target[target.length() - 1].length();
         }
 
         // Found.
-        cursor.setPosition(start, QTextCursor::MoveAnchor);
-        for (int i = 0; i < count; ++i) {
-            bool res = cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-            if (!res) {
-                qDebug();
-                return false;
+        if (backward) {
+            cursor.setPosition(start + count, QTextCursor::MoveAnchor);
+            for (int i = 0; i < count; ++i) {
+                bool res = cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
+                if (!res) {
+                    qCritical() << "Move position failed, res: " << res;
+                    return false;
+                }
+            }
+        } else {
+            cursor.setPosition(start, QTextCursor::MoveAnchor);
+            for (int i = 0; i < count; ++i) {
+                bool res = cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                if (!res) {
+                    qCritical() << "Move position failed, res: " << res;
+                    return false;
+                }
             }
         }
         targetCursor = cursor;
@@ -362,7 +412,7 @@ bool Searcher::Find(const QStringList &target, const QTextCursor &startCursor, Q
 }
 
 template <class T>
-bool Searcher::Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward, bool first) {
     if (editView() == nullptr) {
         return false;
     }
@@ -370,23 +420,60 @@ bool Searcher::Find(const T &target, const QTextCursor &startCursor, QTextCursor
     if (backward) {
         flag |= QTextDocument::FindFlag::FindBackward;
     }
-    if (checkBoxFindMatchCase) {
+    if (checkBoxFindMatchCase_) {
         flag |= QTextDocument::FindFlag::FindCaseSensitively;
     }
-    if (checkBoxFindWholeWord) {
+    if (checkBoxFindWholeWord_) {
         flag |= QTextDocument::FindFlag::FindWholeWords;
     }
 
-    bool res = false;
-    auto cursor = editView()->document()->find(target, startCursor, QTextDocument::FindFlags(flag));
-    if (!cursor.isNull()) {
-        targetCursor = cursor;
-        res = true;
-        return res;
+    // Multiple lines. Targets starts with '\n'.
+    if (std::is_same_v<T, QString> && target.isEmpty()) {
+        QTextCursor cursor = startCursor;
+        // Notice that, block.text().length() not includes '\n', but block.length() includes '\n'.
+        auto block = startCursor.block();
+        if (backward) {
+            block = block.previous();
+
+            // If cursor at the block end position, cursor.block() is its next block.
+            if (startCursor.hasSelection() &&
+                (startCursor.selectedText() == '\n' || startCursor.selectedText() == "\u2029")) {
+                block = block.previous();
+            }
+        }
+        if (block.isValid()) {
+            const auto &firstChar = editView()->document()->characterAt(block.position() + block.length() - 1);
+            const auto &lastChar = editView()->document()->characterAt(block.position() + block.length());
+            qDebug() << "firstChar: " << firstChar << ", lastChar: " << lastChar << "block text: " << block.text();
+            if (lastChar == '\0') {  // EOF
+                qDebug() << "Reach end of file.";
+            } else if (firstChar != '\n' && firstChar != "\u2029") {
+                qDebug() << "First Char: " << firstChar << ", Last Char: " << lastChar;
+            } else {
+                qDebug() << "Found \\n";  // Include '\n'
+                // When we get cursor.block(), the block is that where the cursor selectionEnd() stays at.
+                // if (backward) {
+                //     cursor.setPosition(block.position() + block.length(), QTextCursor::MoveAnchor);  // Set position after '\n'.
+                //     cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
+                //     targetCursor = cursor;
+                // } else {
+                    cursor.setPosition(block.position() + block.length() - 1, QTextCursor::MoveAnchor);  // Set position before '\n'.
+                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                    targetCursor = cursor;
+                // }
+                return true;
+            }
+        }
+    } else {
+        auto cursor = editView()->document()->find(target, startCursor, QTextDocument::FindFlags(flag));
+        if (!cursor.isNull()) {
+            targetCursor = cursor;
+            return true;
+        }
     }
 
-    bool atStart = true;  // TODO: Only re-find if not at start position.
-    if (checkBoxFindWrapAround && atStart) {
+    bool res = false;
+    if (checkBoxFindWrapAround_ && first) {
         QScrollBar *scrollBar = editView()->verticalScrollBar();
         auto sliderPos = scrollBar->sliderPosition();
         QTextCursor anewCursor = startCursor;
@@ -395,11 +482,9 @@ bool Searcher::Find(const T &target, const QTextCursor &startCursor, QTextCursor
         } else {
             anewCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
         }
-        auto cursor = editView()->document()->find(target, anewCursor, QTextDocument::FindFlags(flag));
-        if (!cursor.isNull()) {
-            targetCursor = cursor;
-            res = true;
-        } else {
+
+        res = _Find(target, anewCursor, targetCursor, backward, false);
+        if (!res) {
             // If not found, recover the text cursor.
             scrollBar->setSliderPosition(sliderPos);
         }
@@ -433,41 +518,44 @@ static void HandleEscapeChars(QString &text)
 
 QTextCursor Searcher::FindPrevious(const QString &text, const QTextCursor &startCursor)
 {
-    bool backwardCheck = checkBoxFindBackward;
-    return FindNext(text, startCursor, !backwardCheck);
-}
-
-QTextCursor Searcher::FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
-{
-    bool backwardCheck = checkBoxFindBackward;
-    return FindNext(text, startCursor, backward ? backwardCheck : !backwardCheck);
+    bool backwardCheck = checkBoxFindBackward_;
+    return _FindNext(text, startCursor, !backwardCheck);
 }
 
 QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCursor)
 {
-    bool backwardCheck = checkBoxFindBackward;
-    return FindNext(text, startCursor, backwardCheck);
+    bool backwardCheck = checkBoxFindBackward_;
+    return _FindNext(text, startCursor, backwardCheck);
+}
+
+QTextCursor Searcher::_FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
+{
+    bool backwardCheck = checkBoxFindBackward_;
+    return _FindNext(text, startCursor, backward ? backwardCheck : !backwardCheck);
 }
 
 // Should save original cursor, and restore it if failed.
-QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
+QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
 {
+    if (text.isEmpty()) {
+        return QTextCursor();
+    }
     MainWindow::Instance().setSearchingString(text);
     bool res;
     QTextCursor cursor;
-    if (radioButtonFindRe) {
+    if (radioButtonFindRe_) {
         const QRegExp reTarget = QRegExp(text);
-        res = Find<QRegExp>(reTarget, startCursor, cursor, backward);
+        res = _Find<QRegExp>(reTarget, startCursor, cursor, backward);
     } else {
-        if (radioButtonFindExtended) {
+        if (radioButtonFindExtended_) {
             auto extendedText = text;
             HandleEscapeChars(extendedText);
-            qDebug() << extendedText;
+            qDebug() << "extendedText: " << extendedText;
             auto extendedTexts = extendedText.split("\n");
-            qDebug() << extendedTexts;
-            res = Find(extendedTexts, startCursor, cursor, backward);
+            qDebug() << "extendedTexts: " << extendedTexts;
+            res = _Find(extendedTexts, startCursor, cursor, backward);
         } else {
-            res = Find<QString>(text, startCursor, cursor, backward);
+            res = _Find<QString>(text, startCursor, cursor, backward);
         }
     }
 
@@ -514,7 +602,7 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
         return;
     }
     // Check find options.
-    bool wrapAround = (checkBoxFindWrapAround);
+    bool wrapAround = (checkBoxFindWrapAround_);
     QString startStr;
     QString endStr;
     if (backward) {
@@ -527,7 +615,7 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
 
     // Handle \r, \n, and \t.
     auto extendedText = text;
-    if (radioButtonFindExtended) {
+    if (radioButtonFindExtended_) {
         HandleEscapeChars(extendedText);
     }
 
@@ -545,11 +633,11 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
     }
 
     // To find and replace.
-    auto res = FindNext(target, editView()->textCursor(), backward);
+    auto res = _FindNext(target, editView()->textCursor(), backward);
     if (!res.isNull()) {  // Find success.
         editView()->setTextCursor(res);
         res.insertText(extendedText);
-        res = FindNext(target, res, backward);
+        res = _FindNext(target, res, backward);
         if (!res.isNull()) {
             editView()->setTextCursor(res);
             auto info = QString("<b><font color=#67A9FF size=4>") +
@@ -598,7 +686,7 @@ int Searcher::ReplaceAll(const QString &target, const QString &text) {
 
     // Handle \r, \n, and \t.
     auto extendedText = text;
-    if (radioButtonFindExtended) {
+    if (radioButtonFindExtended_) {
         HandleEscapeChars(extendedText);
     }
 
@@ -606,10 +694,12 @@ int Searcher::ReplaceAll(const QString &target, const QString &text) {
     QTextCursor originalCursor = editView()->textCursor();
 
     // To replace all targets.
+    editView()->textCursor().beginEditBlock();
     auto res = FindAll(target);
     for (auto it = res.rbegin(); it != res.rend(); ++it) {
         it->insertText(extendedText);
     }
+    editView()->textCursor().endEditBlock();
 
     editView()->setTextCursor(originalCursor);
     return res.size();
@@ -617,36 +707,36 @@ int Searcher::ReplaceAll(const QString &target, const QString &text) {
 
 void Searcher::setRadioButtonFindRe(bool value)
 {
-    radioButtonFindRe = value;
+    radioButtonFindRe_ = value;
 }
 
 void Searcher::setRadioButtonFindExtended(bool value)
 {
-    radioButtonFindExtended = value;
+    radioButtonFindExtended_ = value;
 }
 
 void Searcher::setRadioButtonFindNormal(bool value)
 {
-    radioButtonFindNormal = value;
+    radioButtonFindNormal_ = value;
 }
 
 void Searcher::setCheckBoxFindWrapAround(bool value)
 {
-    checkBoxFindWrapAround = value;
+    checkBoxFindWrapAround_ = value;
 }
 
 void Searcher::setCheckBoxFindMatchCase(bool value)
 {
-    checkBoxFindMatchCase = value;
+    checkBoxFindMatchCase_ = value;
 }
 
 void Searcher::setCheckBoxFindWholeWord(bool value)
 {
-    checkBoxFindWholeWord = value;
+    checkBoxFindWholeWord_ = value;
 }
 
 void Searcher::setCheckBoxFindBackward(bool value)
 {
-    checkBoxFindBackward = value;
+    checkBoxFindBackward_ = value;
 }
 }  // namespace QEditor

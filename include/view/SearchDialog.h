@@ -85,12 +85,6 @@ public:
     QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
     QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
 
-    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
-    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
-
-    bool Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
-    template <class T>
-    bool Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
     std::vector<QTextCursor> FindAll(const QString &target);
 
     void Replace(const QString &target, const QString &text, bool backward);
@@ -114,18 +108,25 @@ public:
     void setInfo(const QString &info);
 
 private:
+    QTextCursor _FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
+    QTextCursor _FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
+
+    bool _Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
+    template <class T>
+    bool _Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward, bool first = true);
+
     EditView* editView();
     TabView* tabView();
 
 private:
-    bool checkBoxFindBackward;
-    bool checkBoxFindWholeWord;
-    bool checkBoxFindMatchCase;
-    bool checkBoxFindWrapAround;
+    bool checkBoxFindBackward_;
+    bool checkBoxFindWholeWord_;
+    bool checkBoxFindMatchCase_;
+    bool checkBoxFindWrapAround_;
 
-    bool radioButtonFindNormal;
-    bool radioButtonFindExtended;
-    bool radioButtonFindRe;
+    bool radioButtonFindNormal_;
+    bool radioButtonFindExtended_;
+    bool radioButtonFindRe_;
 
     QString info_;
 };

@@ -1,9 +1,25 @@
+/**
+ * Copyright 2023 QEditor QH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "OpenTerminalDialog.h"
 #include "ui_OpenTerminalDialog.h"
 
-#if defined (Q_OS_WIN)
-#include <winsock2.h>
+#if defined(Q_OS_WIN)
 #include <windows.h>
+#include <winsock2.h>
 // Need link with Ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
 #else
@@ -20,14 +36,13 @@ namespace WinTheme {
 extern bool IsDarkTheme();
 extern void SetDark_qApp();
 extern void SetDarkTitleBar(HWND hwnd);
-}
+} // namespace WinTheme
 #endif
 
 namespace QEditor {
-OpenTerminalDialog::OpenTerminalDialog(QWidget *parent) :
-    QDialog(parent),
-    ui_(new Ui::OpenTerminalDialog)
-{
+OpenTerminalDialog::OpenTerminalDialog(QWidget* parent)
+    : QDialog(parent),
+      ui_(new Ui::OpenTerminalDialog) {
     ui_->setupUi(this);
     if (ui_->lineEditIp->text().isEmpty()) {
         ui_->lineEditIp->setFocus();
@@ -52,16 +67,12 @@ OpenTerminalDialog::OpenTerminalDialog(QWidget *parent) :
     setWindowModality(Qt::WindowModal);
 }
 
-OpenTerminalDialog::~OpenTerminalDialog()
-{
-    delete ui_;
-}
+OpenTerminalDialog::~OpenTerminalDialog() { delete ui_; }
 
 TabView* OpenTerminalDialog::tabView() { return MainWindow::Instance().tabView(); }
 
-static inline bool IsValidIpAddress(const QString &ip)
-{
-#if defined (Q_OS_WIN)
+static inline bool IsValidIpAddress(const QString& ip) {
+#if defined(Q_OS_WIN)
     auto res = inet_addr(ip.toStdString().c_str());
     if (res == INADDR_ANY || res == INADDR_NONE) {
         return false;
@@ -73,8 +84,7 @@ static inline bool IsValidIpAddress(const QString &ip)
 #endif
 }
 
-void OpenTerminalDialog::on_pushButtonConnect_clicked()
-{
+void OpenTerminalDialog::on_pushButtonConnect_clicked() {
     QString ip = ui_->lineEditIp->text();
     if (!IsValidIpAddress(ip)) {
         ui_->lineEditIp->setFocus();
@@ -98,8 +108,5 @@ void OpenTerminalDialog::on_pushButtonConnect_clicked()
     close();
 }
 
-void OpenTerminalDialog::on_pushButtonCancel_clicked()
-{
-    close();
-}
-}  // namespace QEditor
+void OpenTerminalDialog::on_pushButtonCancel_clicked() { close(); }
+} // namespace QEditor

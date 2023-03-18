@@ -36,12 +36,12 @@ QList<FormattedText> Diff::ToFormattedText() {
                 newFts << newFt;
                 break;
             }
-            case EQUAL:
+            case EQUAL: {
                 // Find \n from start.
                 auto pos = text.indexOf(line_feed);
                 if (pos != -1) {
                     // If previous differences exist.
-                    if ((!oldFts.isEmpty() || !newFts.isEmpty())) {
+                    if (!oldFts.isEmpty() || !newFts.isEmpty()) {
                         auto first = text.mid(0, pos + line_feed_len);
                         if (oldFts != newFts) {  // Add the first line's text to old line and new line.
                             // Old part.
@@ -84,7 +84,7 @@ QList<FormattedText> Diff::ToFormattedText() {
                             oldFts << FormattedText(tmp);
                             newFts << FormattedText(tmp);
                         }
-                    } else {  // No difference, append to common line.
+                    } else {  // No difference before, append to common line.
                         // Handle common line's tail spaces.
                         // Find \n from end.
                         auto lastPos = text.lastIndexOf(line_feed, -1);
@@ -92,7 +92,7 @@ QList<FormattedText> Diff::ToFormattedText() {
                             fts << FormattedText(text);
                         } else {
                             fts << FormattedText(text.mid(0, lastPos + line_feed_len));
-                            const auto &tmp = text.mid(0, lastPos + line_feed_len);
+                            const auto &tmp = text.mid(lastPos + line_feed_len);
                             oldFts << FormattedText(tmp);
                             newFts << FormattedText(tmp);
                         }
@@ -102,6 +102,7 @@ QList<FormattedText> Diff::ToFormattedText() {
                     newFts << FormattedText(text);
                 }
                 break;
+            }
         }
     }
     // Append the accumulated old line text and new line text.

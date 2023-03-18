@@ -484,11 +484,14 @@ bool EditView::MaybeSave()
     if (!ShouldSave()) {  // Not use document()->isModified() any more.
         return true;
     }
-    const QMessageBox::StandardButton res
-        = QMessageBox::warning(this, tr(Constants::kAppName),
-                               tr("The document has been modified.\n"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName),
+                           tr("The document has been modified.\n"
+                              "Do you want to save your changes?"),
+                           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
+    warningBox.setButtonText(QMessageBox::Save, tr("Save"));
+    warningBox.setButtonText(QMessageBox::Discard, tr("Discard"));
+    warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
+    int res = warningBox.exec();
     switch (res) {
     case QMessageBox::Save:
         return SaveFile(filePath_);

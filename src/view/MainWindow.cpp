@@ -46,6 +46,8 @@ MainWindow::MainWindow()
     outlineVisible_ = settings.Get("view", "outlinevisible", true).toBool();
     qreal opa = settings.Get("window", "opacity", 1).toDouble();
 
+    setAttribute(Qt::WA_InputMethodEnabled);
+
     setAcceptDrops(true);
     setWindowOpacity(opa);
 

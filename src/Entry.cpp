@@ -25,6 +25,9 @@
 #include "Utils.h"
 #include "Logger.h"
 
+// Q_IMPORT_PLUGIN(QIbusPlatformInputContextPlugin)
+// Q_IMPORT_PLUGIN(StaticQIbusPlatformInputContextPluginInstance)
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);

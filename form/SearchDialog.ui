@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; QTabBar::tab { color: gray; background-color: transparent; } QTabBar::tab:selected { color: lightGray; }</string>
+    <string notr="true">QTabBar::tab { color: gray; background-color: rgb(54, 54, 54); } QTabBar::tab:selected { color: lightGray; }</string>
    </property>
    <property name="currentIndex">
     <number>0</number>
@@ -286,7 +286,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; </string>
+    <string notr="true"/>
    </property>
    <property name="title">
     <string>Search mode</string>
@@ -299,6 +299,9 @@
       <width>151</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>Normal</string>
@@ -316,6 +319,9 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
     <property name="text">
      <string>Extended(\n, \r, \t)</string>
     </property>
@@ -328,6 +334,9 @@
       <width>151</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>Regular Expression</string>
@@ -344,7 +353,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; </string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Whole word</string>
@@ -360,7 +369,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; </string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Backward</string>
@@ -376,7 +385,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; </string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Match case</string>
@@ -392,7 +401,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: transparent; </string>
+    <string notr="true"/>
    </property>
    <property name="text">
     <string>Wrap around</string>

@@ -4,6 +4,11 @@ CONFIG += resources_big
 DEFINES += QT_MESSAGELOGCONTEXT
 requires(qtConfig(filedialog))
 
+QTPLUGIN += fcitxplatforminputcontextplugin
+QTPLUGIN += ibusplatforminputcontextplugin
+QTPLUGIN += composeplatforminputcontextplugin
+QTPLUGIN += qtvirtualkeyboardplugin
+
 RC_ICONS = QEditorIcon.ico
 
 HEADERS       = \

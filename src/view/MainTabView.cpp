@@ -53,27 +53,11 @@ TabView::TabView(QWidget* parent) : QTabWidget(parent), menu_(new QMenu(parent))
         "QTabBar::close-button { border-image: url(:/images/x-circle.svg); }"
         "QTabBar::close-button:hover { background: red; border-image: url(:/images/x.svg); }");
 
-    menu_->setStyleSheet("\
-                         QMenu {\
-                             color: lightGray;\
-                             background-color: rgb(40, 40, 40);\
-                             margin: 2px 2px;\
-                             border: none;\
-                         }\
-                         QMenu::item {\
-                             color: rgb(225, 225, 225);\
-                             background-color: rgb(40, 40, 40);\
-                             padding: 5px 5px;\
-                         }\
-                         QMenu::item:selected {\
-                             background-color: rgb(9, 71, 113);\
-                         }\
-                         QMenu::item:pressed {\
-                             border: 1px solid rgb(60, 60, 60); \
-                             background-color: rgb(29, 91, 133); \
-                         }\
-                         QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
-                        ");
+    menu_->setStyleSheet(
+        "QMenu {color: lightGray;background-color: rgb(40, 40, 40);margin: 2px 2px;border: none;}QMenu::item {color: "
+        "rgb(225, 225, 225);background-color: rgb(40, 40, 40); padding: 5px 5px; } QMenu::item:selected { "
+        "background-color: rgb(9, 71, 113); } QMenu::item:pressed { border: 1px solid rgb(60, 60, 60); "
+        "background-color: rgb(29, 91, 133); } QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
 
     connect(tabBar(), &QTabBar::currentChanged, this, &TabView::HandleCurrentIndexChanged);
     connect(tabBar(), &QTabBar::tabBarDoubleClicked, this, &TabView::HandleTabBarDoubleClicked);
@@ -147,7 +131,6 @@ void TabView::HandleTabBarClicked(int index) {
     if (index == -1) {
         return;
     }
-    setCurrentIndex(index);
     if (QApplication::mouseButtons() == Qt::RightButton) {
         qDebug() << "TabView::barClicked(RightButton), index: " << index;
         menu_->clear();

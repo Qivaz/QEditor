@@ -15,15 +15,12 @@
  */
 
 #include "AnfNodeHierarchy.h"
-
+#include "AnfNodeHierarchyScene.h"
 #include <QScrollBar>
 
-#include "AnfNodeHierarchyScene.h"
-
 namespace QEditor {
-AnfNodeHierarchy::AnfNodeHierarchy(const QString &funcName, IParser *parser, QWidget *parent)
-    : QGraphicsView(parent), funcName_(funcName)
-{
+AnfNodeHierarchy::AnfNodeHierarchy(const QString& funcName, IParser* parser, QWidget* parent)
+    : QGraphicsView(parent), funcName_(funcName) {
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
@@ -53,4 +50,4 @@ AnfNodeHierarchy::AnfNodeHierarchy(const QString &funcName, IParser *parser, QWi
     setScene(scene_);
     scrollContentsBy(0, 0);
 }
-}  // namespace QEditor
+} // namespace QEditor

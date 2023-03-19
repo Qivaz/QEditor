@@ -15,7 +15,12 @@
  */
 
 #include "MainTabView.h"
-
+#include "FileEncoding.h"
+#include "FileRecorder.h"
+#include "Logger.h"
+#include "MainWindow.h"
+#include "RecentFiles.h"
+#include "Toast.h"
 #include <QAbstractButton>
 #include <QApplication>
 #include <QClipboard>
@@ -29,33 +34,26 @@
 #include <QTextCodec>
 #include <QToolButton>
 
-#include "FileEncoding.h"
-#include "FileRecorder.h"
-#include "MainWindow.h"
-#include "RecentFiles.h"
-#include "Toast.h"
-
-#include "Logger.h"
-
 namespace QEditor {
-TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
-{
+TabView::TabView(QWidget* parent) : QTabWidget(parent), menu_(new QMenu(parent)) {
     setAttribute(Qt::WA_StyledBackground);
     setMovable(true);
     setTabsClosable(true);
-    setStyleSheet("QTabWidget { color: darkGray; background-color: rgb(28, 28, 28); selection-color: red; selection-background-color: green; border: none; }"
-                  "QTabBar::tab { color: white; background-color: rgb(54, 54, 54); border: 1px solid rgb(54, 54, 54); "\
-                                "border-left-style: solid; border-left-width: 0.5px; border-left-color: gray; "\
-                                "border-right-style: solid; border-right-width: 0.5px; border-right-color: gray;"\
-                                "padding: 3px; border-top-left-radius: 5px; border-top-right-radius: 5px; }"
-//                  "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #CBC7FF; border-bottom-width: 3px}"
-                  "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #1769AA; border-bottom-width: 3px}"
-                  "QTabBar::tab:hover { background-color: QColor(0, 0, 0); }"
-                  "QTabBar::close-button { border-image: url(:/images/x-circle.svg); }"
-                  "QTabBar::close-button:hover { background: red; border-image: url(:/images/x.svg); }");
+    setStyleSheet(
+        "QTabWidget { color: darkGray; background-color: rgb(28, 28, 28); selection-color: red; "
+        "selection-background-color: green; border: none; }"
+        "QTabBar::tab { color: white; background-color: rgb(54, 54, 54); border: 1px solid rgb(54, 54, 54); "
+        "border-left-style: solid; border-left-width: 0.5px; border-left-color: gray; "
+        "border-right-style: solid; border-right-width: 0.5px; border-right-color: gray;"
+        "padding: 3px; border-top-left-radius: 5px; border-top-right-radius: 5px; }"
+        //                  "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #CBC7FF;
+        //                  border-bottom-width: 3px}"
+        "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #1769AA; border-bottom-width: 3px}"
+        "QTabBar::tab:hover { background-color: QColor(0, 0, 0); }"
+        "QTabBar::close-button { border-image: url(:/images/x-circle.svg); }"
+        "QTabBar::close-button:hover { background: red; border-image: url(:/images/x.svg); }");
 
-    menu_->setStyleSheet(
-                         "\
+    menu_->setStyleSheet("\
                          QMenu {\
                              color: lightGray;\
                              background-color: rgb(40, 40, 40);\
@@ -85,17 +83,15 @@ TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
     setFont(QFont("Consolas", 10));
 }
 
-void TabView::ChangeTabCloseButtonToolTip(int index, const QString &tip)
-{
+void TabView::ChangeTabCloseButtonToolTip(int index, const QString& tip) {
     auto closeButton = (QAbstractButton*)(tabBar()->tabButton(index, QTabBar::ButtonPosition::RightSide));
     closeButton->setToolTip(tip);
 }
 
 // Update with current edit view if 'index' is -1.
 // Otherwise, with edit view at 'index'.
-void TabView::UpdateWindowTitle(int index)
-{
-    EditView *editView = nullptr;
+void TabView::UpdateWindowTitle(int index) {
+    EditView* editView = nullptr;
     if (index == -1) {
         editView = CurrentEditView();
     } else {
@@ -116,17 +112,16 @@ void TabView::UpdateWindowTitle(int index)
     }
 
     title += " - " + QCoreApplication::applicationName();
-    MainWindow *win = (MainWindow*)(this->parent());
+    MainWindow* win = (MainWindow*)(this->parent());
     win->setWindowTitle(title);
 }
 
-void TabView::HandleCurrentIndexChanged(int index)
-{
+void TabView::HandleCurrentIndexChanged(int index) {
     qDebug() << "index: " << index;
     UpdateWindowTitle(index);
 
     auto editView = GetEditView(index);
-#if defined (USE_DIFF_TEXT_VIEW)
+#if defined(USE_DIFF_TEXT_VIEW)
     if (editView == nullptr) {
         editView = GetDiffView(index);
     }
@@ -147,8 +142,7 @@ void TabView::HandleCurrentIndexChanged(int index)
     MainWindow::Instance().UpdateStatusBarRareInfo("Unix", editView->fileEncoding().name(), 0);
 }
 
-void TabView::HandleTabBarClicked(int index)
-{
+void TabView::HandleTabBarClicked(int index) {
     qDebug() << "index: " << index;
     if (index == -1) {
         return;
@@ -157,21 +151,19 @@ void TabView::HandleTabBarClicked(int index)
     if (QApplication::mouseButtons() == Qt::RightButton) {
         qDebug() << "TabView::barClicked(RightButton), index: " << index;
         menu_->clear();
-        QAction *closeAction = new QAction(tr("Close  (Click Close Button)"));
+        QAction* closeAction = new QAction(tr("Close  (Click Close Button)"));
         menu_->addAction(closeAction);
         connect(closeAction, &QAction::triggered, this, &TabView::TabCloseMaybeSave);
         menu_->popup(QCursor::pos());
 
-        QAction *forceCloseAction = new QAction(tr("Force Close  (Double Click)"));
+        QAction* forceCloseAction = new QAction(tr("Force Close  (Double Click)"));
         menu_->addAction(forceCloseAction);
         connect(forceCloseAction, &QAction::triggered, this, &TabView::TabForceClose);
         menu_->popup(QCursor::pos());
 
-        QAction *closeAllAction = new QAction(tr("Force Close All"));
+        QAction* closeAllAction = new QAction(tr("Force Close All"));
         menu_->addAction(closeAllAction);
-        connect(closeAllAction, &QAction::triggered, this, [&]() {
-            clear();
-        });
+        connect(closeAllAction, &QAction::triggered, this, [&]() { clear(); });
         menu_->popup(QCursor::pos());
 
         auto editView = GetEditView(index);
@@ -179,19 +171,19 @@ void TabView::HandleTabBarClicked(int index)
             menu_->addSeparator();
 
             auto filePath = editView->filePath();
-            QAction *copyPathAction = new QAction(tr("Copy Full Path"));
+            QAction* copyPathAction = new QAction(tr("Copy Full Path"));
             menu_->addAction(copyPathAction);
             connect(copyPathAction, &QAction::triggered, this, [filePath]() {
-                QClipboard *clipboard = QGuiApplication::clipboard();
+                QClipboard* clipboard = QGuiApplication::clipboard();
                 clipboard->setText(filePath);
             });
             menu_->popup(QCursor::pos());
 
             auto fileName = editView->fileName();
-            QAction *copyNameAction = new QAction(tr("Copy File Name"));
+            QAction* copyNameAction = new QAction(tr("Copy File Name"));
             menu_->addAction(copyNameAction);
             connect(copyNameAction, &QAction::triggered, this, [fileName]() {
-                QClipboard *clipboard = QGuiApplication::clipboard();
+                QClipboard* clipboard = QGuiApplication::clipboard();
                 clipboard->setText(fileName);
             });
             menu_->popup(QCursor::pos());
@@ -200,9 +192,9 @@ void TabView::HandleTabBarClicked(int index)
 
             auto folderPath = QFileInfo(filePath).canonicalPath();
 #if defined(Q_OS_WIN)
-            QAction *openExplorerAction = new QAction(tr("Reveal in File Explorer"));
+            QAction* openExplorerAction = new QAction(tr("Reveal in File Explorer"));
 #else
-            QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
+            QAction* openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif
             menu_->addAction(openExplorerAction);
             connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {
@@ -215,7 +207,7 @@ void TabView::HandleTabBarClicked(int index)
                 // If use 'QProcess::startDetached("xdg-open", QStringList(QDir::toNativeSeparators(folderPath)))', can't show the browser with the file selected.
                 QString cmd = "dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://%1\" string:\"\"";
                 QProcess::startDetached(cmd.arg(filePath));
-#else  // Q_OS_OSX
+#else // Q_OS_OSX
                 QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 #endif
             });
@@ -224,14 +216,15 @@ void TabView::HandleTabBarClicked(int index)
             menu_->addSeparator();
 
             static bool has_before_path = false;
-            QAction *viewDiffWithAction = new QAction(tr("View Diff between..."));
+            QAction* viewDiffWithAction = new QAction(tr("View Diff between..."));
             menu_->addAction(viewDiffWithAction);
             connect(viewDiffWithAction, &QAction::triggered, this, [editView, this]() {
                 diffFormerEditView_ = editView;
                 has_before_path = true;
             });
             if (has_before_path) {
-                QAction *viewDiffWithPreviousAction = new QAction(tr("View Diff with") + " \'" + diffFormerEditView_->fileName() + "\'");
+                QAction* viewDiffWithPreviousAction =
+                    new QAction(tr("View Diff with") + " \'" + diffFormerEditView_->fileName() + "\'");
                 menu_->addAction(viewDiffWithPreviousAction);
                 connect(viewDiffWithPreviousAction, &QAction::triggered, this, [editView, this]() {
                     ViewDiff(diffFormerEditView_, editView);
@@ -242,20 +235,18 @@ void TabView::HandleTabBarClicked(int index)
             }
         } else {
             auto diffView = GetDiffView(index);
-            if (diffView != nullptr && diffView->diffFormerEditView() != nullptr && diffView->diffLatterEditView() != nullptr) {
+            if (diffView != nullptr && diffView->diffFormerEditView() != nullptr &&
+                diffView->diffLatterEditView() != nullptr) {
                 menu_->addSeparator();
-                QAction *swapDiffAction = new QAction(tr("Swap Diff"));
+                QAction* swapDiffAction = new QAction(tr("Swap Diff"));
                 menu_->addAction(swapDiffAction);
-                connect(swapDiffAction, &QAction::triggered, this, [index, this]() {
-                    SwapDiff(index);
-                });
+                connect(swapDiffAction, &QAction::triggered, this, [index, this]() { SwapDiff(index); });
             }
         }
     }
 }
 
-void TabView::HandleTabBarDoubleClicked(int index)
-{
+void TabView::HandleTabBarDoubleClicked(int index) {
     qDebug() << "index: " << index;
     if (index == -1) {
         return;
@@ -263,26 +254,24 @@ void TabView::HandleTabBarDoubleClicked(int index)
     (void)TabForceClose();
 }
 
-void TabView::HandleTabCloseRequested(int index)
-{
+void TabView::HandleTabCloseRequested(int index) {
     auto currentEditView = GetEditView(index);
     if (currentEditView == nullptr) {
         DeleteWidget(index);
         return;
     }
-    qDebug() << "index: " << index << ", should save: " << currentEditView->ShouldSave()
-               << ", " << currentEditView->filePath();
+    qDebug() << "index: " << index << ", should save: " << currentEditView->ShouldSave() << ", "
+             << currentEditView->filePath();
     (void)TabCloseMaybeSaveInner(currentEditView);
 }
 
-bool TabView::ActionSave()
-{
+bool TabView::ActionSave() {
     auto currentEditView = CurrentEditView();
     if (!currentEditView->ShouldSave()) {
         return true;
     }
 
-    if (currentEditView->filePath().isEmpty()) {  // New file.
+    if (currentEditView->filePath().isEmpty()) { // New file.
         if (currentEditView->SaveAs()) {
             openFiles().insert(currentEditView->filePath());
             RecentFiles::UpdateFiles(currentEditView->filePath());
@@ -292,16 +281,15 @@ bool TabView::ActionSave()
             }
             return true;
         }
-    } else {  // Open file.
+    } else { // Open file.
         return currentEditView->SaveFile(currentEditView->filePath());
     }
     return false;
 }
 
-bool TabView::ActionSaveAs()
-{
+bool TabView::ActionSaveAs() {
     auto currentEditView = CurrentEditView();
-    if (currentEditView->filePath().isEmpty()) {  // New file.
+    if (currentEditView->filePath().isEmpty()) { // New file.
         if (currentEditView->SaveAs()) {
             openFiles().insert(currentEditView->filePath());
             RecentFiles::UpdateFiles(currentEditView->filePath());
@@ -311,7 +299,7 @@ bool TabView::ActionSaveAs()
             }
             return true;
         }
-    } else {  // Open file.
+    } else { // Open file.
         auto oldFilePath = currentEditView->filePath();
         if (currentEditView->SaveAs()) {
             if (currentEditView->filePath() != oldFilePath) {
@@ -326,9 +314,7 @@ bool TabView::ActionSaveAs()
     return false;
 }
 
-
-bool TabView::TabCloseMaybeSave()
-{
+bool TabView::TabCloseMaybeSave() {
     auto currentEditView = CurrentEditView();
     if (currentEditView == nullptr) {
         DeleteWidget(currentWidget());
@@ -337,9 +323,8 @@ bool TabView::TabCloseMaybeSave()
     return TabCloseMaybeSaveInner(currentEditView);
 }
 
-bool TabView::TabCloseMaybeSaveInner(EditView *editView)
-{
-    if (editView->filePath().isEmpty()) {  // New file.
+bool TabView::TabCloseMaybeSaveInner(EditView* editView) {
+    if (editView->filePath().isEmpty()) { // New file.
         if (editView->document()->isEmpty()) {
             // Close tab.
             if (editView->newFileNum() != 0) {
@@ -356,15 +341,14 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
         warningBox.setButtonText(QMessageBox::Discard, tr("Discard"));
         warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
         int res = warningBox.exec();
-        if (res == QMessageBox::Discard ||
-            (res == QMessageBox::Save && editView->SaveAs())) {
+        if (res == QMessageBox::Discard || (res == QMessageBox::Save && editView->SaveAs())) {
             // Close tab.
             if (editView->newFileNum() != 0) {
                 NewFileNum::SetNumber(editView->newFileNum(), false);
             }
             DeleteWidget(editView);
         }
-    } else {  // Open file.
+    } else { // Open file.
         if (editView->MaybeSave()) {
             // Close tab.
             openFiles().remove(editView->filePath());
@@ -374,12 +358,11 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView)
     return false;
 }
 
-bool TabView::TabForceClose()
-{
+bool TabView::TabForceClose() {
     // Close without save.
     auto currentEditView = CurrentEditView();
     if (currentEditView != nullptr) {
-        openFiles().remove(currentEditView->filePath());  // Just force remove.
+        openFiles().remove(currentEditView->filePath()); // Just force remove.
         if (currentEditView->newFileNum() != 0) {
             NewFileNum::SetNumber(currentEditView->newFileNum(), false);
         }
@@ -390,8 +373,7 @@ bool TabView::TabForceClose()
     return true;
 }
 
-void TabView::AutoStore()
-{
+void TabView::AutoStore() {
     QVector<EditView*> editViews;
     for (int i = 0; i < count(); ++i) {
         auto editView = GetEditView(i);
@@ -406,8 +388,7 @@ void TabView::AutoStore()
     fileRecorder.StoreFiles();
 }
 
-bool TabView::AutoLoad()
-{
+bool TabView::AutoLoad() {
     // If a file opened before auto load.
     auto currentEditView = CurrentEditView();
 
@@ -417,21 +398,21 @@ bool TabView::AutoLoad()
     for (int i = 0; i < fileCount; ++i) {
         QString fileName;
         QString filePathTip;
-        EditView *editView;
+        EditView* editView;
         bool modified = false;
         auto fileInfo = fileRecorder.GetFileInfo(i);
-        if (fileInfo.IsTerminal()) {  // Terminal view.
+        if (fileInfo.IsTerminal()) { // Terminal view.
             OpenSsh(fileInfo.ip_, fileInfo.port_, fileInfo.user_, fileInfo.pwd_);
             continue;
         }
-        if (fileInfo.IsNewFile()) {  // New file.
+        if (fileInfo.IsNewFile()) { // New file.
             fileName = QString("new ") + QString::number(fileInfo.num_);
             filePathTip = fileName;
             editView = new EditView(fileName, this);
             editView->setNewFileNum(fileInfo.num_);
             modified = true;
             NewFileNum::SetNumber(editView->newFileNum(), true);
-        } else {  // Open file.
+        } else { // Open file.
             QFileInfo qFileInfo = QFileInfo(fileInfo.path_);
             fileName = qFileInfo.fileName();
             filePathTip = qFileInfo.canonicalFilePath();
@@ -439,9 +420,9 @@ bool TabView::AutoLoad()
             // Don't open file not exist anymore.
             QFile file(filePathTip);
             if (!file.open(QFile::ReadOnly | QFile::Text)) {
-                QMessageBox::warning(this, tr(Constants::kAppName),
-                                     tr("Cannot read file %1:\n%2.")
-                                     .arg(QDir::toNativeSeparators(filePathTip), file.errorString()));
+                QMessageBox::warning(
+                    this, tr(Constants::kAppName),
+                    tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(filePathTip), file.errorString()));
                 continue;
             }
             // Don't open file multiple times.
@@ -466,9 +447,9 @@ bool TabView::AutoLoad()
                 continue;
             }
         } else {
-            const auto &text = fileRecorder.GetText(i);
+            const auto& text = fileRecorder.GetText(i);
             int mibEnum = fileRecorder.GetMibEnum(i);
-//            qDebug() << "load plain text: " << text << ", mibEnum: " << mibEnum << ", for tab " << i;
+            //            qDebug() << "load plain text: " << text << ", mibEnum: " << mibEnum << ", for tab " << i;
             editView->setFileEncoding(FileEncoding(mibEnum));
             editView->setPlainText(text);
             editView->setFileLoaded(true);
@@ -494,9 +475,8 @@ bool TabView::AutoLoad()
     return loaded;
 }
 
-void TabView::DeleteWidget(int index)
-{
-    QWidget *widget = this->widget(index);
+void TabView::DeleteWidget(int index) {
+    QWidget* widget = this->widget(index);
     if (widget == nullptr) {
         qFatal("The widget should not be null");
     }
@@ -504,8 +484,7 @@ void TabView::DeleteWidget(int index)
     delete widget;
 }
 
-void TabView::DeleteWidget(QWidget *widget)
-{
+void TabView::DeleteWidget(QWidget* widget) {
     if (widget == nullptr) {
         qFatal("The widget should not be null");
     }
@@ -513,8 +492,7 @@ void TabView::DeleteWidget(QWidget *widget)
     delete widget;
 }
 
-void TabView::NewFile()
-{
+void TabView::NewFile() {
     int num = NewFileNum::GetNumber();
     QString fileName = QString(tr("new ")) + QString::number(num);
     auto editView = new EditView(fileName, this);
@@ -528,13 +506,12 @@ void TabView::NewFile()
     editView->setFocus();
 }
 
-void TabView::ViewDiff(const QString &former, const QString &latter)
-{
+void TabView::ViewDiff(const QString& former, const QString& latter) {
     diff_.Impose(former, latter);
-#if defined (USE_DIFF_TEXT_VIEW)
-    const auto &formattedTexts = diff_.ToFormattedText();
+#if defined(USE_DIFF_TEXT_VIEW)
+    const auto& formattedTexts = diff_.ToFormattedText();
 #else
-    const QString &html = diff_.ToLineHtml();
+    const QString& html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
 #endif
     QString diffName = former.left(20) + "... → " + latter.left(20) + "...";
@@ -546,9 +523,9 @@ void TabView::ViewDiff(const QString &former, const QString &latter)
     setTabToolTip(count() - 1, diffTip);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
-#if defined (USE_DIFF_TEXT_VIEW)
+#if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
-    foreach (auto &ft, formattedTexts) {
+    foreach (auto& ft, formattedTexts) {
         qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
         cursor.insertText(ft.text, ft.format);
     }
@@ -558,13 +535,12 @@ void TabView::ViewDiff(const QString &former, const QString &latter)
 #endif
 }
 
-void TabView::ViewDiff(const EditView *former, const EditView *latter)
-{
+void TabView::ViewDiff(const EditView* former, const EditView* latter) {
     diff_.Impose(former->toPlainText(), latter->toPlainText());
-#if defined (USE_DIFF_TEXT_VIEW)
-    const auto &formattedTexts = diff_.ToFormattedText();
+#if defined(USE_DIFF_TEXT_VIEW)
+    const auto& formattedTexts = diff_.ToFormattedText();
 #else
-    const QString &html = diff_.ToLineHtml();
+    const QString& html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
 #endif
     QString diffName = former->fileName() + QString(" → ") + latter->fileName();
@@ -580,9 +556,9 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter)
     setTabToolTip(count() - 1, diffTip);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
-#if defined (USE_DIFF_TEXT_VIEW)
+#if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
-    foreach (auto &ft, formattedTexts) {
+    foreach (auto& ft, formattedTexts) {
         qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
         cursor.insertText(ft.text, ft.format);
     }
@@ -592,8 +568,7 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter)
 #endif
 }
 
-void TabView::SwapDiff(int index)
-{
+void TabView::SwapDiff(int index) {
     auto diffView = GetDiffView(index);
     if (diffView == nullptr) {
         qFatal("diffView is null");
@@ -611,10 +586,10 @@ void TabView::SwapDiff(int index)
     auto former = diffView->diffFormerEditView();
     auto latter = diffView->diffLatterEditView();
     diff_.Impose(former->toPlainText(), latter->toPlainText());
-#if defined (USE_DIFF_TEXT_VIEW)
-    const auto &formattedTexts = diff_.ToFormattedText();
+#if defined(USE_DIFF_TEXT_VIEW)
+    const auto& formattedTexts = diff_.ToFormattedText();
 #else
-    const QString &html = diff_.ToLineHtml();
+    const QString& html = diff_.ToLineHtml();
     qDebug() << "html: " << html;
 #endif
     QString diffName = former->fileName() + QString(" → ") + latter->fileName();
@@ -624,9 +599,9 @@ void TabView::SwapDiff(int index)
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
     QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(index, diffTip);
-#if defined (USE_DIFF_TEXT_VIEW)
+#if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
-    foreach (auto &ft, formattedTexts) {
+    foreach (auto& ft, formattedTexts) {
         qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
         cursor.insertText(ft.text, ft.format);
     }
@@ -636,13 +611,9 @@ void TabView::SwapDiff(int index)
 #endif
 }
 
-void TabView::OpenFile()
-{
-    OpenFile(QFileDialog::getOpenFileName(this));
-}
+void TabView::OpenFile() { OpenFile(QFileDialog::getOpenFileName(this)); }
 
-void TabView::OpenFile(const QString &filePath)
-{
+void TabView::OpenFile(const QString& filePath) {
     if (filePath.isEmpty()) {
         return;
     }
@@ -653,7 +624,8 @@ void TabView::OpenFile(const QString &filePath)
         // Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + " already opened.");
         auto index = FindEditViewIndex(fileInfo.canonicalFilePath());
         if (index == -1) {
-            Toast::Instance().Show(Toast::kWarning, fileInfo.canonicalFilePath() + tr(" already opened, but not found!"));
+            Toast::Instance().Show(Toast::kWarning,
+                                   fileInfo.canonicalFilePath() + tr(" already opened, but not found!"));
         } else {
             setCurrentIndex(index);
         }
@@ -664,7 +636,7 @@ void TabView::OpenFile(const QString &filePath)
     MainWindow::Instance().UpdateRecentFilesMenu();
 
     auto editView = new EditView(fileInfo, this);
-    editView->setNewFileNum(0);  // Set new file number as 0 for open file.
+    editView->setNewFileNum(0); // Set new file number as 0 for open file.
     if (!LoadFile(editView, filePath)) {
         delete editView;
         return;
@@ -676,25 +648,24 @@ void TabView::OpenFile(const QString &filePath)
     setTabToolTip(count() - 1, filePath);
 }
 
-bool TabView::LoadFile(EditView *editView, const QString &filePath)
-{
+bool TabView::LoadFile(EditView* editView, const QString& filePath) {
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr(Constants::kAppName),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(filePath), file.errorString()));
+        QMessageBox::warning(
+            this, tr(Constants::kAppName),
+            tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(filePath), file.errorString()));
         return false;
     }
     return LoadFile(editView, filePath, FileEncoding(file));
 }
 
-bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding &&fileEncoding, bool forceUseFileEncoding)
-{
+bool TabView::LoadFile(EditView* editView, const QString& filePath, FileEncoding&& fileEncoding,
+                       bool forceUseFileEncoding) {
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr(Constants::kAppName),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(filePath), file.errorString()));
+        QMessageBox::warning(
+            this, tr(Constants::kAppName),
+            tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(filePath), file.errorString()));
         return false;
     }
 
@@ -702,18 +673,17 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
     if (forceUseFileEncoding || fileEncoding.hasBom()) {
         QTextStream in(&file);
         in.setCodec(fileEncoding.codec());
-        const auto &text = in.readAll();
+        const auto& text = in.readAll();
         qDebug() << "text: " << text << ", bytearry: " << text.toUtf8();
         editView->setPlainText(text);
         editView->setFileEncoding(std::move(fileEncoding));
     } else {
         // If no BOM.
-        const auto &ansiText = fileEncoding.ProcessAnsi(file);
+        const auto& ansiText = fileEncoding.ProcessAnsi(file);
         editView->setPlainText(ansiText);
         editView->setFileEncoding(std::move(fileEncoding));
     }
-    qDebug() << "encoding: " << editView->fileEncoding().name()
-               << ", file: " << file.fileName();
+    qDebug() << "encoding: " << editView->fileEncoding().name() << ", file: " << file.fileName();
 
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
@@ -728,8 +698,7 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
     return true;
 }
 
-void TabView::OpenSsh(const QString &ip, int port, const QString &user, const QString &pwd)
-{
+void TabView::OpenSsh(const QString& ip, int port, const QString& user, const QString& pwd) {
     auto terminalView = new TerminalView(ip, port, user, pwd, this);
     addTab(terminalView, terminalView->fileName());
     setCurrentIndex(count() - 1);
@@ -738,8 +707,7 @@ void TabView::OpenSsh(const QString &ip, int port, const QString &user, const QS
     terminalView->setFocus();
 }
 
-void TabView::ChangeTabDescription(const QFileInfo &fileInfo, int index)
-{
+void TabView::ChangeTabDescription(const QFileInfo& fileInfo, int index) {
     if (index == -1) {
         index = currentIndex();
     }
@@ -747,8 +715,7 @@ void TabView::ChangeTabDescription(const QFileInfo &fileInfo, int index)
     setTabToolTip(index, fileInfo.canonicalFilePath());
 }
 
-void TabView::ApplyWrapTextState(int index)
-{
+void TabView::ApplyWrapTextState(int index) {
     auto textView = GetEditView(index);
     if (textView == nullptr) {
         return;
@@ -756,8 +723,7 @@ void TabView::ApplyWrapTextState(int index)
     textView->ApplyWrapTextState();
 }
 
-void TabView::ApplySpecialCharsVisible(int index)
-{
+void TabView::ApplySpecialCharsVisible(int index) {
     auto textView = GetEditView(index);
     if (textView == nullptr) {
         return;
@@ -765,32 +731,30 @@ void TabView::ApplySpecialCharsVisible(int index)
     textView->ApplySpecialCharsVisible();
 }
 
-void TabView::tabInserted(int index)
-{
+void TabView::tabInserted(int index) {
     auto editView = qobject_cast<EditView*>(widget(index));
     if (editView == nullptr) {
         return;
     }
     qDebug() << "index: " << index << ", widget: " << editView->fileName();
     ChangeTabCloseButtonToolTip(index, tr("Double click to force close."));
-//    UpdateWindowTitle(index);
-//    GetEditView(index)->TrigerParser();
+    //    UpdateWindowTitle(index);
+    //    GetEditView(index)->TrigerParser();
 
-//    ApplyWrapTextState(index);  // TODO: Cause transparent window...
+    //    ApplyWrapTextState(index);  // TODO: Cause transparent window...
 
     AutoStore();
 }
 
-void TabView::tabRemoved(int index)
-{
+void TabView::tabRemoved(int index) {
     // Should notice that 'index' is the position of previous tab closed.
     AutoStore();
 }
 
-void TabView::mouseDoubleClickEvent(QMouseEvent *event) {
+void TabView::mouseDoubleClickEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         // Double click right blank area of tab bar to new a file.
         NewFile();
     }
 }
-}  // namespace QEditor
+} // namespace QEditor

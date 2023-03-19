@@ -17,26 +17,25 @@
 #ifndef GOTOLINEDIALOG_H
 #define GOTOLINEDIALOG_H
 
-#include <QDialog>
 #include "EditView.h"
 #include "MainTabView.h"
+#include <QDialog>
 
 namespace Ui {
 class UIGotoLineDialog;
 }
 
 namespace QEditor {
-class GotoLineDialog : public QDialog
-{
+class GotoLineDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit GotoLineDialog(QWidget *parent = nullptr);
+    explicit GotoLineDialog(QWidget* parent = nullptr);
     ~GotoLineDialog();
 
     EditView* editView();
     TabView* tabView();
 
-    void showEvent(QShowEvent *) override;
+    void showEvent(QShowEvent*) override;
 
 private slots:
     void on_pushButtonOk_clicked();
@@ -44,8 +43,8 @@ private slots:
     void on_pushButtonCacel_clicked();
 
 private:
-    Ui::UIGotoLineDialog *ui_;
+    Ui::UIGotoLineDialog* ui_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // GOTOLINEDIALOG_H

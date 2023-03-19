@@ -15,7 +15,9 @@
  */
 
 #include "ExplorerTreeView.h"
-
+#include "FileType.h"
+#include "Logger.h"
+#include "MainWindow.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QDesktopServices>
@@ -25,16 +27,12 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 
-#include "FileType.h"
-#include "MainWindow.h"
-#include "Logger.h"
-
 namespace QEditor {
-ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(this))
-{
+ExplorerTreeView::ExplorerTreeView(QWidget* parent, const QString& rootPath)
+    : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(this)) {
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-//                  "QTreeView::branch:has-children:!has-siblings:closed, \
+                  //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
 //                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");
@@ -81,8 +79,7 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
                                               background: none; \
                                           }");
 
-    menu_->setStyleSheet(
-                       "\
+    menu_->setStyleSheet("\
                        QMenu {\
                            color: lightGray;\
                            background-color: rgb(40, 40, 40);\
@@ -110,8 +107,8 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
     model_->setOption(QFileSystemModel::DontUseCustomDirectoryIcons);
     model_->setOption(QFileSystemModel::DontWatchForChanges);
     model_->setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-//    model_->setNameFilters(QStringList({"*.txt", "*.ir", "*.dat", "*.h", "*.cpp", "*.cc", "*.py",}));
-//    model_->setNameFilters(QStringList({"*.txt"}));
+    //    model_->setNameFilters(QStringList({"*.txt", "*.ir", "*.dat", "*.h", "*.cpp", "*.cc", "*.py",}));
+    //    model_->setNameFilters(QStringList({"*.txt"}));
     proxyModel_ = new CustSortFilterProxyModel();
     proxyModel_->setSourceModel(model_);
     proxyModel_->sort(0, Qt::AscendingOrder);
@@ -143,53 +140,53 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath) : Q
     connect(model_, &QFileSystemModel::directoryLoaded, this, &ExplorerTreeView::HandleDirLoaded);
 }
 
-void ExplorerTreeView::HandleExpanded(const QModelIndex &index)
-{
-    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+void ExplorerTreeView::HandleExpanded(const QModelIndex& index) {
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
+             << index.data().toString();
 
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
-                << modelIndex.data().toString();
+             << modelIndex.data().toString();
 }
 
-void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
-{
+void ExplorerTreeView::HandleIndexPress(const QModelIndex& index) {
     if (QApplication::mouseButtons() != Qt::RightButton) {
         return;
     }
 
-    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
+             << index.data().toString();
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
-                << modelIndex.data().toString();
+             << modelIndex.data().toString();
     menu_->clear();
 
-    const auto &fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
+    const auto& fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
     auto filePath = fileInfo.canonicalFilePath();
-    QAction *copyPathAction = new QAction(tr("Copy Full Path"));
+    QAction* copyPathAction = new QAction(tr("Copy Full Path"));
     menu_->addAction(copyPathAction);
     connect(copyPathAction, &QAction::triggered, this, [filePath]() {
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(filePath);
     });
-//    menu_->popup(QCursor::pos());
+    //    menu_->popup(QCursor::pos());
 
     auto fileName = fileInfo.fileName();
-    QAction *copyNameAction = new QAction(tr("Copy File Name"));
+    QAction* copyNameAction = new QAction(tr("Copy File Name"));
     menu_->addAction(copyNameAction);
     connect(copyNameAction, &QAction::triggered, this, [fileName]() {
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(fileName);
     });
-//    menu_->popup(QCursor::pos());
+    //    menu_->popup(QCursor::pos());
 
     menu_->addSeparator();
 
     auto folderPath = fileInfo.canonicalPath();
 #if defined(Q_OS_WIN)
-    QAction *openExplorerAction = new QAction(tr("Reveal in File Explorer"));
+    QAction* openExplorerAction = new QAction(tr("Reveal in File Explorer"));
 #else
-    QAction *openExplorerAction = new QAction(tr("Open Containing Folder"));
+    QAction* openExplorerAction = new QAction(tr("Open Containing Folder"));
 #endif
     menu_->addAction(openExplorerAction);
     connect(openExplorerAction, &QAction::triggered, this, [folderPath, filePath]() {
@@ -202,20 +199,20 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index)
         // If use 'QProcess::startDetached("xdg-open", QStringList(QDir::toNativeSeparators(folderPath)))', can't show the browser with the file selected.
         QString cmd = "dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://%1\" string:\"\"";
         QProcess::startDetached(cmd.arg(filePath));
-#else  // Q_OS_OSX
+#else // Q_OS_OSX
         QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 #endif
     });
     menu_->popup(QCursor::pos());
 }
 
-void ExplorerTreeView::HandleIndexClick(const QModelIndex &index)
-{
-    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+void ExplorerTreeView::HandleIndexClick(const QModelIndex& index) {
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
+             << index.data().toString();
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
              << modelIndex.data().toString();
-    const auto &fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
+    const auto& fileInfo = model_->fileInfo(proxyModel_->mapToSource(index));
     if (fileInfo.isDir()) {
         if (isExpanded(index)) {
             collapse(index);
@@ -230,8 +227,7 @@ void ExplorerTreeView::HandleIndexClick(const QModelIndex &index)
     }
 }
 
-void ExplorerTreeView::HandleDirLoaded(const QString &path)
-{
+void ExplorerTreeView::HandleDirLoaded(const QString& path) {
     qDebug() << "path: " << path;
     if (path == gotoDir_) {
         gotoForLoaded_ = true;
@@ -239,8 +235,7 @@ void ExplorerTreeView::HandleDirLoaded(const QString &path)
     }
 }
 
-void ExplorerTreeView::timerEvent(QTimerEvent *event)
-{
+void ExplorerTreeView::timerEvent(QTimerEvent* event) {
     if (gotoForLoaded_) {
         gotoForLoaded_ = false;
 
@@ -252,8 +247,7 @@ void ExplorerTreeView::timerEvent(QTimerEvent *event)
     QTreeView::timerEvent(event);
 }
 
-void ExplorerTreeView::GotoPathPosition(const QString &path)
-{
+void ExplorerTreeView::GotoPathPosition(const QString& path) {
     gotoPath_ = path;
     gotoDir_ = path.section(QDir::separator(), 0, -2);
 
@@ -261,26 +255,23 @@ void ExplorerTreeView::GotoPathPosition(const QString &path)
     setCurrentIndex(modelIndex);
 }
 
-bool CustSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
+bool CustSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const {
     qDebug() << "source_parent: " << source_parent.row() << source_parent.column() << source_parent.data().toString()
              << source_parent.parent().data().toString() << ", source_row: " << source_row;
     return true;
 }
 
-bool CustSortFilterProxyModel::filterAcceptsColumn(int source_column, const QModelIndex &source_parent) const
-{
+bool CustSortFilterProxyModel::filterAcceptsColumn(int source_column, const QModelIndex& source_parent) const {
     return true;
 }
 
-bool CustSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
-{
+bool CustSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const {
     // If sorting by file names column
     if (sortColumn() == 0) {
-        QFileSystemModel *model = qobject_cast<QFileSystemModel*>(sourceModel());
+        QFileSystemModel* model = qobject_cast<QFileSystemModel*>(sourceModel());
         bool asc = (sortOrder() == Qt::AscendingOrder ? true : false);
 
-        QFileInfo leftFileInfo  = model->fileInfo(left);
+        QFileInfo leftFileInfo = model->fileInfo(left);
         QFileInfo rightFileInfo = model->fileInfo(right);
 
         // If DotAndDot move in the beginning
@@ -303,8 +294,7 @@ bool CustSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelInd
     return QSortFilterProxyModel::lessThan(left, right);
 }
 
-QIcon FileIconProvider::icon(const QFileInfo &info) const
-{
+QIcon FileIconProvider::icon(const QFileInfo& info) const {
     if (info.isDir()) {
         auto res = QIcon(":/images/right-outlined.svg");
         res.addFile(":/images/down-outlined.svg", QSize(), QIcon::Mode::Normal, QIcon::State::On);
@@ -322,4 +312,4 @@ QIcon FileIconProvider::icon(const QFileInfo &info) const
     }
     return QFileIconProvider::icon(info);
 }
-}  // namespace QEditor
+} // namespace QEditor

@@ -15,39 +15,34 @@
  */
 
 #include "SearchDialog.h"
-#include "ui_SearchDialog.h"
-
-#include <QScrollBar>
-#include <QTextBlock>
-
+#include "Logger.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include "Logger.h"
+#include "ui_SearchDialog.h"
+#include <QScrollBar>
+#include <QTextBlock>
 
 #ifdef Q_OS_WIN
 namespace WinTheme {
 extern bool IsDarkTheme();
 extern void SetDark_qApp();
 extern void SetDarkTitleBar(HWND hwnd);
-}
+} // namespace WinTheme
 #endif
 
 namespace QEditor {
-SearchDialog::SearchDialog(QWidget *parent, int index) :
-    QDialog(parent),
-    ui_(new Ui::UISearchDialog())
-{
+SearchDialog::SearchDialog(QWidget* parent, int index) : QDialog(parent), ui_(new Ui::UISearchDialog()) {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
-//    setAttribute(Qt::WA_DeleteOnClose);
+    //    setAttribute(Qt::WA_DeleteOnClose);
 
     qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
     ui_->tabWidget->setCurrentIndex(index);
-    if (index == 0) {  // Find
+    if (index == 0) { // Find
         ui_->lineEditFindFindWhat->setFocus();
-    } else {  // Replace
+    } else { // Replace
         ui_->lineEditReplaceFindWhat->setFocus();
     }
     ui_->checkBoxFindWrapAround->setChecked(true);
@@ -56,15 +51,11 @@ SearchDialog::SearchDialog(QWidget *parent, int index) :
     ui_->lineEditReplaceFindWhat->setText(GetSelectedText());
 }
 
-SearchDialog::~SearchDialog()
-{
-    delete ui_;
-}
+SearchDialog::~SearchDialog() { delete ui_; }
 
 EditView* SearchDialog::editView() { return MainWindow::Instance().editView(); }
 
-void SearchDialog::Start(int index)
-{
+void SearchDialog::Start(int index) {
 #define FORCE_DARK_THEME
 #ifdef Q_OS_WIN
 #ifdef FORCE_DARK_THEME
@@ -78,17 +69,16 @@ void SearchDialog::Start(int index)
 
     searcher_ = MainWindow::Instance().GetSearcher();
 
-    if (index == 0) {  // Find.
+    if (index == 0) { // Find.
         ui_->lineEditFindFindWhat->setText(GetSelectedText());
-    } else {  // Replace.
+    } else { // Replace.
         ui_->lineEditReplaceFindWhat->setText(GetSelectedText());
     }
     setCurrentTabIndex(index);
     show();
 }
 
-void SearchDialog::InitSetting()
-{
+void SearchDialog::InitSetting() {
     searcher_->setCheckBoxFindBackward(ui_->checkBoxFindBackward->isChecked());
     searcher_->setCheckBoxFindWholeWord(ui_->checkBoxFindWholeWord->isChecked());
     searcher_->setCheckBoxFindMatchCase(ui_->checkBoxFindMatchCase->isChecked());
@@ -98,18 +88,11 @@ void SearchDialog::InitSetting()
     searcher_->setRadioButtonFindRe(ui_->radioButtonFindRe->isChecked());
 }
 
-int SearchDialog::currentTabIndex()
-{
-    return ui_->tabWidget->currentIndex();
-}
+int SearchDialog::currentTabIndex() { return ui_->tabWidget->currentIndex(); }
 
-void SearchDialog::setCurrentTabIndex(int index)
-{
-    ui_->tabWidget->setCurrentIndex(index);
-}
+void SearchDialog::setCurrentTabIndex(int index) { ui_->tabWidget->setCurrentIndex(index); }
 
-const QString SearchDialog::GetSelectedText()
-{
+const QString SearchDialog::GetSelectedText() {
     if (editView() == nullptr) {
         return "";
     }
@@ -122,12 +105,11 @@ const QString SearchDialog::GetSelectedText()
     return text;
 }
 
-void SearchDialog::on_pushButtonFindFindNext_clicked()
-{
+void SearchDialog::on_pushButtonFindFindNext_clicked() {
     if (editView() == nullptr) {
         return;
     }
-    auto const &target = ui_->lineEditFindFindWhat->text();
+    auto const& target = ui_->lineEditFindFindWhat->text();
     InitSetting();
     auto cursor = searcher_->FindNext(target, editView()->textCursor());
     if (!cursor.isNull()) {
@@ -135,16 +117,14 @@ void SearchDialog::on_pushButtonFindFindNext_clicked()
     }
 }
 
-void SearchDialog::on_radioButtonFindRe_toggled(bool checked)
-{
+void SearchDialog::on_radioButtonFindRe_toggled(bool checked) {
     if (checked) {
         ui_->checkBoxFindWholeWord->setDisabled(true);
         ui_->checkBoxFindMatchCase->setDisabled(true);
     }
 }
 
-void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
-{
+void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked() {
     if (editView() == nullptr) {
         return;
     }
@@ -156,7 +136,7 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     auto sessionItem = searchResultList_->StartSearchSession(editView());
     qDebug() << "Find all start....";
     std::vector<QTextCursor> res;
-    auto const &target = ui_->lineEditFindFindWhat->text();
+    auto const& target = ui_->lineEditFindFindWhat->text();
     InitSetting();
     res = searcher_->FindAll(target);
     qDebug() << "Find all finish....";
@@ -164,21 +144,22 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
 
     // TODO:
     // To support display dynamic visible list items, and do fetchMore for user scrolling.
-    for (const auto &item : res) {
+    for (const auto& item : res) {
         qDebug() << "Display item start....";
         const auto currentBlock = item.block();
         int lineNum = item.blockNumber();
         const auto highlightingTarget = item.selectedText().toHtmlEscaped();
-        const auto htmlTarget = QString("<span style=\"font-size:14px;font-family:Consolas;color:#BCE08C\">") + highlightingTarget + QString("</span>");
+        const auto htmlTarget = QString("<span style=\"font-size:14px;font-family:Consolas;color:#BCE08C\">") +
+                                highlightingTarget + QString("</span>");
         const auto plainText = currentBlock.text();
         auto escapedStr = plainText.toHtmlEscaped();
         escapedStr.replace(highlightingTarget, htmlTarget, Qt::CaseSensitive);
-        qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget << ", htmlTarget: " << htmlTarget
-                 << ", currentStr: " << escapedStr;
+        qDebug() << "Line " << lineNum << ": highlightingTarget: " << highlightingTarget
+                 << ", htmlTarget: " << htmlTarget << ", currentStr: " << escapedStr;
 
-        auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") +
-                    tr("Line ") + QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
-                    QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
+        auto htmlText = QString("<div style=\"font-size:14px;font-family:Consolas;color:#BEBEBE\">") + tr("Line ") +
+                        QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
+                        QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
         qDebug() << "Line " << lineNum << ": text: " << htmlText;
         ++matchCount;
         searchResultList_->AddSearchResult(sessionItem, lineNum, htmlText, plainText, item);
@@ -187,36 +168,28 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked()
     searchResultList_->FinishSearchSession(sessionItem, target, matchCount);
 }
 
-void SearchDialog::on_pushButtonFindCount_clicked()
-{
+void SearchDialog::on_pushButtonFindCount_clicked() {
     if (editView() == nullptr) {
         return;
     }
     std::vector<QTextCursor> res;
-    auto const &target = ui_->lineEditFindFindWhat->text();
+    auto const& target = ui_->lineEditFindFindWhat->text();
     InitSetting();
     res = searcher_->FindAll(target);
-    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) +
-                tr(" matches in ") + editView()->fileName() + "</font></b>";
+    auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) + tr(" matches in ") +
+                editView()->fileName() + "</font></b>";
     ui_->labelInfo->setText(info);
 }
 
-void SearchDialog::on_pushButtonFindCancel_clicked()
-{
-    close();
-}
+void SearchDialog::on_pushButtonFindCancel_clicked() { close(); }
 
-void SearchDialog::on_pushButtonReplaceCancel_clicked()
-{
-    close();
-}
+void SearchDialog::on_pushButtonReplaceCancel_clicked() { close(); }
 
-void SearchDialog::on_pushButtonReplaceFindNext_clicked()
-{
+void SearchDialog::on_pushButtonReplaceFindNext_clicked() {
     if (editView() == nullptr) {
         return;
     }
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
+    auto const& target = ui_->lineEditReplaceFindWhat->text();
     InitSetting();
     auto res = searcher_->FindNext(target, editView()->textCursor());
     if (!res.isNull()) {
@@ -224,24 +197,22 @@ void SearchDialog::on_pushButtonReplaceFindNext_clicked()
     }
 }
 
-void SearchDialog::on_pushButtonReplaceReplace_clicked()
-{
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto const &text = ui_->lineEditReplaceReplaceWith->text();
+void SearchDialog::on_pushButtonReplaceReplace_clicked() {
+    auto const& target = ui_->lineEditReplaceFindWhat->text();
+    auto const& text = ui_->lineEditReplaceReplaceWith->text();
     InitSetting();
     searcher_->setInfo("");
     searcher_->Replace(target, text, ui_->checkBoxFindBackward->isChecked());
     ui_->labelInfo->setText(searcher_->info());
 }
 
-void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
-{
+void SearchDialog::on_pushButtonReplaceReplaceAll_clicked() {
     if (editView() == nullptr) {
         return;
     }
     int count;
-    auto const &target = ui_->lineEditReplaceFindWhat->text();
-    auto const &text = ui_->lineEditReplaceReplaceWith->text();
+    auto const& target = ui_->lineEditReplaceFindWhat->text();
+    auto const& text = ui_->lineEditReplaceReplaceWith->text();
     InitSetting();
     count = searcher_->ReplaceAll(target, text);
     auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(count) +
@@ -249,32 +220,21 @@ void SearchDialog::on_pushButtonReplaceReplaceAll_clicked()
     ui_->labelInfo->setText(info);
 }
 
-void SearchDialog::on_lineEditFindFindWhat_textChanged(const QString &)
-{
-    ui_->labelInfo->clear();
-}
+void SearchDialog::on_lineEditFindFindWhat_textChanged(const QString&) { ui_->labelInfo->clear(); }
 
-void SearchDialog::on_lineEditReplaceFindWhat_textChanged(const QString &)
-{
-    ui_->labelInfo->clear();
-}
+void SearchDialog::on_lineEditReplaceFindWhat_textChanged(const QString&) { ui_->labelInfo->clear(); }
 
 EditView* Searcher::editView() { return MainWindow::Instance().editView(); }
 
 TabView* Searcher::tabView() { return MainWindow::Instance().tabView(); }
 
-QString Searcher::info() const
-{
-    return info_;
-}
+QString Searcher::info() const { return info_; }
 
-void Searcher::setInfo(const QString &info)
-{
-    info_ = info;
-}
+void Searcher::setInfo(const QString& info) { info_ = info; }
 
 // Find for Extended Option.
-bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward) {
+bool Searcher::_Find(const QStringList& target, const QTextCursor& startCursor, QTextCursor& targetCursor,
+                     bool backward) {
     if (editView() == nullptr) {
         return false;
     }
@@ -286,7 +246,7 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
         int end;
         int count = 0;
         QTextCursor cursor;
-        const auto &firstTarget = target[0];
+        const auto& firstTarget = target[0];
         if (!_Find(firstTarget, currentCursor, cursor, backward)) {
             qDebug() << "Not found: " << firstStart;
             return false;
@@ -308,15 +268,16 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
             firstStart = cursor.position();
         }
 
-        const auto &firstChar = editView()->document()->characterAt(start);
-        const auto &lastChar = editView()->document()->characterAt(end);
-        qDebug() << "start: " << start << firstChar << ", end: " << end << lastChar << ", selection: " << cursor.selectedText();
-        if (target.length() > 1) {  // Multiple lines, not one line.
-            if (firstChar == '\n' || firstChar == "\u2029") {  // Multiple lines target. Starts with '\n'.
-                ++count;  // Include '\n'
+        const auto& firstChar = editView()->document()->characterAt(start);
+        const auto& lastChar = editView()->document()->characterAt(end);
+        qDebug() << "start: " << start << firstChar << ", end: " << end << lastChar
+                 << ", selection: " << cursor.selectedText();
+        if (target.length() > 1) {                            // Multiple lines, not one line.
+            if (firstChar == '\n' || firstChar == "\u2029") { // Multiple lines target. Starts with '\n'.
+                ++count;                                      // Include '\n'
             } else {
                 // Check if ends with '\n'.
-                if (lastChar == '\0') {  // EOF
+                if (lastChar == '\0') { // EOF
                     qDebug() << "Reach end of file.";
                 } else if (lastChar != '\n' && lastChar != "\u2029") {
                     qDebug() << "lastChar: " << lastChar;
@@ -330,7 +291,7 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
                     currentCursor.setPosition(newStart, QTextCursor::MoveAnchor);
                     continue;
                 } else {
-                    ++count;  // Include '\n'
+                    ++count; // Include '\n'
                 }
             }
         }
@@ -349,7 +310,7 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
                 match = false;
                 break;
             }
-            count += target[i].length() + 1;  // "+ 1" to include '\n'
+            count += target[i].length() + 1; // "+ 1" to include '\n'
             block = block.next();
         }
         if (!match) {
@@ -366,8 +327,8 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
 
         // The last block.
         if (target.length() > 1) {
-            const auto &lastTarget = target[target.length() - 1];
-            if (!lastTarget.isEmpty()) {  // Not ends with '\n'.
+            const auto& lastTarget = target[target.length() - 1];
+            if (!lastTarget.isEmpty()) { // Not ends with '\n'.
                 if (!block.text().startsWith(lastTarget)) {
                     qDebug() << "Match last block failed, lastTarget: " << lastTarget << ", block: " << block.text();
                     int newStart;
@@ -412,7 +373,8 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
 }
 
 template <class T>
-bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward, bool first) {
+bool Searcher::_Find(const T& target, const QTextCursor& startCursor, QTextCursor& targetCursor, bool backward,
+                     bool first) {
     if (editView() == nullptr) {
         return false;
     }
@@ -442,24 +404,25 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
             }
         }
         if (block.isValid()) {
-            const auto &firstChar = editView()->document()->characterAt(block.position() + block.length() - 1);
-            const auto &lastChar = editView()->document()->characterAt(block.position() + block.length());
+            const auto& firstChar = editView()->document()->characterAt(block.position() + block.length() - 1);
+            const auto& lastChar = editView()->document()->characterAt(block.position() + block.length());
             qDebug() << "firstChar: " << firstChar << ", lastChar: " << lastChar << "block text: " << block.text();
-            if (lastChar == '\0') {  // EOF
+            if (lastChar == '\0') { // EOF
                 qDebug() << "Reach end of file.";
             } else if (firstChar != '\n' && firstChar != "\u2029") {
                 qDebug() << "First Char: " << firstChar << ", Last Char: " << lastChar;
             } else {
-                qDebug() << "Found \\n";  // Include '\n'
+                qDebug() << "Found \\n"; // Include '\n'
                 // When we get cursor.block(), the block is that where the cursor selectionEnd() stays at.
                 // if (backward) {
-                //     cursor.setPosition(block.position() + block.length(), QTextCursor::MoveAnchor);  // Set position after '\n'.
-                //     cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
-                //     targetCursor = cursor;
+                //     cursor.setPosition(block.position() + block.length(), QTextCursor::MoveAnchor);  // Set position
+                //     after '\n'. cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor); targetCursor =
+                //     cursor;
                 // } else {
-                    cursor.setPosition(block.position() + block.length() - 1, QTextCursor::MoveAnchor);  // Set position before '\n'.
-                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-                    targetCursor = cursor;
+                cursor.setPosition(block.position() + block.length() - 1,
+                                   QTextCursor::MoveAnchor); // Set position before '\n'.
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                targetCursor = cursor;
                 // }
                 return true;
             }
@@ -474,7 +437,7 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
 
     bool res = false;
     if (checkBoxFindWrapAround_ && first) {
-        QScrollBar *scrollBar = editView()->verticalScrollBar();
+        QScrollBar* scrollBar = editView()->verticalScrollBar();
         auto sliderPos = scrollBar->sliderPosition();
         QTextCursor anewCursor = startCursor;
         if (backward) {
@@ -492,23 +455,22 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
     return res;
 }
 
-static void HandleEscapeChars(QString &text)
-{
-//    text.replace("\\a", "\a");  // 0x07, Alert bell
-//    text.replace("\\b", "\b");  // 0x08, Backspace
-//    text.replace("\\e", "\e");  // 0x1B, Escape char
-//    text.replace("\\f", "\f");  // 0x0C, Formfeed Page Break
-//    text.replace("\\n", "\n");  // 0x0A, Line Feed
-//    text.replace("\\r", "\r");  // 0x0D, Carriage Return
-//    text.replace("\\t", "\t");  // 0x09, Horizontal Tab
-//    text.replace("\\v", "\v");  // 0x0B, Vertical Tab
-//    text.replace("\\", "\u005c");  // 0x5C, Backslash
-//    text.replace("\\'", "\'");  // 0x27, Single quotation mark
-//    text.replace("\\"", "\"");  // 0x22, Double quotation mark
-//    text.replace("\\?", "\?");  // 0x3F, Question mark
-//    text.replace("\\ddd", "d");  // Octal interpreted.
-//    text.replace("\\xxx", "xxx");  // Hexadecimal interpreted.
-//    text.replace("\\uhhhh", "hhhh");  // Unicode code.
+static void HandleEscapeChars(QString& text) {
+    //    text.replace("\\a", "\a");  // 0x07, Alert bell
+    //    text.replace("\\b", "\b");  // 0x08, Backspace
+    //    text.replace("\\e", "\e");  // 0x1B, Escape char
+    //    text.replace("\\f", "\f");  // 0x0C, Formfeed Page Break
+    //    text.replace("\\n", "\n");  // 0x0A, Line Feed
+    //    text.replace("\\r", "\r");  // 0x0D, Carriage Return
+    //    text.replace("\\t", "\t");  // 0x09, Horizontal Tab
+    //    text.replace("\\v", "\v");  // 0x0B, Vertical Tab
+    //    text.replace("\\", "\u005c");  // 0x5C, Backslash
+    //    text.replace("\\'", "\'");  // 0x27, Single quotation mark
+    //    text.replace("\\"", "\"");  // 0x22, Double quotation mark
+    //    text.replace("\\?", "\?");  // 0x3F, Question mark
+    //    text.replace("\\ddd", "d");  // Octal interpreted.
+    //    text.replace("\\xxx", "xxx");  // Hexadecimal interpreted.
+    //    text.replace("\\uhhhh", "hhhh");  // Unicode code.
 
     text.replace("\\r\\n", "\n");
     text.replace("\\r", "\n");
@@ -516,27 +478,23 @@ static void HandleEscapeChars(QString &text)
     text.replace("\\t", "\t");
 }
 
-QTextCursor Searcher::FindPrevious(const QString &text, const QTextCursor &startCursor)
-{
+QTextCursor Searcher::FindPrevious(const QString& text, const QTextCursor& startCursor) {
     bool backwardCheck = checkBoxFindBackward_;
     return _FindNext(text, startCursor, !backwardCheck);
 }
 
-QTextCursor Searcher::FindNext(const QString &text, const QTextCursor &startCursor)
-{
+QTextCursor Searcher::FindNext(const QString& text, const QTextCursor& startCursor) {
     bool backwardCheck = checkBoxFindBackward_;
     return _FindNext(text, startCursor, backwardCheck);
 }
 
-QTextCursor Searcher::_FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward)
-{
+QTextCursor Searcher::_FindPrevious(const QString& text, const QTextCursor& startCursor, bool backward) {
     bool backwardCheck = checkBoxFindBackward_;
     return _FindNext(text, startCursor, backward ? backwardCheck : !backwardCheck);
 }
 
 // Should save original cursor, and restore it if failed.
-QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCursor, bool backward)
-{
+QTextCursor Searcher::_FindNext(const QString& text, const QTextCursor& startCursor, bool backward) {
     if (text.isEmpty()) {
         return QTextCursor();
     }
@@ -568,7 +526,7 @@ QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCur
     }
 }
 
-std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
+std::vector<QTextCursor> Searcher::FindAll(const QString& target) {
     std::vector<QTextCursor> cursors;
     if (editView() == nullptr) {
         return cursors;
@@ -597,7 +555,7 @@ std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
 }
 
 // Replace 'target' with 'text'.
-void Searcher::Replace(const QString &target, const QString &text, bool backward) {
+void Searcher::Replace(const QString& target, const QString& text, bool backward) {
     if (editView() == nullptr) {
         return;
     }
@@ -634,45 +592,41 @@ void Searcher::Replace(const QString &target, const QString &text, bool backward
 
     // To find and replace.
     auto res = _FindNext(target, editView()->textCursor(), backward);
-    if (!res.isNull()) {  // Find success.
+    if (!res.isNull()) { // Find success.
         editView()->setTextCursor(res);
         res.insertText(extendedText);
         res = _FindNext(target, res, backward);
         if (!res.isNull()) {
             editView()->setTextCursor(res);
             auto info = QString("<b><font color=#67A9FF size=4>") +
-                                tr("1 occurrence were replaced, to continue replacing.") +
-                                "</font></b>";
+                        tr("1 occurrence were replaced, to continue replacing.") + "</font></b>";
             setInfo(info);
         } else {
             if (wrapAround) {
                 auto info = QString("<b><font color=#67A9FF size=4>") +
-                                    tr("1 occurrence were replaced. No more occurrence to replace.") +
-                                    "</font></b>";
+                            tr("1 occurrence were replaced. No more occurrence to replace.") + "</font></b>";
                 setInfo(info);
             } else {
-                auto info = QString("<b><font color=#67A9FF size=4>") +
-                                    tr("1 occurrence were replaced. ") + endStr +
-                                    tr(" has been reached.") + "</font></b>";
+                auto info = QString("<b><font color=#67A9FF size=4>") + tr("1 occurrence were replaced. ") + endStr +
+                            tr(" has been reached.") + "</font></b>";
                 setInfo(info);
             }
         }
-    } else {  // Find failure.
-        if (wrapAround) {  // No found in the whole text.
-            auto info = QString("<b><font color=#67A9FF size=4>") +
-                                tr("No more occurrence to replace.") + "</font></b>";
+    } else {              // Find failure.
+        if (wrapAround) { // No found in the whole text.
+            auto info =
+                QString("<b><font color=#67A9FF size=4>") + tr("No more occurrence to replace.") + "</font></b>";
             setInfo(info);
-        } else {  // Not found from current cursor to TOP or BOTTOM.
-            auto info = QString("<b><font color=#67A9FF size=4>") +
-                                tr("No occurrence to replace, the ") + endStr +
-                                tr(" has been reached.") + "</font></b>";
+        } else { // Not found from current cursor to TOP or BOTTOM.
+            auto info = QString("<b><font color=#67A9FF size=4>") + tr("No occurrence to replace, the ") + endStr +
+                        tr(" has been reached.") + "</font></b>";
             setInfo(info);
         }
     }
 }
 
 // Replace all 'target' with 'text'.
-int Searcher::ReplaceAll(const QString &target, const QString &text) {
+int Searcher::ReplaceAll(const QString& target, const QString& text) {
     if (editView() == nullptr) {
         return 0;
     }
@@ -705,38 +659,17 @@ int Searcher::ReplaceAll(const QString &target, const QString &text) {
     return res.size();
 }
 
-void Searcher::setRadioButtonFindRe(bool value)
-{
-    radioButtonFindRe_ = value;
-}
+void Searcher::setRadioButtonFindRe(bool value) { radioButtonFindRe_ = value; }
 
-void Searcher::setRadioButtonFindExtended(bool value)
-{
-    radioButtonFindExtended_ = value;
-}
+void Searcher::setRadioButtonFindExtended(bool value) { radioButtonFindExtended_ = value; }
 
-void Searcher::setRadioButtonFindNormal(bool value)
-{
-    radioButtonFindNormal_ = value;
-}
+void Searcher::setRadioButtonFindNormal(bool value) { radioButtonFindNormal_ = value; }
 
-void Searcher::setCheckBoxFindWrapAround(bool value)
-{
-    checkBoxFindWrapAround_ = value;
-}
+void Searcher::setCheckBoxFindWrapAround(bool value) { checkBoxFindWrapAround_ = value; }
 
-void Searcher::setCheckBoxFindMatchCase(bool value)
-{
-    checkBoxFindMatchCase_ = value;
-}
+void Searcher::setCheckBoxFindMatchCase(bool value) { checkBoxFindMatchCase_ = value; }
 
-void Searcher::setCheckBoxFindWholeWord(bool value)
-{
-    checkBoxFindWholeWord_ = value;
-}
+void Searcher::setCheckBoxFindWholeWord(bool value) { checkBoxFindWholeWord_ = value; }
 
-void Searcher::setCheckBoxFindBackward(bool value)
-{
-    checkBoxFindBackward_ = value;
-}
-}  // namespace QEditor
+void Searcher::setCheckBoxFindBackward(bool value) { checkBoxFindBackward_ = value; }
+} // namespace QEditor

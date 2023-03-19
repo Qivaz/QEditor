@@ -20,17 +20,14 @@
 #include <QDockWidget>
 
 namespace QEditor {
-class DockView : public QDockWidget
-{
+class DockView : public QDockWidget {
     Q_OBJECT
 public:
-    DockView(QWidget *parent = nullptr);
-    ~DockView() {
-        setWidget(nullptr);
-    }
+    DockView(QWidget* parent = nullptr);
+    ~DockView() { setWidget(nullptr); }
 
-    void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
-                    const QString &backColor, const QString &leftPadding, const QString &topPadding);
+    void SetDockQss(QDockWidget* dockView, const QString& fontSize, const QString& textColor, const QString& backColor,
+                    const QString& leftPadding, const QString& topPadding);
 
     int savedMaxWidth() const { return savedMaxWidth_; }
     void setSavedMaxWidth(int savedMaxWidth) {
@@ -42,6 +39,6 @@ public:
 private:
     int savedMaxWidth_{0};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // DOCKVIEW_H

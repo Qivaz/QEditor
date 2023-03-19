@@ -17,39 +17,32 @@
 #ifndef TOAST_H
 #define TOAST_H
 
-#include <QObject>
-#include <QRect>
 #include <QDialog>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QEvent>
+#include <QObject>
+#include <QRect>
 
 namespace QEditor {
 class ToastDialog;
-class Toast : public QObject
-{
+class Toast : public QObject {
     Q_OBJECT
 public:
-    static Toast &Instance();
-    enum Level
-    {
-        kInfo,
-        kWarning,
-        kError
-    };
-    void Show(Level level, const QString &text);
+    static Toast& Instance();
+    enum Level { kInfo, kWarning, kError };
+    void Show(Level level, const QString& text);
 
 private:
     Toast();
-    void timerEvent(QTimerEvent *) override;
+    void timerEvent(QTimerEvent*) override;
 
-    ToastDialog *dialog_{nullptr};
+    ToastDialog* dialog_{nullptr};
     int timerId_{0};
 };
 
 #define FRAME_RADIUS
-class ToastDialog: public QDialog
-{
+class ToastDialog : public QDialog {
     Q_OBJECT
 public:
     ToastDialog();
@@ -57,11 +50,11 @@ public:
     void Show(Toast::Level level, const QString& text);
 
 private:
-    QLabel *label_;
+    QLabel* label_;
 #ifdef FRAME_RADIUS
-    QFrame *frame_;
+    QFrame* frame_;
 #endif
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // TOAST_H

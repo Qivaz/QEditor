@@ -15,28 +15,21 @@
  */
 
 #include "Toast.h"
-
+#include "MainWindow.h"
 #include <QDialog>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QEvent>
-
-#include "MainWindow.h"
 
 namespace QEditor {
-Toast::Toast()
-{
-    dialog_ = new ToastDialog();
-}
+Toast::Toast() { dialog_ = new ToastDialog(); }
 
-Toast &Toast::Instance()
-{
+Toast& Toast::Instance() {
     static Toast _toast;
     return _toast;
 }
 
-void Toast::Show(Toast::Level level, const QString &text)
-{
+void Toast::Show(Toast::Level level, const QString& text) {
     dialog_->Show(level, text);
     // Kill the timer triggered before.
     if (timerId_ != 0) {
@@ -52,16 +45,14 @@ void Toast::Show(Toast::Level level, const QString &text)
     MainWindow::Instance().statusBar()->showMessage(text, 10000);
 }
 
-void Toast::timerEvent(QTimerEvent *)
-{
+void Toast::timerEvent(QTimerEvent*) {
     killTimer(timerId_);
     timerId_ = 0;
-    dialog_->accept();  // Hidden.
+    dialog_->accept(); // Hidden.
     dialog_->hide();
 }
 
-ToastDialog::ToastDialog()
-{
+ToastDialog::ToastDialog() {
     auto layout = new QHBoxLayout(this);
     label_ = new QLabel(this);
     label_->setStyleSheet("color: white; background: transparent");
@@ -85,8 +76,7 @@ ToastDialog::ToastDialog()
     // setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void ToastDialog::Show(Toast::Level level, const QString &text)
-{
+void ToastDialog::Show(Toast::Level level, const QString& text) {
 #ifdef FRAME_RADIUS
     const QString qss("QFrame{background-color:%1; border:none;"
                       "border-top-left-radius:10px; border-top-right-radius:10px;"
@@ -115,4 +105,4 @@ void ToastDialog::Show(Toast::Level level, const QString &text)
     show();
 }
 
-}  // namespace QEditor
+} // namespace QEditor

@@ -17,33 +17,31 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <QDir>
-
 #include "Logger.h"
+#include <QDir>
 
 namespace QEditor {
 namespace Utils {
-static inline QString mkdir(const QString &path)
-{
-    QDir dir(path);
-    if (dir.exists(path)) {
+    static inline QString mkdir(const QString& path) {
+        QDir dir(path);
+        if (dir.exists(path)) {
+            return path;
+        }
+        auto pos = path.lastIndexOf('/');
+        if (pos == -1) {
+            qDebug() << "Can not create dir: " << path;
+            qFatal("Create dir failed.");
+            return path;
+        }
+        auto parentPath = mkdir(path.mid(0, pos));
+        auto currentDirName = path.mid(path.lastIndexOf('/') + 1);
+        if (!currentDirName.isEmpty()) {
+            QDir parentDir(parentPath);
+            parentDir.mkpath(currentDirName);
+        }
         return path;
     }
-    auto pos = path.lastIndexOf('/');
-    if (pos == -1) {
-        qDebug() << "Can not create dir: " << path;
-        qFatal("Create dir failed.");
-        return path;
-    }
-    auto parentPath = mkdir(path.mid(0, pos));
-    auto currentDirName = path.mid(path.lastIndexOf('/') + 1);
-    if (!currentDirName.isEmpty()) {
-        QDir parentDir(parentPath);
-        parentDir.mkpath(currentDirName);
-    }
-    return path;
-}
-}  // namespace
-}  // namespace QEditor
+} // namespace Utils
+} // namespace QEditor
 
 #endif // UTILS_H

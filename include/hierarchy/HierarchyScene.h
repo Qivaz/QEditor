@@ -17,10 +17,9 @@
 #ifndef HIERARCHYSCENE_H
 #define HIERARCHYSCENE_H
 
-#include <QGraphicsScene>
-
-#include "IParser.h"
 #include "AnfNodeItem.h"
+#include "IParser.h"
+#include <QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -33,43 +32,42 @@ class QColor;
 QT_END_NAMESPACE
 
 namespace QEditor {
-class HierarchyScene : public QGraphicsScene
-{
+class HierarchyScene : public QGraphicsScene {
     Q_OBJECT
 public:
     enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
 
-    explicit HierarchyScene(QMenu *itemMenu, QObject *parent = nullptr);
+    explicit HierarchyScene(QMenu* itemMenu, QObject* parent = nullptr);
     QColor itemColor() const { return itemColor_; }
     QColor lineColor() const { return lineColor_; }
-    void setLineColor(const QColor &color);
-    void setItemColor(const QColor &color);
+    void setLineColor(const QColor& color);
+    void setItemColor(const QColor& color);
 
 public slots:
     void setMode(Mode mode);
     void setItemType(AnfNodeItem::NodeType type);
 
 signals:
-    void itemInserted(AnfNodeItem *item);
-    void itemSelected(QGraphicsItem *item);
+    void itemInserted(AnfNodeItem* item);
+    void itemSelected(QGraphicsItem* item);
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
 
     bool ItemChanged(int type) const;
 
     NodeItem::NodeType itemType_;
-    QMenu *itemMenu_;
+    QMenu* itemMenu_;
     Mode mode_;
     bool leftButtonDown_;
     QPointF startPoint_;
-    QGraphicsLineItem *line_;
+    QGraphicsLineItem* line_;
     QColor itemColor_;
     QColor lineColor_;
     QVector<int> xPos_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // HIERARCHYSCENE_H

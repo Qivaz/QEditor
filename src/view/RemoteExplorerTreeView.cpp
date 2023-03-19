@@ -15,7 +15,9 @@
  */
 
 #include "RemoteExplorerTreeView.h"
-
+#include "FileType.h"
+#include "Logger.h"
+#include "MainWindow.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QDesktopServices>
@@ -25,17 +27,12 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 
-#include "FileType.h"
-#include "MainWindow.h"
-#include "Logger.h"
-
 namespace QEditor {
-RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget *parent, const QString &rootPath)
-    : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(parent))
-{
+RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& rootPath)
+    : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(parent)) {
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-//                  "QTreeView::branch:has-children:!has-siblings:closed, \
+                  //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
 //                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");
@@ -82,8 +79,7 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget *parent, const QString &r
                                               background: none; \
                                           }");
 
-    menu_->setStyleSheet(
-                       "\
+    menu_->setStyleSheet("\
                        QMenu {\
                            color: lightGray;\
                            background-color: rgb(40, 40, 40);\
@@ -126,37 +122,36 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget *parent, const QString &r
     connect(this, &QTreeView::expanded, this, &RemoteExplorerTreeView::HandleExpanded);
 }
 
-void RemoteExplorerTreeView::HandleExpanded(const QModelIndex &index)
-{
-    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+void RemoteExplorerTreeView::HandleExpanded(const QModelIndex& index) {
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
+             << index.data().toString();
 
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
-                << modelIndex.data().toString();
+             << modelIndex.data().toString();
 }
 
-void RemoteExplorerTreeView::HandleIndexPress(const QModelIndex &index)
-{
+void RemoteExplorerTreeView::HandleIndexPress(const QModelIndex& index) {
     if (QApplication::mouseButtons() != Qt::RightButton) {
         return;
     }
 
-    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
+    qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
+             << index.data().toString();
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
     qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
-                << modelIndex.data().toString();
-}
-
-void RemoteExplorerTreeView::HandleIndexClick(const QModelIndex &index)
-{
-    qCritical() << "index: " << index.row() << index.column() << index.parent().data().toString() << index.data().toString();
-    QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
-    qCritical() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
              << modelIndex.data().toString();
 }
 
-void RemoteExplorerTreeView::HandleDirLoaded(const QString &path)
-{
+void RemoteExplorerTreeView::HandleIndexClick(const QModelIndex& index) {
+    qCritical() << "index: " << index.row() << index.column() << index.parent().data().toString()
+                << index.data().toString();
+    QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
+    qCritical() << "modelIndex: " << modelIndex.row() << modelIndex.column() << index.parent().data().toString()
+                << modelIndex.data().toString();
+}
+
+void RemoteExplorerTreeView::HandleDirLoaded(const QString& path) {
     qDebug() << "path: " << path;
     if (path == gotoDir_) {
         gotoForLoaded_ = true;
@@ -164,11 +159,7 @@ void RemoteExplorerTreeView::HandleDirLoaded(const QString &path)
     }
 }
 
-void RemoteExplorerTreeView::timerEvent(QTimerEvent *event)
-{
-}
+void RemoteExplorerTreeView::timerEvent(QTimerEvent* event) {}
 
-void RemoteExplorerTreeView::GotoPathPosition(const QString &path)
-{
-}
-}  // namespace QEditor
+void RemoteExplorerTreeView::GotoPathPosition(const QString& path) {}
+} // namespace QEditor

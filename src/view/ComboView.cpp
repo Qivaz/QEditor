@@ -15,15 +15,12 @@
  */
 
 #include "ComboView.h"
-
+#include "Logger.h"
 #include <QLineEdit>
 #include <QListWidget>
 
-#include "Logger.h"
-
 namespace QEditor {
-ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fixed)
-{
+ComboView::ComboView(QWidget* parent, bool fixed) : QComboBox(parent), fixed_(fixed) {
     auto qss = "QComboBox {\
                     color: lightGray; background: transparent;\
                     border: none;\
@@ -31,7 +28,7 @@ ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fi
                     min-width: 3px;\
                     padding-left: 1px;\
                 }"
-                "QComboBox:enabled:hover, QComboBox:enabled:focus {\
+               "QComboBox:enabled:hover, QComboBox:enabled:focus {\
                     color: lightGray; background-color: rgb(68, 68, 68);\
                     border: 1px solid gray;\
                     border-radius: 3px;\
@@ -39,26 +36,26 @@ ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fi
                     min-width: 3px;\
                     padding-left: 1px;\
                     }"
-//                "QComboBox:!editable:on, QComboBox::drop-down:editable:on {\
+               //                "QComboBox:!editable:on, QComboBox::drop-down:editable:on {\
 //                    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
 //                                                stop: 0 #D3D3D3, stop: 0.4 #D8D8D8,\
 //                                                stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1);\
 //                    }"
-                "QComboBox::drop-down {\
+               "QComboBox::drop-down {\
                     border: none; background: transparent; }"
-                "QComboBox::down-arrow {\
+               "QComboBox::down-arrow {\
                     image: url(:images/chevron-down.svg); width: 15px;\
                     }"
-                "QComboBox QAbstractItemView {\
+               "QComboBox QAbstractItemView {\
                         color: lightGray;\
                         border: 1px solid rgb(68, 68, 100);\
                         background: rgb(68, 68, 68);\
                         outline: rgb(68, 68, 255);\
                 }"
-                "QComboBox QAbstractItemView::item {\
+               "QComboBox QAbstractItemView::item {\
                         color: lightGray;\
                 }"
-                "QComboBox QAbstractItemView::item:selected {\
+               "QComboBox QAbstractItemView::item:selected {\
                         background: rgb(232, 241, 250);\
                         color: rgb(255, 65, 132);\
                 }";
@@ -71,8 +68,7 @@ ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fi
     setStyleSheet(qssStr);
 }
 
-void ComboView::ShrinkForPopup()
-{
+void ComboView::ShrinkForPopup() {
     if (fixed_ && maxWidth_ != 0) {
         qDebug() << ", maxWidth_: " << maxWidth_;
         view()->setFixedWidth(maxWidth_ * 1.5 + 15);
@@ -92,8 +88,7 @@ void ComboView::ShrinkForPopup()
     view()->setFixedWidth(maxWidth * 1.5 + 15);
 }
 
-void ComboView::ShrinkForChosen()
-{
+void ComboView::ShrinkForChosen() {
     QFontMetricsF fm(font());
     auto text = lineEdit()->text();
     qDebug() << "text: " << text;
@@ -103,15 +98,13 @@ void ComboView::ShrinkForChosen()
     setFixedWidth(width * 1.2 + 15);
 }
 
-void ComboView::showPopup()
-{
+void ComboView::showPopup() {
     ShrinkForPopup();
     QComboBox::showPopup();
 }
 
-void ComboView::hidePopup()
-{
+void ComboView::hidePopup() {
     ShrinkForChosen();
     QComboBox::hidePopup();
 }
-}  // namespace QEditor
+} // namespace QEditor

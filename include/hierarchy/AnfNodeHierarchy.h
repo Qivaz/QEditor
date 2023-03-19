@@ -17,25 +17,22 @@
 #ifndef NODEHIERARCHY_H
 #define NODEHIERARCHY_H
 
-#include <QGraphicsView>
-
+#include "AnfNodeHierarchyScene.h"
 #include "IParser.h"
 #include "IrParser.h"
-
-#include "AnfNodeHierarchyScene.h"
+#include <QGraphicsView>
 
 namespace QEditor {
-class AnfNodeHierarchy : public QGraphicsView
-{
+class AnfNodeHierarchy : public QGraphicsView {
 public:
-    AnfNodeHierarchy(const QString &funcName, IParser *parser = new DummyParser(), QWidget *parent = nullptr);
+    AnfNodeHierarchy(const QString& funcName, IParser* parser = new DummyParser(), QWidget* parent = nullptr);
 
-    const QString &funcName() const { return funcName_; }
+    const QString& funcName() const { return funcName_; }
 
 private:
-    AnfNodeHierarchyScene *scene_{nullptr};
+    AnfNodeHierarchyScene* scene_{nullptr};
     QString funcName_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // NODEHIERARCHY_H

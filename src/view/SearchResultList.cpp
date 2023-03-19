@@ -15,7 +15,10 @@
  */
 
 #include "SearchResultList.h"
-
+#include "Logger.h"
+#include "MainTabView.h"
+#include "MainWindow.h"
+#include "SearchResultItem.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QHeaderView>
@@ -27,19 +30,13 @@
 #include <QTextEdit>
 #include <QToolTip>
 
-#include "SearchResultItem.h"
-#include "MainWindow.h"
-#include "MainTabView.h"
-#include "Logger.h"
-
 namespace QEditor {
-void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
+void HtmlDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
     QStyleOptionViewItem itemOption = option;
     initStyleOption(&itemOption, index);
 
     qDebug() << itemOption.widget << itemOption.widget->style();
-    QStyle *style = itemOption.widget ? itemOption.widget->style() : QApplication::style();
+    QStyle* style = itemOption.widget ? itemOption.widget->style() : QApplication::style();
 
     QTextDocument doc;
     doc.setHtml(itemOption.text);
@@ -63,8 +60,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     painter->restore();
 }
 
-QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
+QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const {
     QStyleOptionViewItem itemOption = option;
     initStyleOption(&itemOption, index);
 
@@ -74,18 +70,18 @@ QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     return QSize(doc.idealWidth(), doc.size().height());
 }
 
-SearchResultList::SearchResultList(TabView *tabView) : QTreeWidget(&MainWindow::Instance()), tabView_(tabView), menu_(new QMenu(this))
-{
-//    setHeaderLabel("Result...");
-//    setStyle(QStyleFactory::create("windows"));
+SearchResultList::SearchResultList(TabView* tabView)
+    : QTreeWidget(&MainWindow::Instance()), tabView_(tabView), menu_(new QMenu(this)) {
+    //    setHeaderLabel("Result...");
+    //    setStyle(QStyleFactory::create("windows"));
     SetQss();
-//    setRootIsDecorated(false);
+    //    setRootIsDecorated(false);
     setHeaderHidden(true);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-    QHeaderView *headerView = header();
-//    headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
-//    headerView->setStretchLastSection(false);
+    QHeaderView* headerView = header();
+    //    headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
+    //    headerView->setStretchLastSection(false);
     headerView->setSectionResizeMode(QHeaderView::Stretch);
 
     clear();
@@ -96,12 +92,11 @@ SearchResultList::SearchResultList(TabView *tabView) : QTreeWidget(&MainWindow::
     connect(this, &QTreeWidget::itemClicked, this, &SearchResultList::HandleItemClicked);
 
     // Create custom delegate
-    QEditor::HtmlDelegate *delegate = new HtmlDelegate();
+    QEditor::HtmlDelegate* delegate = new HtmlDelegate();
     // Set delegate to the treeview object
     setItemDelegate(delegate);
 
-    menu_->setStyleSheet(
-                       "\
+    menu_->setStyleSheet("\
                        QMenu {\
                            color: lightGray;\
                            background-color: rgb(40, 40, 40);\
@@ -124,16 +119,15 @@ SearchResultList::SearchResultList(TabView *tabView) : QTreeWidget(&MainWindow::
                       ");
 }
 
-void SearchResultList::SetQss()
-{
-//    QStringList qss;
-//    qss.append(QString("QTreeWidget{color: darkGray; background-color: rgb(28, 28, 28)}"));
-//    qss.append(QString("QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"));
-//    setStyleSheet(qss.join(""));
+void SearchResultList::SetQss() {
+    //    QStringList qss;
+    //    qss.append(QString("QTreeWidget{color: darkGray; background-color: rgb(28, 28, 28)}"));
+    //    qss.append(QString("QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"));
+    //    setStyleSheet(qss.join(""));
 
     setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-//                  "QTreeView::branch:has-children:!has-siblings:closed, \
+                  //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
 //                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");
@@ -168,13 +162,9 @@ void SearchResultList::SetQss()
                   ");
 }
 
-void SearchResultList::setTopItem(QTreeWidgetItem *topItem)
-{
-    topItem_ = topItem;
-}
+void SearchResultList::setTopItem(QTreeWidgetItem* topItem) { topItem_ = topItem; }
 
-QTreeWidgetItem *SearchResultList::topItem()
-{
+QTreeWidgetItem* SearchResultList::topItem() {
     if (topItem_ == nullptr) {
         topItem_ = new SearchResultItem();
         addTopLevelItem(topItem_);
@@ -182,8 +172,7 @@ QTreeWidgetItem *SearchResultList::topItem()
     return topItem_;
 }
 
-void SearchResultList::HandleItemDoubleClicked(QTreeWidgetItem *item, int column)
-{
+void SearchResultList::HandleItemDoubleClicked(QTreeWidgetItem* item, int column) {
     qDebug() << ", " << item << ", col: " << column;
     auto searchItem = (SearchResultItem*)item;
     auto editView = searchItem->editView();
@@ -201,16 +190,14 @@ void SearchResultList::HandleItemDoubleClicked(QTreeWidgetItem *item, int column
     editView->GotoCursor(cursor);
 }
 
-void SearchResultList::HandleItemClicked(QTreeWidgetItem *item, int column)
-{
-//    item->setBackgroundColor(0, QColor(255, 71, 255));
+void SearchResultList::HandleItemClicked(QTreeWidgetItem* item, int column) {
+    //    item->setBackgroundColor(0, QColor(255, 71, 255));
 }
 
-bool SearchResultList::event(QEvent *event)
-{
+bool SearchResultList::event(QEvent* event) {
     qDebug() << event->type();
     if (event->type() == QEvent::ToolTip) {
-        QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+        QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
         auto item = itemAt(helpEvent->pos());
         qDebug() << helpEvent->pos();
         if (item != nullptr) {
@@ -223,34 +210,31 @@ bool SearchResultList::event(QEvent *event)
     return QTreeWidget::event(event);
 }
 
-void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
-{
+void SearchResultList::contextMenuEvent(QContextMenuEvent* event) {
     menu_->clear();
-    QAction *collapseAllAction = new QAction(tr("Collapse All"));
+    QAction* collapseAllAction = new QAction(tr("Collapse All"));
     connect(collapseAllAction, &QAction::triggered, this, [this]() {
         collapseAll();
         topItem()->setExpanded(true);
     });
     menu_->addAction(collapseAllAction);
-    QAction *expandAllAction = new QAction(tr("Expand All"));
-    connect(expandAllAction, &QAction::triggered, this, [this]() {
-        expandAll();
-    });
+    QAction* expandAllAction = new QAction(tr("Expand All"));
+    connect(expandAllAction, &QAction::triggered, this, [this]() { expandAll(); });
     menu_->addAction(expandAllAction);
 
     menu_->addSeparator();
-    QAction *copySelectedAction = new QAction(tr("Copy Selected"));
+    QAction* copySelectedAction = new QAction(tr("Copy Selected"));
     connect(copySelectedAction, &QAction::triggered, this, [this]() {
         QString text;
         const auto items = selectedItems();
-        for (const auto &item : items) {
+        for (const auto& item : items) {
             text += item->toolTip(0) + '\n';
         }
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(text);
     });
     menu_->addAction(copySelectedAction);
-    QAction *copyAllAction = new QAction(tr("Copy All"));
+    QAction* copyAllAction = new QAction(tr("Copy All"));
     connect(copyAllAction, &QAction::triggered, this, [this]() {
         QString text;
         for (int i = 0; i < topItem()->childCount(); ++i) {
@@ -263,13 +247,13 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
             }
             text += '\n';
         }
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(text);
     });
     menu_->addAction(copyAllAction);
 
     menu_->addSeparator();
-    QAction *clearSelectedItemAction = new QAction(tr("Clear Selected"));
+    QAction* clearSelectedItemAction = new QAction(tr("Clear Selected"));
     connect(clearSelectedItemAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
         if (item->parent() != nullptr) {
@@ -277,7 +261,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
         }
     });
     menu_->addAction(clearSelectedItemAction);
-    QAction *clearSelectedResultAction = new QAction(tr("Clear Containing Result"));
+    QAction* clearSelectedResultAction = new QAction(tr("Clear Containing Result"));
     connect(clearSelectedResultAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
         qDebug() << "item: " << item->toolTip(0);
@@ -288,7 +272,7 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
         topItem()->removeChild(item);
     });
     menu_->addAction(clearSelectedResultAction);
-    QAction *clearAllAction = new QAction(tr("Clear All"));
+    QAction* clearAllAction = new QAction(tr("Clear All"));
     connect(clearAllAction, &QAction::triggered, this, [this]() {
         clear();
         setTopItem(nullptr);
@@ -298,14 +282,13 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event)
     menu_->exec(event->globalPos());
 }
 
-void SearchResultList::mousePressEvent(QMouseEvent *event)
-{
+void SearchResultList::mousePressEvent(QMouseEvent* event) {
     if (QApplication::mouseButtons() == Qt::RightButton && selectionMode() != SelectionMode::SingleSelection) {
         return;
     }
-    if (QApplication::keyboardModifiers() == Qt::ControlModifier) {  // If Ctrl-Key pressed.
+    if (QApplication::keyboardModifiers() == Qt::ControlModifier) { // If Ctrl-Key pressed.
         setSelectionMode(SelectionMode::MultiSelection);
-    } else if (QApplication::keyboardModifiers() == Qt::ShiftModifier) {  // If Shift-Key pressed.
+    } else if (QApplication::keyboardModifiers() == Qt::ShiftModifier) { // If Shift-Key pressed.
         setSelectionMode(SelectionMode::ContiguousSelection);
     } else {
         setSelectionMode(SelectionMode::SingleSelection);
@@ -313,20 +296,18 @@ void SearchResultList::mousePressEvent(QMouseEvent *event)
     QTreeWidget::mousePressEvent(event);
 }
 
-QTreeWidgetItem* SearchResultList::StartSearchSession(EditView *editView)
-{
+QTreeWidgetItem* SearchResultList::StartSearchSession(EditView* editView) {
     editView_ = editView;
-    const QString &title = editView->fileName();
-    SearchResultItem *sessionItem = new SearchResultItem();
+    const QString& title = editView->fileName();
+    SearchResultItem* sessionItem = new SearchResultItem();
     sessionItem->setText(0, title);
     topItem()->insertChild(0, sessionItem);
     return sessionItem;
 }
 
-void SearchResultList::AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum,
-                                       const QString &htmlText, const QString &plainText, const QTextCursor &cursor)
-{
-    SearchResultItem *searchItem = new SearchResultItem(editView_);
+void SearchResultList::AddSearchResult(QTreeWidgetItem* sessionItem, const int lineNum, const QString& htmlText,
+                                       const QString& plainText, const QTextCursor& cursor) {
+    SearchResultItem* searchItem = new SearchResultItem(editView_);
     searchItem->setText(0, htmlText);
     searchItem->setToolTip(0, plainText);
     searchItem->setPosition(cursor.selectionStart());
@@ -335,12 +316,13 @@ void SearchResultList::AddSearchResult(QTreeWidgetItem *sessionItem, const int l
     sessionItem->addChild(searchItem);
 }
 
-void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount)
-{
+void SearchResultList::FinishSearchSession(QTreeWidgetItem* sessionItem, const QString& target, int matchCount) {
     // Update current session's search info.
     const auto name = sessionItem->text(0);
-    const auto title = name + " " + QString(tr("(Search ")) + "\"" + target + "\": " + QString::number(matchCount) + tr(" hits)");
-    const auto html = QString("<div style=\"font-size:14px;font-family:Consolas;color:#E3CEAB\">") + title + QString("</div>");
+    const auto title =
+        name + " " + QString(tr("(Search ")) + "\"" + target + "\": " + QString::number(matchCount) + tr(" hits)");
+    const auto html =
+        QString("<div style=\"font-size:14px;font-family:Consolas;color:#E3CEAB\">") + title + QString("</div>");
     sessionItem->setToolTip(0, title);
     sessionItem->setText(0, html);
     expandItem(sessionItem);
@@ -348,7 +330,8 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
 
     // Update header's total result count.
     auto info = QString::number(topItem()->childCount()) + tr(" results:");
-    auto htmlText = QString("<div style=\"font-size:15px;font-family:Consolas;color:#C3AE8B\">") + info + QString("</div>");
+    auto htmlText =
+        QString("<div style=\"font-size:15px;font-family:Consolas;color:#C3AE8B\">") + info + QString("</div>");
     topItem()->setText(0, htmlText);
 }
-}  // namespace QEditor
+} // namespace QEditor

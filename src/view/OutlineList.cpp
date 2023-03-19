@@ -15,15 +15,12 @@
  */
 
 #include "OutlineList.h"
-
+#include "Logger.h"
+#include "MainWindow.h"
 #include <QScrollBar>
 
-#include "MainWindow.h"
-#include "Logger.h"
-
 namespace QEditor {
-OutlineList::OutlineList(IParser *parser) : parser_(parser)
-{
+OutlineList::OutlineList(IParser* parser) : parser_(parser) {
     verticalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
                                        "QScrollBar::add-line:vertical { \
                                             border: none; \
@@ -46,13 +43,13 @@ OutlineList::OutlineList(IParser *parser) : parser_(parser)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     int num = 0;
-    for (const auto &info : parser->funcGraphInfos()) {
+    for (const auto& info : parser->funcGraphInfos()) {
         auto top = new OverviewItem(num);
         ++num;
         auto resizeFont = font();
         resizeFont.setPointSize(10);
         top->setFont(0, resizeFont);
-//        top->setFont(0, QFont("Consolas", 10));
+        //        top->setFont(0, QFont("Consolas", 10));
         top->setIcon(0, QIcon(":/images/function.svg"));
         top->setText(0, info.name_ + "() -> " + info.returnValue_);
         addTopLevelItem(top);
@@ -72,8 +69,7 @@ OutlineList::OutlineList(IParser *parser) : parser_(parser)
     setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void OutlineList::HandleItemClicked(QTreeWidgetItem *item, int column)
-{
+void OutlineList::HandleItemClicked(QTreeWidgetItem* item, int column) {
     qDebug() << item << column;
     auto editView = MainWindow::Instance().editView();
     if (editView == nullptr) {
@@ -85,11 +81,10 @@ void OutlineList::HandleItemClicked(QTreeWidgetItem *item, int column)
     editView->GotoCursor(cursor);
 }
 
-int OutlineList::GetIndexByCursorPos(int cursorPos)
-{
+int OutlineList::GetIndexByCursorPos(int cursorPos) {
     if (parser_->funcGraphInfos().isEmpty()) {
         return 0;
     }
     return parser_->GetIndexByCursorPosition(cursorPos);
 }
-}  // namespace QEditor
+} // namespace QEditor

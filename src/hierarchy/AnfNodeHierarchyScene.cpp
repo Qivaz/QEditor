@@ -15,20 +15,17 @@
  */
 
 #include "AnfNodeHierarchyScene.h"
-
+#include "AnfNodeHierarchy.h"
+#include "AnfNodeItem.h"
+#include "Arrow.h"
+#include "Toast.h"
+#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QTextCursor>
-#include <QDebug>
-
-#include "Arrow.h"
-#include "AnfNodeItem.h"
-#include "AnfNodeHierarchy.h"
-#include "Toast.h"
 
 namespace QEditor {
-AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *parser, QMenu *itemMenu, QObject *parent)
-    : HierarchyScene(itemMenu, parent), parser_(parser)
-{
+AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString& funcName, IParser* parser, QMenu* itemMenu, QObject* parent)
+    : HierarchyScene(itemMenu, parent), parser_(parser) {
     itemMenu_ = itemMenu;
     mode_ = MoveItem;
     itemType_ = AnfNodeItem::Process;
@@ -36,8 +33,8 @@ AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *p
     itemColor_ = QColor(106, 106, 106);
     lineColor_ = QColor(0, 122, 204);
 
-    const auto &funcGraphInfo = parser_->GetFuncGraphInfo(funcName);
-    const auto &nodesMap = parser_->ParseNodes(funcName);
+    const auto& funcGraphInfo = parser_->GetFuncGraphInfo(funcName);
+    const auto& nodesMap = parser_->ParseNodes(funcName);
     constexpr auto startY = 100;
     constexpr auto distanceY = 100;
     constexpr auto startX = 50;
@@ -46,10 +43,10 @@ AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *p
     auto [maxX, maxY] = PaintNodeCalls(funcGraphInfo.returnVariable_, nodesMap, 0, distanceY);
 
     // Handle isolated free variables.
-    const auto &nodes = nodesMap.values();
+    const auto& nodes = nodesMap.values();
     for (auto iter = nodes.crbegin(); iter != nodes.crend(); ++iter) {
-        const auto &nodeInfo = *iter;
-        const QString &nodeName = "%" + nodeInfo.variableName_ + "(" + nodeInfo.operatorName_ + ")";
+        const auto& nodeInfo = *iter;
+        const QString& nodeName = "%" + nodeInfo.variableName_ + "(" + nodeInfo.operatorName_ + ")";
         if (!nodes_.contains(nodeName)) {
             qDebug() << "maxX: " << maxX << ", maxY: " << maxY;
             auto [x, y] = PaintNodeCalls(nodeInfo.variableName_, nodesMap, maxX, distanceY);
@@ -59,14 +56,14 @@ AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *p
     }
 }
 
-std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
-    const QString &nodeName, const QMap<QString, NodeInfo> &nodesMap, int startX, int startY)
-{
+std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(const QString& nodeName,
+                                                          const QMap<QString, NodeInfo>& nodesMap, int startX,
+                                                          int startY) {
     constexpr auto distanceY = 100;
     constexpr auto distanceX = 250;
     int maxX = 0;
     int maxY = 0;
-    const auto &info = nodesMap.value(nodeName);
+    const auto& info = nodesMap.value(nodeName);
     if (info.pos_ == -1) {
         return {maxX, maxY};
     }
@@ -78,9 +75,10 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
 
     qDebug() << "nodeName: " << nodeName << ", info.varInputs_: " << info.varInputs_;
     for (int i = 0; i < info.varInputs_.size(); ++i) {
-        const auto &input = info.varInputs_[i];
-        const auto &inputInfo = nodesMap.value(input);
-        qDebug() << "input: " << input << ", pos: " << inputInfo.pos_ << ", x: " << (startX + distanceX * i) << ", y: " << (startY + distanceY);
+        const auto& input = info.varInputs_[i];
+        const auto& inputInfo = nodesMap.value(input);
+        qDebug() << "input: " << input << ", pos: " << inputInfo.pos_ << ", x: " << (startX + distanceX * i)
+                 << ", y: " << (startY + distanceY);
         if (inputInfo.pos_ == -1) {
             continue;
         }
@@ -93,9 +91,9 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
             maxY = std::max(maxY, newY);
         }
 
-        AnfNodeItem *startItem = qgraphicsitem_cast<AnfNodeItem *>(startNode);
-        AnfNodeItem *endItem = qgraphicsitem_cast<AnfNodeItem *>(endNode);
-        Arrow *arrow = new Arrow(startItem, endItem);
+        AnfNodeItem* startItem = qgraphicsitem_cast<AnfNodeItem*>(startNode);
+        AnfNodeItem* endItem = qgraphicsitem_cast<AnfNodeItem*>(endNode);
+        Arrow* arrow = new Arrow(startItem, endItem);
         arrow->setColor(lineColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
@@ -111,4 +109,4 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(
     }
     return {maxX, maxY};
 }
-}  // namespace QEditor
+} // namespace QEditor

@@ -15,30 +15,24 @@
  */
 
 #include "MainWindow.h"
-
-#include <QtWidgets>
-#include <QLayoutItem>
-#include <QSizePolicy>
-#include <MainWindow.h>
-#include <MainWindow.h>
-
-#include "ExplorerTreeView.h"
-#include "RemoteExplorerTreeView.h"
 #include "ComboView.h"
+#include "ExplorerTreeView.h"
+#include "Logger.h"
 #include "OpenTerminalDialog.h"
 #include "RecentFiles.h"
+#include "RemoteExplorerTreeView.h"
 #include "SearchDialog.h"
 #include "SearchResultList.h"
 #include "Settings.h"
 #include "Toast.h"
 #include "win/WinTheme.h"
-
-#include "Logger.h"
+#include <MainWindow.h>
+#include <QLayoutItem>
+#include <QSizePolicy>
+#include <QtWidgets>
 
 namespace QEditor {
-MainWindow::MainWindow()
-    : tabView_(new TabView(this))
-{
+MainWindow::MainWindow() : tabView_(new TabView(this)) {
     auto settings = Settings();
     shouldWrapText_ = settings.Get("view", "wraptext", true).toBool();
     specialCharsVisible_ = settings.Get("view", "allcharsvisible", false).toBool();
@@ -51,7 +45,8 @@ MainWindow::MainWindow()
     setAcceptDrops(true);
     setWindowOpacity(opa);
 
-    setStyleSheet("background: rgb(68, 68, 68); selection-background-color: rgb(9, 71, 113); border: 5px, solid, rgb(255, 0, 0);");
+    setStyleSheet("background: rgb(68, 68, 68); selection-background-color: rgb(9, 71, 113); border: 5px, solid, "
+                  "rgb(255, 0, 0);");
     setCentralWidget(tabView_);
 
     CreateActions();
@@ -65,7 +60,9 @@ MainWindow::MainWindow()
 #endif
 
     // Delay to show the window.
-    connect(this, &MainWindow::Show, this, [](){ QTimer::singleShot(500, []() { MainWindow::Instance().show(); }); }, Qt::QueuedConnection);
+    connect(
+        this, &MainWindow::Show, this, []() { QTimer::singleShot(500, []() { MainWindow::Instance().show(); }); },
+        Qt::QueuedConnection);
 
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -96,40 +93,42 @@ MainWindow::MainWindow()
     }
 
     QPalette pal = QPalette();
-//    pal.setColor(QPalette::ToolTipBase, QColor(0, 0, 255));
+    //    pal.setColor(QPalette::ToolTipBase, QColor(0, 0, 255));
     pal.setColor(QPalette::ToolTipText, Qt::lightGray);
     QToolTip::setPalette(pal);
 }
 
-void MainWindow::CreateActions()
-{
-    menuBar()->setStyleSheet("QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
+void MainWindow::CreateActions() {
+    menuBar()->setStyleSheet(
+        "QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
                              QMenu{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(40, 40, 40); border: none;}\
                              QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
 
-    auto toolBarStyle = "QToolBar { color: lightGray;" "background-color: rgb(28, 28, 28); }"\
-                        "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
-                        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
-                        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
-                        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
-                        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
+    auto toolBarStyle =
+        "QToolBar { color: lightGray;"
+        "background-color: rgb(28, 28, 28); }"
+        "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
+        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
+        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
+        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
+        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
     // File menu.
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    QToolBar *fileToolBar = addToolBar(tr("File"));
+    QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
+    QToolBar* fileToolBar = addToolBar(tr("File"));
     fileToolBar->setStyleSheet(toolBarStyle);
 
     // TODO:
     // Use addPixmap() set on/off icons.
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/file.svg"));
-    QAction *newAct = new QAction(newIcon, tr("&New"), this);
-//    newAct->setShortcuts(QKeySequence::New);
+    QAction* newAct = new QAction(newIcon, tr("&New"), this);
+    //    newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, &QAction::triggered, this, &MainWindow::NewFile);
     fileMenu->addAction(newAct);
     fileToolBar->addAction(newAct);
 
     const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/folder-open.svg"));
-    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+    QAction* openAct = new QAction(openIcon, tr("&Open..."), this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, &QAction::triggered, this, &MainWindow::Open);
@@ -141,7 +140,7 @@ void MainWindow::CreateActions()
     UpdateRecentFilesMenu();
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.svg"));
-    QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
+    QAction* saveAct = new QAction(saveIcon, tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, &QAction::triggered, this, &MainWindow::Save);
@@ -149,32 +148,32 @@ void MainWindow::CreateActions()
     fileToolBar->addAction(saveAct);
 
     const QIcon saveAllIcon = QIcon::fromTheme("document-save-all");
-    QAction *saveAllAct = fileMenu->addAction(saveAllIcon, tr("Save all"), this, &MainWindow::SaveAll);
+    QAction* saveAllAct = fileMenu->addAction(saveAllIcon, tr("Save all"), this, &MainWindow::SaveAll);
     saveAllAct->setShortcuts(QKeySequence::SaveAs);
     saveAllAct->setStatusTip(tr("Save all open documents"));
 
     const QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
-    QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::SaveAs);
+    QAction* saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::SaveAs);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
 
     fileMenu->addSeparator();
 
     const QIcon exitIcon = QIcon::fromTheme("application-exit");
-    QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
+    QAction* exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
 
     // Edit menu.
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-    QToolBar *editToolBar = addToolBar(tr("Edit"));
+    QMenu* editMenu = menuBar()->addMenu(tr("&Edit"));
+    QToolBar* editToolBar = addToolBar(tr("Edit"));
     editToolBar->setStyleSheet(toolBarStyle);
 #ifndef QT_NO_CLIPBOARD
     const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(":/images/cut.svg"));
     cutAct_ = new QAction(cutIcon, tr("Cu&t"), this);
     cutAct_->setShortcuts(QKeySequence::Cut);
     cutAct_->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
+                             "clipboard"));
     connect(cutAct_, &QAction::triggered, this, &MainWindow::Cut);
     editMenu->addAction(cutAct_);
     editToolBar->addAction(cutAct_);
@@ -183,13 +182,13 @@ void MainWindow::CreateActions()
     copyAct_ = new QAction(copyIcon, tr("&Copy"), this);
     copyAct_->setShortcuts(QKeySequence::Copy);
     copyAct_->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
+                              "clipboard"));
     connect(copyAct_, &QAction::triggered, this, &MainWindow::Copy);
     editMenu->addAction(copyAct_);
     editToolBar->addAction(copyAct_);
 
     const QIcon pasteIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.svg"));
-    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
+    QAction* pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
     pasteAct->setShortcuts(QKeySequence::Paste);
     pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
@@ -201,7 +200,7 @@ void MainWindow::CreateActions()
 #endif // !QT_NO_CLIPBOARD
 
     // Undo&Redo
-    QToolBar *undoRedoToolBar = addToolBar(tr("Undo&Redo"));
+    QToolBar* undoRedoToolBar = addToolBar(tr("Undo&Redo"));
     undoRedoToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/action-undo.svg"));
@@ -221,34 +220,34 @@ void MainWindow::CreateActions()
     undoRedoToolBar->addAction(redoAct_);
 
     // Select menu.
-    QMenu *selectMenu = menuBar()->addMenu(tr("&Select"));
-    QToolBar *searchToolBar = addToolBar(tr("Select"));
+    QMenu* selectMenu = menuBar()->addMenu(tr("&Select"));
+    QToolBar* searchToolBar = addToolBar(tr("Select"));
     searchToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon findIcon = QIcon::fromTheme("select-search", QIcon(":/images/search.svg"));
-    QAction *findAct = new QAction(findIcon, tr("&Find..."), this);
+    QAction* findAct = new QAction(findIcon, tr("&Find..."), this);
     findAct->setShortcuts(QKeySequence::Find);
     findAct->setStatusTip(tr("Find"));
     connect(findAct, &QAction::triggered, this, &MainWindow::Find);
     selectMenu->addAction(findAct);
     searchToolBar->addAction(findAct);
 
-    QAction *findNextAct = new QAction(tr("&Find Next"), this);
+    QAction* findNextAct = new QAction(tr("&Find Next"), this);
     findNextAct->setShortcuts(QKeySequence::FindNext);
     findNextAct->setStatusTip(tr("Find next"));
     connect(findNextAct, &QAction::triggered, this, &MainWindow::FindNext);
     selectMenu->addAction(findNextAct);
 
-    QAction *findPreviousAct = new QAction(tr("&Find Previous"), this);
+    QAction* findPreviousAct = new QAction(tr("&Find Previous"), this);
     findPreviousAct->setShortcuts(QKeySequence::FindPrevious);
     findPreviousAct->setStatusTip(tr("Find previous"));
     connect(findPreviousAct, &QAction::triggered, this, &MainWindow::FindPrevious);
     selectMenu->addAction(findPreviousAct);
 
     const QIcon replaceIcon = QIcon::fromTheme("select-replace", QIcon(":/images/replace.svg"));
-    QAction *replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);
+    QAction* replaceAct = new QAction(replaceIcon, tr("&Replace..."), this);
     auto replaceKeySeq = QKeySequence(Qt::CTRL + Qt::Key_H);
-    replaceAct->setShortcut(replaceKeySeq);  // QKeySequence::Replace
+    replaceAct->setShortcut(replaceKeySeq); // QKeySequence::Replace
     replaceAct->setStatusTip(tr("Replace"));
     connect(replaceAct, &QAction::triggered, this, &MainWindow::Replace);
     selectMenu->addAction(replaceAct);
@@ -257,8 +256,8 @@ void MainWindow::CreateActions()
     selectMenu->addSeparator();
 
     const QIcon gotoLineIcon = QIcon::fromTheme("select-got-line", QIcon(":/images/goto-line.svg"));
-    QAction *gotoLineAct = new QAction(gotoLineIcon, tr("&Go to Line..."), this);
-    auto gotoLineKeySeq = QKeySequence(Qt::CTRL + Qt::Key_G);  // QKeySequence(tr("F3, Ctrl+G"))
+    QAction* gotoLineAct = new QAction(gotoLineIcon, tr("&Go to Line..."), this);
+    auto gotoLineKeySeq = QKeySequence(Qt::CTRL + Qt::Key_G); // QKeySequence(tr("F3, Ctrl+G"))
     gotoLineAct->setShortcut(gotoLineKeySeq);
     gotoLineAct->setStatusTip(tr("GotoLine"));
     connect(gotoLineAct, &QAction::triggered, this, &MainWindow::GotoLine);
@@ -266,7 +265,7 @@ void MainWindow::CreateActions()
     searchToolBar->addAction(gotoLineAct);
 
     const QIcon selectAllIcon = QIcon::fromTheme("select-all-lines", QIcon(":/images/select-all.svg"));
-    QAction *selectAllAct = new QAction(selectAllIcon, tr("&Select All Lines"), this);
+    QAction* selectAllAct = new QAction(selectAllIcon, tr("&Select All Lines"), this);
     selectAllAct->setShortcuts(QKeySequence::SelectAll);
     selectAllAct->setStatusTip(tr("SelectAll"));
     connect(selectAllAct, &QAction::triggered, this, &MainWindow::SelectAll);
@@ -275,11 +274,11 @@ void MainWindow::CreateActions()
 
     selectMenu->addSeparator();
 
-    QToolBar *markToolBar = addToolBar(tr("Mark"));
+    QToolBar* markToolBar = addToolBar(tr("Mark"));
     markToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon markIcon = QIcon::fromTheme("select-mark", QIcon(":/images/highlighter.svg"));
-    QAction *markAct = new QAction(markIcon, tr("&Mark or Unmark"), this);
+    QAction* markAct = new QAction(markIcon, tr("&Mark or Unmark"), this);
     auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
     markAct->setShortcut(markKeySeq);
     markAct->setStatusTip(tr("Mark & Unmack"));
@@ -288,7 +287,7 @@ void MainWindow::CreateActions()
     markToolBar->addAction(markAct);
 
     const QIcon unmarkAllIcon = QIcon::fromTheme("select-unmark-all", QIcon(":/images/eraser.svg"));
-    QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
+    QAction* unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
     auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
     unmarkAllAct->setShortcut(unmarkAllKeySeq);
     unmarkAllAct->setStatusTip(tr("Mark"));
@@ -298,11 +297,11 @@ void MainWindow::CreateActions()
 
     selectMenu->addSeparator();
 
-    QToolBar *stepToolBar = addToolBar(tr("Step"));
+    QToolBar* stepToolBar = addToolBar(tr("Step"));
     stepToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon stepBackIcon = QIcon::fromTheme("step-back", QIcon(":/images/arrow-thick-to-left.svg"));
-    QAction *stepBackAct = new QAction(stepBackIcon, tr("&Step Back"), this);
+    QAction* stepBackAct = new QAction(stepBackIcon, tr("&Step Back"), this);
     auto stepBackSeq = QKeySequence(Qt::ALT + Qt::Key_Left);
     stepBackAct->setShortcut(stepBackSeq);
     stepBackAct->setStatusTip(tr("Step back"));
@@ -311,7 +310,7 @@ void MainWindow::CreateActions()
     stepToolBar->addAction(stepBackAct);
 
     const QIcon stepForwardIcon = QIcon::fromTheme("step-forward", QIcon(":/images/arrow-thick-to-right.svg"));
-    QAction *stepForwardAct = new QAction(stepForwardIcon, tr("&Step Forward"), this);
+    QAction* stepForwardAct = new QAction(stepForwardIcon, tr("&Step Forward"), this);
     auto stepForwardSeq = QKeySequence(Qt::ALT + Qt::Key_Right);
     stepForwardAct->setShortcut(stepForwardSeq);
     stepForwardAct->setStatusTip(tr("Step forward"));
@@ -320,19 +319,19 @@ void MainWindow::CreateActions()
     stepToolBar->addAction(stepForwardAct);
 
     // View menu.
-    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-    QToolBar *viewToolBar = addToolBar(tr("View"));
+    QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
+    QToolBar* viewToolBar = addToolBar(tr("View"));
     viewToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon zoomInIcon = QIcon::fromTheme("view-zoomin", QIcon(":/images/zoom-in.svg"));
-    QAction *zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
+    QAction* zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
     zoomInAct->setStatusTip(tr("ZoomIn"));
     connect(zoomInAct, &QAction::triggered, this, &MainWindow::ZoomIn);
     viewMenu->addAction(zoomInAct);
     viewToolBar->addAction(zoomInAct);
 
     const QIcon zoomOutIcon = QIcon::fromTheme("view-zoomout", QIcon(":/images/zoom-out.svg"));
-    QAction *zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
+    QAction* zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
     zoomOutAct->setStatusTip(tr("ZoomOut"));
     connect(zoomOutAct, &QAction::triggered, this, &MainWindow::ZoomOut);
     viewMenu->addAction(zoomOutAct);
@@ -341,7 +340,7 @@ void MainWindow::CreateActions()
     viewMenu->addSeparator();
 
     const QIcon wrapTextIcon = QIcon::fromTheme("view-wrap-text", QIcon(":/images/wrap-text.svg"));
-    QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
+    QAction* wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
     wrapTextAct->setStatusTip(tr("WrapText"));
     wrapTextAct->setCheckable(true);
     wrapTextAct->setChecked(shouldWrapText_);
@@ -350,7 +349,7 @@ void MainWindow::CreateActions()
     viewToolBar->addAction(wrapTextAct);
 
     const QIcon showAllCharsIcon = QIcon::fromTheme("view-show-chars", QIcon(":/images/show-all-chars.svg"));
-    QAction *showAllCharsAct = new QAction(showAllCharsIcon, tr("Show All Chars"), this);
+    QAction* showAllCharsAct = new QAction(showAllCharsIcon, tr("Show All Chars"), this);
     showAllCharsAct->setStatusTip(tr("ShowSpecialChars"));
     showAllCharsAct->setCheckable(true);
     showAllCharsAct->setChecked(specialCharsVisible_);
@@ -360,11 +359,11 @@ void MainWindow::CreateActions()
 
     viewMenu->addSeparator();
 
-    QToolBar *viewToolBar2 = addToolBar(tr("View addin"));
+    QToolBar* viewToolBar2 = addToolBar(tr("View addin"));
     viewToolBar2->setStyleSheet(toolBarStyle);
 
     const QIcon showDirIcon = QIcon::fromTheme("view-show-dir", QIcon(":/images/folder.svg"));
-    QAction *showDirAct = new QAction(showDirIcon, tr("Show Explorer Window"), this);
+    QAction* showDirAct = new QAction(showDirIcon, tr("Show Explorer Window"), this);
     showDirAct->setStatusTip(tr("ShowExplorerWindow"));
     showDirAct->setCheckable(true);
     showDirAct->setChecked(explorerVisible_);
@@ -373,7 +372,7 @@ void MainWindow::CreateActions()
     viewToolBar2->addAction(showDirAct);
 
     const QIcon showOutlineIcon = QIcon::fromTheme("view-show-outline", QIcon(":/images/brackets-contain.svg"));
-    QAction *showOutlineAct = new QAction(showOutlineIcon, tr("Show Outline Window"), this);
+    QAction* showOutlineAct = new QAction(showOutlineIcon, tr("Show Outline Window"), this);
     showOutlineAct->setStatusTip(tr("ShowOutlineWindow"));
     showOutlineAct->setCheckable(true);
     showOutlineAct->setChecked(outlineVisible_);
@@ -382,7 +381,7 @@ void MainWindow::CreateActions()
     viewToolBar2->addAction(showOutlineAct);
 
     const QIcon showHierarchyIcon = QIcon::fromTheme("view-show-hierarchy", QIcon(":/images/sitemap.svg"));
-    QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
+    QAction* showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
     showHierarchyAct->setStatusTip(tr("ShowHierarchyWindow"));
     showHierarchyAct->setCheckable(true);
     showHierarchyAct->setChecked(outlineVisible_);
@@ -391,12 +390,12 @@ void MainWindow::CreateActions()
     viewToolBar2->addAction(showHierarchyAct);
 
     // Terminal menu.
-    QMenu *terminalMenu = menuBar()->addMenu(tr("&Terminal"));
-    QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
+    QMenu* terminalMenu = menuBar()->addMenu(tr("&Terminal"));
+    QToolBar* terminalToolBar = addToolBar(tr("Terminal"));
     terminalToolBar->setStyleSheet(toolBarStyle);
 
     const QIcon openSshIcon = QIcon::fromTheme("term-open-ssh", QIcon(":/images/terminal.svg"));
-    QAction *openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
+    QAction* openSshAct = new QAction(openSshIcon, tr("Open SSH"), this);
     openSshAct->setStatusTip(tr("Open SSH"));
     connect(openSshAct, &QAction::triggered, this, []() {
         (new OpenTerminalDialog(&MainWindow::Instance()))->show();
@@ -406,8 +405,8 @@ void MainWindow::CreateActions()
     terminalToolBar->addAction(openSshAct);
 
     // Help menu.
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
+    QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
+    QAction* aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
     aboutAct->setStatusTip(tr("Show the application's About box"));
 
 #ifndef QT_NO_CLIPBOARD
@@ -418,13 +417,9 @@ void MainWindow::CreateActions()
 #endif // !QT_NO_CLIPBOARD
 }
 
-void MainWindow::HandleCurrentTabChanged(int index)
-{
-    qDebug() << "MainWindow::tabIndexChanged, " << index;
-}
+void MainWindow::HandleCurrentTabChanged(int index) { qDebug() << "MainWindow::tabIndexChanged, " << index; }
 
-void MainWindow::ShowSearchDockView()
-{
+void MainWindow::ShowSearchDockView() {
     if (!searchDockView_->isVisible()) {
         qDebug() << "Search Dock invisible";
         searchDockView_->show();
@@ -433,14 +428,14 @@ void MainWindow::ShowSearchDockView()
     }
 }
 
-DockView *MainWindow::CreateSearchDockView()
-{
+DockView* MainWindow::CreateSearchDockView() {
     if (searchDockView_ == nullptr) {
         searchDockView_ = new DockView(this);
     }
     searchDockView_->setWindowTitle(tr("Search result:"));
-//    searchDockView_->setFont(QFont("Consolas", 11));
-    searchDockView_->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
+    //    searchDockView_->setFont(QFont("Consolas", 11));
+    searchDockView_->setFeatures(QDockWidget::DockWidgetClosable |
+                                 QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::BottomDockWidgetArea, searchDockView_);
     return searchDockView_;
 }
@@ -452,7 +447,7 @@ bool MainWindow::IsExplorerDockViewShowing() {
     return explorerDockView_->isVisible();
 }
 
-void MainWindow::SetExplorerDockViewPosition(const QString &path) {
+void MainWindow::SetExplorerDockViewPosition(const QString& path) {
     if (explorerDockView_ == nullptr) {
         return;
     }
@@ -463,8 +458,7 @@ void MainWindow::SetExplorerDockViewPosition(const QString &path) {
     tree->GotoPathPosition(path);
 }
 
-void MainWindow::ShowExplorerDockView()
-{
+void MainWindow::ShowExplorerDockView() {
     if (explorerDockView_ == nullptr) {
         auto dir = CreateExplorerDockView();
         auto treeView = new ExplorerTreeView(this);
@@ -474,8 +468,7 @@ void MainWindow::ShowExplorerDockView()
     explorerDockView_->show();
 }
 
-void MainWindow::HideExplorerDockView()
-{
+void MainWindow::HideExplorerDockView() {
     if (explorerDockView_ == nullptr) {
         auto dir = CreateExplorerDockView();
         auto treeView = new ExplorerTreeView(this);
@@ -484,8 +477,7 @@ void MainWindow::HideExplorerDockView()
     explorerDockView_->hide();
 }
 
-DockView *MainWindow::CreateExplorerDockView()
-{
+DockView* MainWindow::CreateExplorerDockView() {
     if (explorerDockView_ == nullptr) {
         explorerDockView_ = new DockView(this);
         explorerDockView_->setSavedMaxWidth(explorerDockView_->maximumWidth());
@@ -493,8 +485,9 @@ DockView *MainWindow::CreateExplorerDockView()
         explorerDockView_->setMinimumWidth(0);
     }
     explorerDockView_->setWindowTitle(tr("EXPLORER"));
-//    explorerDockView_->setFont(QFont("Consolas", 11));
-    explorerDockView_->setFeatures(/*QDockWidget::DockWidgetClosable | */QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
+    //    explorerDockView_->setFont(QFont("Consolas", 11));
+    explorerDockView_->setFeatures(
+        /*QDockWidget::DockWidgetClosable | */ QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, explorerDockView_);
     return explorerDockView_;
 }
@@ -520,46 +513,42 @@ void MainWindow::SetOutlineDockViewPosition(int cursorPos) {
 
     try {
         // TODO: Why setSelectionMode(QAbstractItemView::SingleSelection) not work.
-        const auto &selectedItems = list->selectedItems();
-        for (const auto &item : selectedItems) {
+        const auto& selectedItems = list->selectedItems();
+        for (const auto& item : selectedItems) {
             item->setSelected(false);
         }
 
         // Select the item relevant to the text cursor.
         auto index = list->GetIndexByCursorPos(cursorPos);
         list->topLevelItem(index)->setSelected(true);
-    } catch (const std::out_of_range &e) {
+    } catch (const std::out_of_range& e) {
         qDebug() << "Out of range: " << cursorPos;
         return;
     }
 }
 
-void MainWindow::UpdateOutlineDockView(OutlineList *list)
-{
+void MainWindow::UpdateOutlineDockView(OutlineList* list) {
     if (!IsOutlineDockViewShowing()) {
         return;
     }
     outlineDockView_->setWidget(list);
 }
 
-void MainWindow::ShowOutlineDockView()
-{
+void MainWindow::ShowOutlineDockView() {
     if (outlineDockView_ == nullptr) {
         CreateOutlineDockView();
     }
     outlineDockView_->show();
 }
 
-void MainWindow::HideOutlineDockView()
-{
+void MainWindow::HideOutlineDockView() {
     if (outlineDockView_ == nullptr) {
         CreateOutlineDockView();
     }
     outlineDockView_->hide();
 }
 
-DockView *MainWindow::CreateOutlineDockView()
-{
+DockView* MainWindow::CreateOutlineDockView() {
     if (outlineDockView_ == nullptr) {
         outlineDockView_ = new DockView(this);
         outlineDockView_->setSavedMaxWidth(outlineDockView_->maximumWidth());
@@ -567,8 +556,9 @@ DockView *MainWindow::CreateOutlineDockView()
         outlineDockView_->setMinimumWidth(0);
     }
     outlineDockView_->setWindowTitle(tr("OUTLINE"));
-//    overviewDockView_->setFont(QFont("Consolas", 11));
-    outlineDockView_->setFeatures(/*QDockWidget::DockWidgetClosable | */QDockWidget::DockWidgetMovable/* | QDockWidget::DockWidgetFloatable*/);
+    //    overviewDockView_->setFont(QFont("Consolas", 11));
+    outlineDockView_->setFeatures(
+        /*QDockWidget::DockWidgetClosable | */ QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, outlineDockView_);
     return outlineDockView_;
 }
@@ -580,8 +570,7 @@ bool MainWindow::IsHierarchyDockViewShowing() {
     return hierarchyDockView_->isVisible();
 }
 
-void MainWindow::UpdateHierarchyDockView(FunctionHierarchy *view)
-{
+void MainWindow::UpdateHierarchyDockView(FunctionHierarchy* view) {
     if (hierarchyDockView_ == nullptr) {
         CreateHierarchyDockView();
     }
@@ -589,23 +578,20 @@ void MainWindow::UpdateHierarchyDockView(FunctionHierarchy *view)
     ShowHierarchyDockView();
 }
 
-void MainWindow::ShowHierarchyDockView()
-{
+void MainWindow::ShowHierarchyDockView() {
     if (hierarchyDockView_ != nullptr && !hierarchyDockView_->isVisible()) {
         hierarchyDockView_->show();
     }
 }
 
-void MainWindow::HideHierarchyDockView()
-{
+void MainWindow::HideHierarchyDockView() {
     if (hierarchyDockView_ != nullptr && hierarchyDockView_->isVisible()) {
         hierarchyDockView_->hide();
     }
     HideNodeHierarchyDockView();
 }
 
-DockView *MainWindow::CreateHierarchyDockView()
-{
+DockView* MainWindow::CreateHierarchyDockView() {
     if (hierarchyDockView_ == nullptr) {
         hierarchyDockView_ = new DockView(this);
         hierarchyDockView_->setSavedMaxWidth(hierarchyDockView_->maximumWidth());
@@ -625,8 +611,7 @@ bool MainWindow::IsNodeHierarchyDockViewShowing() {
     return nodeHierarchyDockView_->isVisible();
 }
 
-void MainWindow::UpdateNodeHierarchyDockView(AnfNodeHierarchy *view)
-{
+void MainWindow::UpdateNodeHierarchyDockView(AnfNodeHierarchy* view) {
     if (nodeHierarchyDockView_ == nullptr) {
         CreateNodeHierarchyDockView();
     }
@@ -640,22 +625,19 @@ void MainWindow::UpdateNodeHierarchyDockView(AnfNodeHierarchy *view)
     ShowNodeHierarchyDockView();
 }
 
-void MainWindow::ShowNodeHierarchyDockView()
-{
+void MainWindow::ShowNodeHierarchyDockView() {
     if (nodeHierarchyDockView_ != nullptr && !nodeHierarchyDockView_->isVisible()) {
         nodeHierarchyDockView_->show();
     }
 }
 
-void MainWindow::HideNodeHierarchyDockView()
-{
+void MainWindow::HideNodeHierarchyDockView() {
     if (nodeHierarchyDockView_ != nullptr && nodeHierarchyDockView_->isVisible()) {
         nodeHierarchyDockView_->hide();
     }
 }
 
-DockView *MainWindow::CreateNodeHierarchyDockView()
-{
+DockView* MainWindow::CreateNodeHierarchyDockView() {
     if (nodeHierarchyDockView_ == nullptr) {
         nodeHierarchyDockView_ = new DockView(this);
         nodeHierarchyDockView_->setSavedMaxWidth(nodeHierarchyDockView_->maximumWidth());
@@ -668,17 +650,13 @@ DockView *MainWindow::CreateNodeHierarchyDockView()
     return nodeHierarchyDockView_;
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *event)
-{
+void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     qDebug() << "event: " << event->answerRect();
     event->acceptProposedAction();
 }
 
-void MainWindow::dropEvent(QDropEvent *event)
-{
-    qDebug() << "event: " << event->pos()
-             << ", " << event->mimeData()->text()
-             << ", " << event->mimeData()->urls()
+void MainWindow::dropEvent(QDropEvent* event) {
+    qDebug() << "event: " << event->pos() << ", " << event->mimeData()->text() << ", " << event->mimeData()->urls()
              << ", " << event->mimeData()->html();
     auto urls = event->mimeData()->urls();
     if (!urls.isEmpty()) {
@@ -687,8 +665,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     }
 }
 
-void MainWindow::showEvent(QShowEvent *event)
-{
+void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
     if (!init_) {
         init_ = true;
@@ -700,52 +677,40 @@ void MainWindow::showEvent(QShowEvent *event)
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    tabView_->AutoStore();
-}
+void MainWindow::closeEvent(QCloseEvent* event) { tabView_->AutoStore(); }
 
-bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
+bool MainWindow::IsLeftOrRightSeparator(const QPoint& pos) {
     constexpr auto distance_threhold = 3;
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
 }
 
-Searcher *MainWindow::GetSearcher()
-{
+Searcher* MainWindow::GetSearcher() {
     if (searcher_ == nullptr) {
         searcher_ = new Searcher();
     }
     return searcher_;
 }
 
-SearchResultList *MainWindow::GetSearchResultList()
-{
+SearchResultList* MainWindow::GetSearchResultList() {
     if (searchResultList_ == nullptr) {
         searchResultList_ = new SearchResultList(tabView());
         auto dockView = MainWindow::Instance().CreateSearchDockView();
         dockView->setWidget(searchResultList_);
-//        searchResultList_->setParent(dockView);
+        //        searchResultList_->setParent(dockView);
         searchResultList_->setFont(QFont("Consolas", 11));
     }
     return searchResultList_;
 }
 
-QString MainWindow::searchingString() const
-{
-    return searchingString_;
-}
+QString MainWindow::searchingString() const { return searchingString_; }
 
-void MainWindow::setSearchingString(const QString &searchingString)
-{
-    searchingString_ = searchingString;
-}
+void MainWindow::setSearchingString(const QString& searchingString) { searchingString_ = searchingString; }
 
-bool MainWindow::eventFilter(QObject *obj, QEvent *event)
-{
+bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
     qDebug() << "event: " << event->type() << ", obj: " << obj;
     const auto editView = this->editView();
     if (event->type() == QEvent::HoverMove) {
-        QHoverEvent *hoverEvent = static_cast<QHoverEvent*>(event);
+        QHoverEvent* hoverEvent = static_cast<QHoverEvent*>(event);
         if (IsLeftOrRightSeparator(hoverEvent->pos())) {
             setCursor(Qt::SplitHCursor);
         } else {
@@ -778,8 +743,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         auto mouseEvent = static_cast<QMouseEvent*>(event);
         if (moveSeparatorToHide_) {
             // Set both minimum and maxmum width to 0 to hide the widget.
-            if ((explorerDockView_ != nullptr && explorerDockView_->rect().contains(explorerDockView_->mapFrom(this, mouseEvent->pos()))) ||
-                    (outlineDockView_ != nullptr && outlineDockView_->rect().contains(outlineDockView_->mapFrom(this, mouseEvent->pos())))) {
+            if ((explorerDockView_ != nullptr &&
+                 explorerDockView_->rect().contains(explorerDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                (outlineDockView_ != nullptr &&
+                 outlineDockView_->rect().contains(outlineDockView_->mapFrom(this, mouseEvent->pos())))) {
                 if (explorerDockView_ != nullptr) {
                     explorerDockView_->setMaximumWidth(0);
                 }
@@ -787,8 +754,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     outlineDockView_->setMaximumWidth(0);
                 }
             }
-            if ((hierarchyDockView_ != nullptr && hierarchyDockView_->rect().contains(hierarchyDockView_->mapFrom(this, mouseEvent->pos()))) ||
-                    (nodeHierarchyDockView_ != nullptr && nodeHierarchyDockView_->rect().contains(nodeHierarchyDockView_->mapFrom(this, mouseEvent->pos())))) {
+            if ((hierarchyDockView_ != nullptr &&
+                 hierarchyDockView_->rect().contains(hierarchyDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                (nodeHierarchyDockView_ != nullptr &&
+                 nodeHierarchyDockView_->rect().contains(nodeHierarchyDockView_->mapFrom(this, mouseEvent->pos())))) {
                 if (hierarchyDockView_ != nullptr) {
                     hierarchyDockView_->setMaximumWidth(0);
                 }
@@ -803,34 +772,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 void MainWindow::OpenRecentFile() {
-    QAction *action = qobject_cast<QAction*>(sender());
+    QAction* action = qobject_cast<QAction*>(sender());
     if (action != nullptr) {
         OpenWith(action->data().toString());
     }
 }
 
-void MainWindow::NewFile()
-{
-    tabView_->NewFile();
-}
+void MainWindow::NewFile() { tabView_->NewFile(); }
 
-void MainWindow::Open()
-{
-    tabView_->OpenFile();
-}
+void MainWindow::Open() { tabView_->OpenFile(); }
 
-void MainWindow::OpenWith(const QString &filePath)
-{
-    tabView_->OpenFile(filePath);
-}
+void MainWindow::OpenWith(const QString& filePath) { tabView_->OpenFile(filePath); }
 
-bool MainWindow::Save()
-{
-    return tabView_->ActionSave();
-}
+bool MainWindow::Save() { return tabView_->ActionSave(); }
 
-bool MainWindow::Find()
-{
+bool MainWindow::Find() {
     qDebug() << "MainWindow::find()";
     if (searchDialog_ == nullptr) {
         searchDialog_ = new SearchDialog(this);
@@ -839,8 +795,7 @@ bool MainWindow::Find()
     return true;
 }
 
-bool MainWindow::FindNext()
-{
+bool MainWindow::FindNext() {
     if (searchingString().isEmpty()) {
         return false;
     }
@@ -852,8 +807,7 @@ bool MainWindow::FindNext()
     return false;
 }
 
-bool MainWindow::FindPrevious()
-{
+bool MainWindow::FindPrevious() {
     if (searchingString().isEmpty()) {
         return false;
     }
@@ -865,8 +819,7 @@ bool MainWindow::FindPrevious()
     return false;
 }
 
-bool MainWindow::Replace()
-{
+bool MainWindow::Replace() {
     qDebug() << "MainWindow::find()";
     if (searchDialog_ == nullptr) {
         searchDialog_ = new SearchDialog(this);
@@ -875,11 +828,10 @@ bool MainWindow::Replace()
     return true;
 }
 
-bool MainWindow::MarkUnmarkCursorText()
-{
+bool MainWindow::MarkUnmarkCursorText() {
     auto editView = this->editView();
     if (editView != nullptr) {
-        const auto &text = editView->GetCursorText();
+        const auto& text = editView->GetCursorText();
         if (!editView->RemoveMarkText(text)) {
             editView->AddMarkText(text);
         }
@@ -889,8 +841,7 @@ bool MainWindow::MarkUnmarkCursorText()
     return false;
 }
 
-bool MainWindow::UnmarkAll()
-{
+bool MainWindow::UnmarkAll() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->ClearMarkTexts();
@@ -900,8 +851,7 @@ bool MainWindow::UnmarkAll()
     return false;
 }
 
-bool MainWindow::StepBack()
-{
+bool MainWindow::StepBack() {
     if (tabView()->backwardSteps().size() <= 1) {
         return false;
     }
@@ -922,8 +872,7 @@ bool MainWindow::StepBack()
     return true;
 }
 
-bool MainWindow::StepForward()
-{
+bool MainWindow::StepForward() {
     if (tabView()->forwardSteps().isEmpty()) {
         return false;
     }
@@ -944,8 +893,7 @@ bool MainWindow::StepForward()
     return true;
 }
 
-bool MainWindow::ZoomIn()
-{
+bool MainWindow::ZoomIn() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->ZoomIn();
@@ -959,8 +907,7 @@ bool MainWindow::ZoomIn()
     return false;
 }
 
-bool MainWindow::ZoomOut()
-{
+bool MainWindow::ZoomOut() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->ZoomOut();
@@ -974,56 +921,42 @@ bool MainWindow::ZoomOut()
     return false;
 }
 
-bool MainWindow::SaveAll()
-{
-    return false;
+bool MainWindow::SaveAll() { return false; }
+
+bool MainWindow::SaveAs() { return tabView_->ActionSaveAs(); }
+
+void MainWindow::About() {
+    QMessageBox::about(this, tr("About ") + Constants::kAppName,
+                       tr("<font color=\"lightgray\"><b>") + Constants::kAppName + tr("<br/>Version: ") +
+                           Constants::kVersionStr + tr("</b><br/>") + tr("----------<br/>The <b>") +
+                           Constants::kAppName +
+                           tr("</b> is a compact text editor "
+                              "with common functions, such as search, replace, "
+                              "mark, and simple syntax highlighting.<br/><br/>"
+                              "<b>Author: <a href=\"mailto:zhang-qh@hotmail.com\">Q</a></b></font>"));
 }
 
-bool MainWindow::SaveAs()
-{
-    return tabView_->ActionSaveAs();
-}
-
-void MainWindow::About()
-{
-   QMessageBox::about(this, tr("About ") + Constants::kAppName,
-                      tr("<font color=\"lightgray\"><b>") + Constants::kAppName +
-                      tr("<br/>Version: ") + Constants::kVersionStr + tr("</b><br/>") +
-                      tr("----------<br/>The <b>") + Constants::kAppName +
-                      tr("</b> is a compact text editor "
-                      "with common functions, such as search, replace, "
-                      "mark, and simple syntax highlighting.<br/><br/>"
-                      "<b>Author: <a href=\"mailto:zhang-qh@hotmail.com\">Q</a></b></font>"));
-}
-
-void MainWindow::ReadSettings()
-{
+void MainWindow::ReadSettings() {
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
         const QRect availableGeometry = screen()->availableGeometry();
         resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
-        move((availableGeometry.width() - width()) / 2,
-             (availableGeometry.height() - height()) / 2);
+        move((availableGeometry.width() - width()) / 2, (availableGeometry.height() - height()) / 2);
     } else {
         restoreGeometry(geometry);
     }
 }
 
-void MainWindow::WriteSettings()
-{
+void MainWindow::WriteSettings() {
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     settings.setValue("geometry", saveGeometry());
 }
 
-bool MainWindow::MaybeSave()
-{
-    return true;
-}
+bool MainWindow::MaybeSave() { return true; }
 
 #ifndef QT_NO_SESSIONMANAGER
-void MainWindow::HandleCommitData(QSessionManager &manager)
-{
+void MainWindow::HandleCommitData(QSessionManager& manager) {
     if (manager.allowsInteraction()) {
         manager.cancel();
     } else {
@@ -1032,14 +965,16 @@ void MainWindow::HandleCommitData(QSessionManager &manager)
 }
 #endif
 
-QString GetToolBarQss(const QString &image_default, const QString &image_enable)
-{
+QString GetToolBarQss(const QString& image_default, const QString& image_enable) {
     QStringList qss;
     qss.append(QString("QToolBar { background-color: rgb(28, 28, 28); image: %1; }").arg(image_default));
     qss.append(QString("QToolBar QToolButton { border: 1px solid transparent; background-color: rgb(28, 28, 28); }"));
-    qss.append(QString("QToolBar QToolButton:hover { border: 1px solid transparent; background-color: rgb(60, 60, 90); }"));
-    qss.append(QString("QToolBar QToolButton:enabled { border: 1px solid rgb(80, 80, 100); image: %1; }").arg(image_enable));
-    qss.append(QString("QToolBar QToolButton:pressed { border: 1px solid rgb(23, 105, 170); background-color: rgb(28, 28, 28);}"));
+    qss.append(
+        QString("QToolBar QToolButton:hover { border: 1px solid transparent; background-color: rgb(60, 60, 90); }"));
+    qss.append(
+        QString("QToolBar QToolButton:enabled { border: 1px solid rgb(80, 80, 100); image: %1; }").arg(image_enable));
+    qss.append(QString(
+        "QToolBar QToolButton:pressed { border: 1px solid rgb(23, 105, 170); background-color: rgb(28, 28, 28);}"));
     return qss.join("");
 }
 
@@ -1070,7 +1005,7 @@ void MainWindow::UpdateRecentFilesMenu() {
 
     auto clearRecentFilesAction = new QAction(this);
     clearRecentFilesAction->setText(tr("Clear Recently Opened"));
-    connect(clearRecentFilesAction, &QAction::triggered, this, [this](){
+    connect(clearRecentFilesAction, &QAction::triggered, this, [this]() {
         recentFileActions_.clear();
         recentFilesMenu_->clear();
         recentFilesMenu_->setEnabled(false);
@@ -1080,8 +1015,7 @@ void MainWindow::UpdateRecentFilesMenu() {
     recentFileActions_.append(clearRecentFilesAction);
 }
 
-void MainWindow::SelectAll()
-{
+void MainWindow::SelectAll() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->selectAll();
@@ -1093,13 +1027,9 @@ void MainWindow::SelectAll()
     }
 }
 
-void MainWindow::GotoLine()
-{
-    (new GotoLineDialog(this))->show();
-}
+void MainWindow::GotoLine() { (new GotoLineDialog(this))->show(); }
 
-void MainWindow::SyncWrapTextState()
-{
+void MainWindow::SyncWrapTextState() {
     QPlainTextEdit::LineWrapMode mode;
     if (shouldWrapText_) {
         mode = QPlainTextEdit::LineWrapMode::WidgetWidth;
@@ -1115,20 +1045,17 @@ void MainWindow::SyncWrapTextState()
     }
 }
 
-void MainWindow::SwitchWrapText()
-{
+void MainWindow::SwitchWrapText() {
     shouldWrapText_ = !shouldWrapText_;
     SyncWrapTextState();
 
     Settings().Set("view", "wraptext", shouldWrapText_);
 }
 
-void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow)
-{
+void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow) {
     QTextOption textOption;
     if (shouldShow) {
-        textOption.setFlags(QTextOption::ShowTabsAndSpaces |
-                            QTextOption::ShowLineAndParagraphSeparators |
+        textOption.setFlags(QTextOption::ShowTabsAndSpaces | QTextOption::ShowLineAndParagraphSeparators |
                             QTextOption::ShowDocumentTerminator);
     } else {
         textOption.setFlags(0);
@@ -1143,16 +1070,14 @@ void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow)
     }
 }
 
-void MainWindow::SwitchSpecialCharsVisible()
-{
+void MainWindow::SwitchSpecialCharsVisible() {
     specialCharsVisible_ = !specialCharsVisible_;
     SyncShowSpecialCharsVisible(specialCharsVisible_);
 
     Settings().Set("view", "allcharsvisible", specialCharsVisible_);
 }
 
-void MainWindow::SwitchExplorerWindowVisible()
-{
+void MainWindow::SwitchExplorerWindowVisible() {
     if (editView() == nullptr) {
         return;
     }
@@ -1171,8 +1096,7 @@ void MainWindow::SwitchExplorerWindowVisible()
     Settings().Set("view", "explorervisible", explorerVisible_);
 }
 
-void MainWindow::SwitchOutlineWindowVisible()
-{
+void MainWindow::SwitchOutlineWindowVisible() {
     if (editView() == nullptr) {
         return;
     }
@@ -1191,8 +1115,7 @@ void MainWindow::SwitchOutlineWindowVisible()
     Settings().Set("view", "outlinevisible", outlineVisible_);
 }
 
-void MainWindow::SwitchHierarchyWindowVisible()
-{
+void MainWindow::SwitchHierarchyWindowVisible() {
     if (editView() == nullptr) {
         return;
     }
@@ -1211,8 +1134,7 @@ void MainWindow::SwitchHierarchyWindowVisible()
     Settings().Set("view", "hierarchyvisible", hierarchyVisible_);
 }
 
-void MainWindow::Copy()
-{
+void MainWindow::Copy() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->copy();
@@ -1224,8 +1146,7 @@ void MainWindow::Copy()
     }
 }
 
-void MainWindow::Cut()
-{
+void MainWindow::Cut() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->cut();
@@ -1237,8 +1158,7 @@ void MainWindow::Cut()
     }
 }
 
-void MainWindow::Paste()
-{
+void MainWindow::Paste() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->paste();
@@ -1250,14 +1170,12 @@ void MainWindow::Paste()
     }
 }
 
-void MainWindow::SetCopyAvailable(bool avail)
-{
+void MainWindow::SetCopyAvailable(bool avail) {
     copyAct_->setEnabled(avail);
     cutAct_->setEnabled(avail);
 }
 
-void MainWindow::Undo()
-{
+void MainWindow::Undo() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->undo();
@@ -1269,8 +1187,7 @@ void MainWindow::Undo()
     }
 }
 
-void MainWindow::Redo()
-{
+void MainWindow::Redo() {
     auto editView = this->editView();
     if (editView != nullptr) {
         editView->redo();
@@ -1282,19 +1199,12 @@ void MainWindow::Redo()
     }
 }
 
-void MainWindow::SetUndoAvailable(bool avail)
-{
-    undoAct_->setEnabled(avail);
-}
+void MainWindow::SetUndoAvailable(bool avail) { undoAct_->setEnabled(avail); }
 
-void MainWindow::SetRedoAvailable(bool avail)
-{
-    redoAct_->setEnabled(avail);
-}
+void MainWindow::SetRedoAvailable(bool avail) { redoAct_->setEnabled(avail); }
 
-void MainWindow::UpdateStatusBarFrequentInfo(const QString &ln, const QString &col, const QString &pos,
-                                             const QString &len, const QString &lines)
-{
+void MainWindow::UpdateStatusBarFrequentInfo(const QString& ln, const QString& col, const QString& pos,
+                                             const QString& len, const QString& lines) {
     line_->setText(ln);
     column_->setText(col);
     position_->setText(pos);
@@ -1303,9 +1213,8 @@ void MainWindow::UpdateStatusBarFrequentInfo(const QString &ln, const QString &c
     lines_->setText(lines);
 }
 
-void MainWindow::UpdateStatusBarRareInfo(const QString &newLineSeq, const QString &encodingSeq,
-                                         const QString &insertModeSeq)
-{
+void MainWindow::UpdateStatusBarRareInfo(const QString& newLineSeq, const QString& encodingSeq,
+                                         const QString& insertModeSeq) {
     qDebug() << "newLine: " << newLineSeq << ", encoding: " << encodingSeq << "/" << encoding_->currentIndex();
     newLineChar_->setCurrentIndex(newLineChar_->findText(newLineSeq));
     newLineChar_->ShrinkForPopup();
@@ -1317,16 +1226,15 @@ void MainWindow::UpdateStatusBarRareInfo(const QString &newLineSeq, const QStrin
     encoding_->ShrinkForChosen();
 }
 
-void MainWindow::CreateStatusBar()
-{
+void MainWindow::CreateStatusBar() {
     auto qss = "color: lightGray;"
                "background-color: rgb(54, 54, 54);";
     auto small_qss = "color: lightGray;"
                      "background-color: rgb(54, 54, 54);"
                      "padding-left: 20px;";
     auto normal_item_qss = "color: lightGray;"
-                            "background-color: rgb(54, 54, 54);"
-                            "min-width: 60px";
+                           "background-color: rgb(54, 54, 54);"
+                           "min-width: 60px";
     auto last_item_qss = "color: lightGray;"
                          "background-color: rgb(54, 54, 54);"
                          "min-width: 60px;"
@@ -1351,14 +1259,12 @@ void MainWindow::CreateStatusBar()
 
     // New line char.
     newLineChar_ = new ComboView(this);
-    newLineChar_->addItems({Constants::kFormatNewLineUnix,
-                            Constants::kFormatNewLineDos,
-                            Constants::kFormatNewLineMac});
+    newLineChar_->addItems({Constants::kFormatNewLineUnix, Constants::kFormatNewLineDos, Constants::kFormatNewLineMac});
     statusBar()->addPermanentWidget(newLineChar_);
     newLineChar_->ShrinkForPopup();
     newLineChar_->ShrinkForChosen();
     connect(newLineChar_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [=](int index){ HandleNewLineCharChanged(index); });
+            [=](int index) { HandleNewLineCharChanged(index); });
 
     // File encoding.
     encoding_ = new ComboView(this);
@@ -1367,26 +1273,25 @@ void MainWindow::CreateStatusBar()
     encoding_->ShrinkForPopup();
     encoding_->ShrinkForChosen();
     connect(encoding_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [=](int index){ HandleEncodingChanged(index); });
+            [=](int index) { HandleEncodingChanged(index); });
 
-    insertMode_ = new QLabel(tr("INS"), this);  // INS/OVR
+    insertMode_ = new QLabel(tr("INS"), this); // INS/OVR
     insertMode_->setStyleSheet(small_qss);
     statusBar()->addPermanentWidget(insertMode_);
 
     statusBar()->showMessage(tr("Ready"));
     statusBar()->setStyleSheet(qss);
-//    statusBar()->setStyleSheet("color: lightGray;" "background-color: black; border-color: rgb(0, 0, 0); border:1px solid lightGray;");
-//                               "QStatusBar::item{border: 0px}");
+    //    statusBar()->setStyleSheet("color: lightGray;" "background-color: black; border-color: rgb(0, 0, 0);
+    //    border:1px solid lightGray;");
+    //                               "QStatusBar::item{border: 0px}");
 }
 
-void MainWindow::HandleNewLineCharChanged(int index)
-{
+void MainWindow::HandleNewLineCharChanged(int index) {
     qDebug() << "index: " << index;
     newLineChar_->ShrinkForChosen();
 }
 
-void MainWindow::HandleEncodingChanged(int index)
-{
+void MainWindow::HandleEncodingChanged(int index) {
     qDebug() << "index: " << index;
     encoding_->ShrinkForChosen();
 
@@ -1414,4 +1319,4 @@ void MainWindow::HandleEncodingChanged(int index)
     }
     editView->ChangeFileEncoding(std::move(fileEncoding));
 }
-}  // namespace QEditor
+} // namespace QEditor

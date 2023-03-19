@@ -15,26 +15,21 @@
  */
 
 #include "GotoLineDialog.h"
-
-#include "ui_GotoLineDialog.h"
-
+#include "Logger.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include "Logger.h"
+#include "ui_GotoLineDialog.h"
 
 #ifdef Q_OS_WIN
 namespace WinTheme {
 extern bool IsDarkTheme();
 extern void SetDark_qApp();
 extern void SetDarkTitleBar(HWND hwnd);
-}
+} // namespace WinTheme
 #endif
 
 namespace QEditor {
-GotoLineDialog::GotoLineDialog(QWidget *parent) :
-    QDialog(parent),
-    ui_(new Ui::UIGotoLineDialog)
-{
+GotoLineDialog::GotoLineDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::UIGotoLineDialog) {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -44,17 +39,13 @@ GotoLineDialog::GotoLineDialog(QWidget *parent) :
     setWindowModality(Qt::WindowModal);
 }
 
-GotoLineDialog::~GotoLineDialog()
-{
-    delete ui_;
-}
+GotoLineDialog::~GotoLineDialog() { delete ui_; }
 
 EditView* GotoLineDialog::editView() { return MainWindow::Instance().editView(); }
 
 TabView* GotoLineDialog::tabView() { return MainWindow::Instance().tabView(); }
 
-void GotoLineDialog::showEvent(QShowEvent *)
-{
+void GotoLineDialog::showEvent(QShowEvent*) {
 #define FORCE_DARK_THEME
 #ifdef Q_OS_WIN
 #ifdef FORCE_DARK_THEME
@@ -69,8 +60,7 @@ void GotoLineDialog::showEvent(QShowEvent *)
     ui_->lineEditGotoLine->clear();
 }
 
-void GotoLineDialog::on_pushButtonOk_clicked()
-{
+void GotoLineDialog::on_pushButtonOk_clicked() {
     auto lineStr = ui_->lineEditGotoLine->text();
     int line = lineStr.toInt();
     if (line <= 0 || line > editView()->document()->blockCount()) {
@@ -81,8 +71,5 @@ void GotoLineDialog::on_pushButtonOk_clicked()
     close();
 }
 
-void GotoLineDialog::on_pushButtonCacel_clicked()
-{
-    hide();
-}
-}  // namespace QEditor
+void GotoLineDialog::on_pushButtonCacel_clicked() { hide(); }
+} // namespace QEditor

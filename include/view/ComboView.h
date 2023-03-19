@@ -21,11 +21,10 @@
 #include <QLineEdit>
 
 namespace QEditor {
-class ComboView : public QComboBox
-{
+class ComboView : public QComboBox {
     Q_OBJECT
 public:
-    ComboView(QWidget *parent = nullptr, bool fixed = true);
+    ComboView(QWidget* parent = nullptr, bool fixed = true);
     virtual ~ComboView() { delete lineEdit(); }
 
     void ShrinkForPopup();
@@ -38,6 +37,6 @@ private:
     bool fixed_{false};
     qreal maxWidth_{0};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // COMBOVIEW_H

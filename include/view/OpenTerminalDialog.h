@@ -1,20 +1,18 @@
 #ifndef OPENTERMINALDIALOG_H
 #define OPENTERMINALDIALOG_H
 
-#include <QDialog>
-
 #include "MainTabView.h"
+#include <QDialog>
 
 namespace Ui {
 class OpenTerminalDialog;
 }
 
 namespace QEditor {
-class OpenTerminalDialog : public QDialog
-{
+class OpenTerminalDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit OpenTerminalDialog(QWidget *parent = nullptr);
+    explicit OpenTerminalDialog(QWidget* parent = nullptr);
     ~OpenTerminalDialog();
 
     TabView* tabView();
@@ -24,8 +22,8 @@ private slots:
     void on_pushButtonCancel_clicked();
 
 private:
-    Ui::OpenTerminalDialog *ui_;
+    Ui::OpenTerminalDialog* ui_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // OPENTERMINALDIALOG_H

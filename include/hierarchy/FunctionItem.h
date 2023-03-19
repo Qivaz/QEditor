@@ -17,10 +17,9 @@
 #ifndef FUNCTIONITEM_H
 #define FUNCTIONITEM_H
 
+#include "NodeItem.h"
 #include <QGraphicsPixmapItem>
 #include <QVector>
-
-#include "NodeItem.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -33,18 +32,17 @@ namespace QEditor {
 class Arrow;
 class IParser;
 
-class FunctionItem : public NodeItem
-{
+class FunctionItem : public NodeItem {
 public:
-    FunctionItem(const QString &name, IParser *parser, NodeType diagramType,
-                 QMenu *contextMenu, QGraphicsItem *parent = nullptr);
+    FunctionItem(const QString& name, IParser* parser, NodeType diagramType, QMenu* contextMenu,
+                 QGraphicsItem* parent = nullptr);
 
 protected:
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
-    IParser *parser_{nullptr};
+    IParser* parser_{nullptr};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // FUNCTIONITEM_H

@@ -17,13 +17,11 @@
 #ifndef OUTLINELIST_H
 #define OUTLINELIST_H
 
+#include "IParser.h"
 #include <QTreeWidget>
 
-#include "IParser.h"
-
 namespace QEditor {
-class OverviewItem : public QTreeWidgetItem
-{
+class OverviewItem : public QTreeWidgetItem {
 public:
     OverviewItem(int num) : num_(num) {}
     int num() { return num_; }
@@ -32,18 +30,17 @@ private:
     int num_;
 };
 
-class OutlineList : public QTreeWidget
-{
+class OutlineList : public QTreeWidget {
 public:
-    OutlineList(IParser *parser);
+    OutlineList(IParser* parser);
 
-    void HandleItemClicked(QTreeWidgetItem *item, int column);
+    void HandleItemClicked(QTreeWidgetItem* item, int column);
 
     int GetIndexByCursorPos(int cursorPos);
 
 private:
-    IParser *parser_{nullptr};
+    IParser* parser_{nullptr};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // OUTLINELIST_H

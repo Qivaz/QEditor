@@ -15,15 +15,11 @@
  */
 
 #include "FunctionHierarchy.h"
-
+#include "FunctionHierarchyScene.h"
 #include <QScrollBar>
 
-#include "FunctionHierarchyScene.h"
-
 namespace QEditor {
-FunctionHierarchy::FunctionHierarchy(IParser *parser, QWidget *parent)
-    : QGraphicsView(parent)
-{
+FunctionHierarchy::FunctionHierarchy(IParser* parser, QWidget* parent) : QGraphicsView(parent) {
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
@@ -53,4 +49,4 @@ FunctionHierarchy::FunctionHierarchy(IParser *parser, QWidget *parent)
     setScene(scene_);
     scrollContentsBy(0, 0);
 }
-}  // namespace QEditor
+} // namespace QEditor

@@ -15,12 +15,10 @@
  */
 
 #include "SshClient.h"
-
 #include "Logger.h"
 
 namespace QEditor {
-SshClient::SshClient(const QString &ip, int port, const QString &user, const QString &pwd)
-{
+SshClient::SshClient(const QString& ip, int port, const QString& user, const QString& pwd) {
     ip_ = ip;
     port_ = port;
     user_ = user;
@@ -28,8 +26,7 @@ SshClient::SshClient(const QString &ip, int port, const QString &user, const QSt
     ipPort_ = ip_ + ":" + QString::number(port_);
 }
 
-SshClient::~SshClient()
-{
+SshClient::~SshClient() {
     qCritical();
     if (thread_ != nullptr) {
         thread_->requestInterruption();
@@ -45,16 +42,15 @@ SshClient::~SshClient()
         delete timer_;
         timer_ = nullptr;
     }
-    if(sshConnection_ != nullptr){
+    if (sshConnection_ != nullptr) {
         delete sshConnection_;
         sshConnection_ = nullptr;
     }
 }
 
-void SshClient::Initialize()
-{
+void SshClient::Initialize() {
     thread_ = new QThread(this);
-//    connect(thread_, SIGNAL(finished()), this, SLOT(HandleThreadFinished()));
+    //    connect(thread_, SIGNAL(finished()), this, SLOT(HandleThreadFinished()));
     this->moveToThread(thread_);
     thread_->start();
 
@@ -63,79 +59,67 @@ void SshClient::Initialize()
     emit sigInitializeInThread();
 }
 
-void SshClient::Uninitialize()
-{
-    thread_->quit();
-}
+void SshClient::Uninitialize() { thread_->quit(); }
 
-int SshClient::Send(const QString &message)
-{
+int SshClient::Send(const QString& message) {
     qCritical() << "Send: " << message;
     int size = 0;
-    if(connected_ && shellConnected_){
-       size = shell_->write(message.toLatin1().data());
-       qCritical() << "Send successfully, size: " << size;
-    }else{
-       qCritical() << "Not connected or shell is not connected: " << IpAndPort();
+    if (connected_ && shellConnected_) {
+        size = shell_->write(message.toLatin1().data());
+        qCritical() << "Send successfully, size: " << size;
+    } else {
+        qCritical() << "Not connected or shell is not connected: " << IpAndPort();
     }
     return size;
 }
 
-void SshClient::HandleDisconnected()
-{
+void SshClient::HandleDisconnected() {
     qCritical();
     sshConnection_->disconnectFromHost();
 }
 
-void SshClient::HandleResetConnection(const QString &ipPort)
-{
-    if(this->IpAndPort() == ipPort){
+void SshClient::HandleResetConnection(const QString& ipPort) {
+    if (this->IpAndPort() == ipPort) {
         this->HandleDisconnected();
     }
 }
 
-void SshClient::HandleShellSend(const QString &message)
-{
-    Send(message);
-}
+void SshClient::HandleShellSend(const QString& message) { Send(message); }
 
-void SshClient::HandleShellReceived()
-{
+void SshClient::HandleShellReceived() {
     qCritical();
     QByteArray recvByteArray = shell_->readAllStandardOutput();
     QString recv = QString::fromUtf8(recvByteArray);
-    if(recv.isEmpty()) {
+    if (recv.isEmpty()) {
         return;
     }
     qCritical() << "Receive: " << recv;
     emit sigShellDataArrived(recv, ip_, port_);
 }
 
-void SshClient::HandleInitializeInThread()
-{
+void SshClient::HandleInitializeInThread() {
     parameters_.port = port_;
     parameters_.userName = user_;
     parameters_.password = pwd_;
     parameters_.host = ip_;
     parameters_.timeout = 10;
     parameters_.authenticationType = QSsh::SshConnectionParameters::AuthenticationTypePassword;
-    HandleCreateConnection();  // Create connection.
+    HandleCreateConnection(); // Create connection.
 
     if (timer_ == nullptr) {
         timer_ = new QTimer(this);
     }
     timer_->setInterval(RECONNET_SPAN_TIME);
     connect(timer_, SIGNAL(timeout()), this, SLOT(HandleCreateConnection()));
-    timer_->start();  // Start heartbeat timer, call slotCreateConnection to check if reconnection needed in circles.
+    timer_->start(); // Start heartbeat timer, call slotCreateConnection to check if reconnection needed in circles.
 }
 
-void SshClient::HandleCreateConnection()
-{
+void SshClient::HandleCreateConnection() {
     qCritical();
-    if(connected_) {
+    if (connected_) {
         return;
     }
-    if(sshConnection_ == nullptr){
+    if (sshConnection_ == nullptr) {
         sshConnection_ = new QSsh::SshConnection(parameters_);
         connect(sshConnection_, SIGNAL(connected()), SLOT(HandleConnected()));
         connect(sshConnection_, SIGNAL(error(QSsh::SshError)), SLOT(HandleSshConnectError(const QSsh::SshError&)));
@@ -144,8 +128,7 @@ void SshClient::HandleCreateConnection()
     qCritical() << "Try to connect: " << IpAndPort();
 }
 
-void SshClient::HandleConnected()
-{
+void SshClient::HandleConnected() {
     qCritical() << "Ssh connected: " << IpAndPort();
     timer_->stop();
 
@@ -159,37 +142,37 @@ void SshClient::HandleConnected()
     // Create sftp channel.
     channel_ = sshConnection_->createSftpChannel();
     connect(channel_.data(), SIGNAL(initialized()), this, SLOT(HandleChannelInitialized()));
-    connect(channel_.data(), SIGNAL(channelError(QString)), this,SLOT(HandleChannelInitializationFailure(QString)));
-    connect(channel_.data(), SIGNAL(finished(QSsh::SftpJobId, QString)), this, SLOT(HandleChannelJobFinished(QSsh::SftpJobId, QString)));
+    connect(channel_.data(), SIGNAL(channelError(QString)), this, SLOT(HandleChannelInitializationFailure(QString)));
+    connect(channel_.data(), SIGNAL(finished(QSsh::SftpJobId, QString)), this,
+            SLOT(HandleChannelJobFinished(QSsh::SftpJobId, QString)));
     connect(channel_.data(), SIGNAL(closed()), this, SLOT(HandleChannelClosed()));
-    connect(channel_.data(), SIGNAL(fileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList)),
-            this, SLOT(HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList)));
+    connect(channel_.data(),
+            SIGNAL(fileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo>& fileInfoList)), this,
+            SLOT(HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo>& fileInfoList)));
     channel_->initialize();
 
     connected_ = true;
     emit sigConnectStateChanged(connected_, ip_, port_);
 }
 
-void SshClient::HandleThreadFinished()
-{
+void SshClient::HandleThreadFinished() {
     qCritical();
     thread_->deleteLater();
     this->deleteLater();
 }
 
-void SshClient::HandleSshConnectError(const QSsh::SshError &sshError)
-{
+void SshClient::HandleSshConnectError(const QSsh::SshError& sshError) {
     shellConnected_ = false;
     connected_ = false;
     emit sigConnectStateChanged(connected_, ip_, port_);
     timer_->start();
 
-    switch(sshError){
+    switch (sshError) {
     case QSsh::SshNoError:
         qCritical() << "SshNoError: " << IpAndPort();
         break;
     case QSsh::SshSocketError:
-        qCritical() << "SshSocketError: " << IpAndPort();  // If cable detached.
+        qCritical() << "SshSocketError: " << IpAndPort(); // If cable detached.
         break;
     case QSsh::SshTimeoutError:
         qCritical() << "SshTimeoutError: " << IpAndPort();
@@ -217,52 +200,41 @@ void SshClient::HandleSshConnectError(const QSsh::SshError &sshError)
     }
 }
 
-void SshClient::HandleShellStart()
-{
+void SshClient::HandleShellStart() {
     qCritical() << "Shell connected: " << IpAndPort();
     shellConnected_ = true;
     emit sigShellConnected(ip_, port_);
 }
 
-void SshClient::HandleShellError()
-{
-    qCritical() << "Shell error happpended: " << IpAndPort();
-}
+void SshClient::HandleShellError() { qCritical() << "Shell error happpended: " << IpAndPort(); }
 
-void SshClient::HandleChannelInitialized()
-{
+void SshClient::HandleChannelInitialized() {
     qCritical() << "Channel initialized: " << IpAndPort();
-//    QSsh::SftpJobId job = channel_->listDirectory("/");
-//    if (job == QSsh::SftpInvalidJob) {
-//        qCritical() << "Start job failed.";
-//    }
+    //    QSsh::SftpJobId job = channel_->listDirectory("/");
+    //    if (job == QSsh::SftpInvalidJob) {
+    //        qCritical() << "Start job failed.";
+    //    }
     const QSsh::SftpJobId statJob = channel_->statFile("/home/zqh/tmp1/tmp");
     if (statJob == QSsh::SftpInvalidJob) {
         qCritical() << "Start job failed.";
     }
-//    const QSsh::SftpJobId uploadJob = channel_->uploadFile("/home/zqh/tmp1/tmp", "/home/zqh/tmp2/tmp", QSsh::SftpOverwriteExisting);
-//    if (uploadJob == QSsh::SftpInvalidJob) {
-//        qCritical() << "Start job failed.";
-//    }
+    //    const QSsh::SftpJobId uploadJob = channel_->uploadFile("/home/zqh/tmp1/tmp", "/home/zqh/tmp2/tmp",
+    //    QSsh::SftpOverwriteExisting); if (uploadJob == QSsh::SftpInvalidJob) {
+    //        qCritical() << "Start job failed.";
+    //    }
 }
 
-void SshClient::HandleChannelInitializationFailure(const QString &)
-{
+void SshClient::HandleChannelInitializationFailure(const QString&) {
     qCritical() << "Channel initialize failure: " << IpAndPort();
 }
 
-void SshClient::HandleChannelJobFinished(const QSsh::SftpJobId job, const QString &info)
-{
+void SshClient::HandleChannelJobFinished(const QSsh::SftpJobId job, const QString& info) {
     qCritical() << "Channel job finished: " << IpAndPort() << ", job: " << job << ", " << info;
 }
 
-void SshClient::HandleChannelClosed()
-{
-    qCritical() << "Channel closed: " << IpAndPort();
-}
+void SshClient::HandleChannelClosed() { qCritical() << "Channel closed: " << IpAndPort(); }
 
-void SshClient::HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList)
-{
+void SshClient::HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo>& fileInfoList) {
     qCritical() << "File info: " << IpAndPort() << ", job: " << job << ", total: " << fileInfoList.size();
 }
-}  // namespace QEditor
+} // namespace QEditor

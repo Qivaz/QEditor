@@ -17,14 +17,13 @@
 #ifndef SEARCHRESULTITEM_H
 #define SEARCHRESULTITEM_H
 
-#include <QTreeWidgetItem>
 #include "EditView.h"
+#include <QTreeWidgetItem>
 
 namespace QEditor {
-class SearchResultItem : public QTreeWidgetItem
-{
+class SearchResultItem : public QTreeWidgetItem {
 public:
-    SearchResultItem(EditView *editView = nullptr);
+    SearchResultItem(EditView* editView = nullptr);
 
     int line() { return line_; }
     void setLine(int line) { line_ = line; }
@@ -35,14 +34,14 @@ public:
     int len() { return len_; }
     void setLen(int len) { len_ = len; }
 
-    EditView *editView() { return editView_; }
+    EditView* editView() { return editView_; }
 
 private:
-    EditView *editView_{nullptr};
+    EditView* editView_{nullptr};
     int line_{0};
     int position_{0};
     int len_{0};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // SEARCHRESULTITEM_H

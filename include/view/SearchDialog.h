@@ -17,10 +17,10 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
-#include <QDialog>
 #include "EditView.h"
 #include "MainTabView.h"
 #include "SearchResultList.h"
+#include <QDialog>
 
 namespace Ui {
 class UISearchDialog;
@@ -29,11 +29,10 @@ class UISearchDialog;
 namespace QEditor {
 class Searcher;
 
-class SearchDialog : public QDialog
-{
+class SearchDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit SearchDialog(QWidget *parent = nullptr, int index = 0);
+    explicit SearchDialog(QWidget* parent = nullptr, int index = 0);
     ~SearchDialog();
 
     void Start(int index);
@@ -60,9 +59,9 @@ private slots:
 
     void on_pushButtonReplaceReplaceAll_clicked();
 
-    void on_lineEditFindFindWhat_textChanged(const QString &arg1);
+    void on_lineEditFindFindWhat_textChanged(const QString& arg1);
 
-    void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
+    void on_lineEditReplaceFindWhat_textChanged(const QString& arg1);
 
 private:
     void InitSetting();
@@ -70,25 +69,24 @@ private:
     const QString GetSelectedText();
 
 private:
-    Ui::UISearchDialog *ui_;
-    SearchResultList *searchResultList_{nullptr};
-    Searcher *searcher_{nullptr};
+    Ui::UISearchDialog* ui_;
+    SearchResultList* searchResultList_{nullptr};
+    Searcher* searcher_{nullptr};
 };
 
-class Searcher : public QObject
-{
+class Searcher : public QObject {
     Q_OBJECT
 public:
     Searcher() = default;
     ~Searcher() = default;
 
-    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
-    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
+    QTextCursor FindNext(const QString& text, const QTextCursor& startCursor);
+    QTextCursor FindPrevious(const QString& text, const QTextCursor& startCursor);
 
-    std::vector<QTextCursor> FindAll(const QString &target);
+    std::vector<QTextCursor> FindAll(const QString& target);
 
-    void Replace(const QString &target, const QString &text, bool backward);
-    int ReplaceAll(const QString &target, const QString &text);
+    void Replace(const QString& target, const QString& text, bool backward);
+    int ReplaceAll(const QString& target, const QString& text);
 
     void setCheckBoxFindBackward(bool value);
 
@@ -105,15 +103,16 @@ public:
     void setRadioButtonFindRe(bool value);
 
     QString info() const;
-    void setInfo(const QString &info);
+    void setInfo(const QString& info);
 
 private:
-    QTextCursor _FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
-    QTextCursor _FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
+    QTextCursor _FindNext(const QString& text, const QTextCursor& startCursor, bool backward);
+    QTextCursor _FindPrevious(const QString& text, const QTextCursor& startCursor, bool backward);
 
-    bool _Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
+    bool _Find(const QStringList& target, const QTextCursor& startCursor, QTextCursor& targetCursor, bool backward);
     template <class T>
-    bool _Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward, bool first = true);
+    bool _Find(const T& target, const QTextCursor& startCursor, QTextCursor& targetCursor, bool backward,
+               bool first = true);
 
     EditView* editView();
     TabView* tabView();
@@ -130,6 +129,6 @@ private:
 
     QString info_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // DIALOG_H

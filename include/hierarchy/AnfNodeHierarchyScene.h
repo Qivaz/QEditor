@@ -17,25 +17,24 @@
 #ifndef NODEHIERARCHYSCENE_H
 #define NODEHIERARCHYSCENE_H
 
+#include "AnfNodeItem.h"
 #include "HierarchyScene.h"
 #include "IParser.h"
-#include "AnfNodeItem.h"
 
 namespace QEditor {
-class AnfNodeHierarchyScene : public HierarchyScene
-{
+class AnfNodeHierarchyScene : public HierarchyScene {
     Q_OBJECT
 public:
-    explicit AnfNodeHierarchyScene(const QString &funcName, IParser *parser, QMenu *itemMenu, QObject *parent = nullptr);
+    explicit AnfNodeHierarchyScene(const QString& funcName, IParser* parser, QMenu* itemMenu,
+                                   QObject* parent = nullptr);
 
 private:
-    std::pair<int, int> PaintNodeCalls(const QString &nodeName, const QMap<QString, NodeInfo> &nodesMap,
-                                       int startX, int startY);
+    std::pair<int, int> PaintNodeCalls(const QString& nodeName, const QMap<QString, NodeInfo>& nodesMap, int startX,
+                                       int startY);
 
-    std::pair<AnfNodeItem *, bool> GetNode(const QString &inputName, const NodeInfo &info)
-    {
-        const QString &nodeName = "%" + inputName + "(" + info.operatorName_ + ")";
-        AnfNodeItem *startNode;
+    std::pair<AnfNodeItem*, bool> GetNode(const QString& inputName, const NodeInfo& info) {
+        const QString& nodeName = "%" + inputName + "(" + info.operatorName_ + ")";
+        AnfNodeItem* startNode;
         bool exist;
         auto iter = nodes_.find(nodeName);
         if (iter == nodes_.end()) {
@@ -52,9 +51,9 @@ private:
         return {startNode, exist};
     }
 
-    IParser *parser_{nullptr};
+    IParser* parser_{nullptr};
     QMap<QString, AnfNodeItem*> nodes_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // NODEHIERARCHYSCENE_H

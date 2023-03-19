@@ -21,8 +21,7 @@
 #include <QSet>
 
 namespace QEditor {
-struct FuncGraphInfo
-{
+struct FuncGraphInfo {
     QString name_;
     int pos_{-1};
     QString returnVariable_;
@@ -32,30 +31,28 @@ struct FuncGraphInfo
     QVector<QString> callees_;
 };
 
-struct NodeInfo
-{
-    QString variableName_;    // Variable name
-    QString operatorName_;  // Operator name
+struct NodeInfo {
+    QString variableName_; // Variable name
+    QString operatorName_; // Operator name
     int pos_{-1};
     QVector<QString> varInputs_;
     bool hasConstantInput_;
 };
 
-class IParser : public QObject
-{
+class IParser : public QObject {
     Q_OBJECT
 public:
-    explicit IParser(QObject *parent = nullptr) : QObject(parent) {}
+    explicit IParser(QObject* parent = nullptr) : QObject(parent) {}
     virtual ~IParser() = default;
 
     virtual void ParseFuncGraph() = 0;
     virtual const QString& GetEntry() const = 0;
-    virtual FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const = 0;
-    virtual const QVector<FuncGraphInfo> &funcGraphInfos() const = 0;
+    virtual FuncGraphInfo GetFuncGraphInfo(const QString& funcName) const = 0;
+    virtual const QVector<FuncGraphInfo>& funcGraphInfos() const = 0;
     virtual int GetIndexByCursorPosition(int cursorPos) const = 0;
 
-    virtual const QMap<QString, NodeInfo> &ParseNodes(const QString &funcName) = 0;
+    virtual const QMap<QString, NodeInfo>& ParseNodes(const QString& funcName) = 0;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // IPARSER_H

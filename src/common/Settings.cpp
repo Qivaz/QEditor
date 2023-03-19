@@ -15,13 +15,11 @@
  */
 
 #include "Settings.h"
-
 #include "Constants.h"
 
 namespace QEditor {
-Settings::Settings()
-{
+Settings::Settings() {
     settingsFile_ = Constants::kAppInternalPath + Constants::kConfigFile;
     settings_ = new QSettings(settingsFile_, QSettings::IniFormat);
 }
-}  // namespace QEditor
+} // namespace QEditor

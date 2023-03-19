@@ -17,22 +17,19 @@
 #ifndef FUNCTIONHIERARCHY_H
 #define FUNCTIONHIERARCHY_H
 
-#include <QGraphicsView>
-
+#include "FunctionHierarchyScene.h"
 #include "IParser.h"
 #include "IrParser.h"
-
-#include "FunctionHierarchyScene.h"
+#include <QGraphicsView>
 
 namespace QEditor {
-class FunctionHierarchy : public QGraphicsView
-{
+class FunctionHierarchy : public QGraphicsView {
 public:
-    FunctionHierarchy(IParser *parser = new DummyParser(), QWidget *parent = nullptr);
+    FunctionHierarchy(IParser* parser = new DummyParser(), QWidget* parent = nullptr);
 
 private:
-    FunctionHierarchyScene *scene_{nullptr};
+    FunctionHierarchyScene* scene_{nullptr};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // FUNCTIONHIERARCHY_H

@@ -15,13 +15,12 @@
  */
 
 #include "DiffView.h"
-
 #include <QApplication>
 #include <QScrollBar>
 #include <QWheelEvent>
 
 namespace QEditor {
-DiffHtmlView::DiffHtmlView(QWidget *parent) : QTextEdit(parent) {
+DiffHtmlView::DiffHtmlView(QWidget* parent) : QTextEdit(parent) {
     setStyleSheet("color: darkGray;"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
@@ -52,7 +51,7 @@ DiffHtmlView::DiffHtmlView(QWidget *parent) : QTextEdit(parent) {
     currentFontSize_ = font().pointSize();
 }
 
-void DiffHtmlView::wheelEvent(QWheelEvent *event) {
+void DiffHtmlView::wheelEvent(QWheelEvent* event) {
     // If Ctrl-Key pressed.
     if (QApplication::keyboardModifiers() != Qt::ControlModifier) {
         QTextEdit::wheelEvent(event);
@@ -66,25 +65,23 @@ void DiffHtmlView::wheelEvent(QWheelEvent *event) {
     }
 }
 
-void DiffHtmlView::ZoomIn()
-{
+void DiffHtmlView::ZoomIn() {
     auto currentFont = font();
     currentFont.setPointSize(font().pointSize() + 1);
     setFont(currentFont);
     currentFontSize_ = currentFont.pointSize();
 }
 
-void DiffHtmlView::ZoomOut()
-{
+void DiffHtmlView::ZoomOut() {
     auto currentFont = font();
     currentFont.setPointSize(font().pointSize() - 1);
     setFont(currentFont);
     currentFontSize_ = currentFont.pointSize();
 }
 
-DiffTextView::DiffTextView(QWidget *parent) : EditView(parent) {
+DiffTextView::DiffTextView(QWidget* parent) : EditView(parent) {
     setFont(QFont("Consolas", 11));
-//    setReadOnly(true);
-//    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    //    setReadOnly(true);
+    //    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 }
-}  // namespace QEditor
+} // namespace QEditor

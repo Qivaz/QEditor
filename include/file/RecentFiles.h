@@ -17,17 +17,15 @@
 #ifndef RECENTFILES_H
 #define RECENTFILES_H
 
-#include <QObject>
-#include <QDataStream>
-
 #include "Constants.h"
+#include <QDataStream>
+#include <QObject>
 
 namespace QEditor {
-class RecentFiles : public QObject
-{
+class RecentFiles : public QObject {
     Q_OBJECT
 public:
-    static void UpdateFiles(const QString &filePath);
+    static void UpdateFiles(const QString& filePath);
     static void Clear();
 
     static void StoreFiles();
@@ -43,6 +41,6 @@ private:
 
     static const int kMaxRecentFilesNum_ = Constants::kMaxOpenRecentFilesNum;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // RECENTFILES_H

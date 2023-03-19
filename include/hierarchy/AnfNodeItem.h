@@ -17,11 +17,10 @@
 #ifndef ANFNODEITEM_H
 #define ANFNODEITEM_H
 
+#include "IParser.h"
+#include "NodeItem.h"
 #include <QGraphicsPixmapItem>
 #include <QVector>
-
-#include "NodeItem.h"
-#include "IParser.h"
 
 QT_BEGIN_NAMESPACE
 class QPixmap;
@@ -33,18 +32,17 @@ QT_END_NAMESPACE
 namespace QEditor {
 class Arrow;
 
-class AnfNodeItem : public NodeItem
-{
+class AnfNodeItem : public NodeItem {
 public:
-    AnfNodeItem(const QString &name, const NodeInfo &info, NodeType diagramType,
-                QMenu *contextMenu, QGraphicsItem *parent = nullptr);
+    AnfNodeItem(const QString& name, const NodeInfo& info, NodeType diagramType, QMenu* contextMenu,
+                QGraphicsItem* parent = nullptr);
 
 protected:
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     NodeInfo nodeInfo_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // ANFNODEITEM_H

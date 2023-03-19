@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-#include <QApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QLockFile>
-
 #include "Constants.h"
+#include "Logger.h"
 #include "MainWindow.h"
 #include "SingleApp.h"
 #include "Utils.h"
-#include "Logger.h"
+#include <QApplication>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
+#include <QLockFile>
 
 // Q_IMPORT_PLUGIN(QIbusPlatformInputContextPlugin)
 // Q_IMPORT_PLUGIN(StaticQIbusPlatformInputContextPluginInstance)
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     QEditor::Constants::kAppPath = QApplication::applicationDirPath();
-    QEditor::Constants::kAppInternalPath = QEditor::Constants::kAppPath + "/" + QEditor::Constants::kAppInternalRelativePath;
+    QEditor::Constants::kAppInternalPath =
+        QEditor::Constants::kAppPath + "/" + QEditor::Constants::kAppInternalRelativePath;
     qDebug() << "Constants::kAppInternalPath: " << QEditor::Constants::kAppInternalPath;
     (void)QEditor::Utils::mkdir(QEditor::Constants::kAppInternalPath);
     Q_INIT_RESOURCE(QEditor);
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
         qCritical() << "Already run, lock error: " << singleRunLockFile.error();
         QMessageBox::warning(nullptr, QString(QEditor::Constants::kAppName),
                              QString(QObject::tr("Cannot read file %1:\n%2."))
-                             .arg(QDir::toNativeSeparators(singleRunFilePath), singleRunLockFile.error()));
+                                 .arg(QDir::toNativeSeparators(singleRunFilePath), singleRunLockFile.error()));
         return 0;
     }
     qDebug() << "start running";
@@ -85,8 +84,8 @@ int main(int argc, char *argv[])
     }
 
     QEditor::MainWindow::Instance().setWindowIcon(QIcon(":/images/QEditorIcon.webp"));
-//    QEditor::MainWindow::Instance().show();
+    //    QEditor::MainWindow::Instance().show();
     QEditor::MainWindow::Instance().showMaximized();
-//    app.setQuitOnLastWindowClosed(false);
+    //    app.setQuitOnLastWindowClosed(false);
     return app.exec();
 }

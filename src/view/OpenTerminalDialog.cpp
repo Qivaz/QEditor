@@ -40,9 +40,7 @@ extern void SetDarkTitleBar(HWND hwnd);
 #endif
 
 namespace QEditor {
-OpenTerminalDialog::OpenTerminalDialog(QWidget* parent)
-    : QDialog(parent),
-      ui_(new Ui::OpenTerminalDialog) {
+OpenTerminalDialog::OpenTerminalDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::OpenTerminalDialog) {
     ui_->setupUi(this);
     if (ui_->lineEditIp->text().isEmpty()) {
         ui_->lineEditIp->setFocus();

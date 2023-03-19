@@ -15,11 +15,10 @@
  */
 
 #include "RecentFiles.h"
-
+#include "Logger.h"
+#include "Utils.h"
 #include <QDir>
 #include <QFile>
-#include "Utils.h"
-#include "Logger.h"
 
 namespace QEditor {
 QStringList RecentFiles::files_;
@@ -32,7 +31,7 @@ void RecentFiles::Clear() {
     StoreFiles();
 }
 
-void RecentFiles::UpdateFiles(const QString &filePath) {
+void RecentFiles::UpdateFiles(const QString& filePath) {
     auto size = files_.size();
     auto exist = files_.removeOne(filePath);
     if (!exist && size >= kMaxRecentFilesNum_) {
@@ -43,8 +42,7 @@ void RecentFiles::UpdateFiles(const QString &filePath) {
     StoreFiles();
 }
 
-void RecentFiles::StoreFiles()
-{
+void RecentFiles::StoreFiles() {
     qDebug() << "kAppInternalPath_: " << Constants::kAppInternalPath;
     (void)QDir(Constants::kAppInternalPath).remove(kAppInternalRecentFilesDirName_);
     QString autoSavePath = Constants::kAppInternalPath + kAppInternalRecentFilesDirName_ + "/";
@@ -58,8 +56,7 @@ void RecentFiles::StoreFiles()
     filesInfoStream << files_;
 }
 
-void RecentFiles::LoadFiles()
-{
+void RecentFiles::LoadFiles() {
     if (!QDir(Constants::kAppInternalPath).exists(kAppInternalRecentFilesDirName_)) {
         qDebug() << "," << kAppInternalRecentFilesDirName_ << " not exists, in " << Constants::kAppInternalPath;
         return;
@@ -76,4 +73,4 @@ void RecentFiles::LoadFiles()
     QDataStream filesInfoStream(&filesInfoFile);
     filesInfoStream >> files_;
 }
-}  // namespace QEditor
+} // namespace QEditor

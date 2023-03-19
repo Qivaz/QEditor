@@ -17,34 +17,30 @@
 #ifndef SINGLEAPP_H
 #define SINGLEAPP_H
 
-#include <QApplication>
-#include <QFile>
-#include <QLocalSocket>
-#include <QLocalServer>
-#include <QWindow>
-
 #include "Constants.h"
 #include "MainWindow.h"
 #include "Toast.h"
+#include <QApplication>
+#include <QFile>
+#include <QLocalServer>
+#include <QLocalSocket>
+#include <QWindow>
 
 namespace QEditor {
-class SingleAppServer : public QObject
-{
+class SingleAppServer : public QObject {
     Q_OBJECT
 public:
     SingleAppServer() : server_(new QLocalServer()) {
         connect(server_, SIGNAL(newConnection()), this, SLOT(HandleNewConnection()));
     }
 
-    ~SingleAppServer()
-    {
+    ~SingleAppServer() {
         server_->close();
         delete server_;
         qDebug() << "Server removed.";
     }
 
-    void RunServer()
-    {
+    void RunServer() {
         if (QLocalServer::removeServer(Constants::kSingleAppHostName)) {
             qDebug() << "Remove server failure.";
         }
@@ -58,11 +54,10 @@ public:
             return;
         }
         qDebug() << "Run server success.";
-     }
+    }
 
 public slots:
-    void HandleNewConnection()
-    {
+    void HandleNewConnection() {
         qDebug() << "New Connection.";
         qDebug() << "listen: " << server_->serverName();
         qDebug() << "hasPendingConnections: " << server_->hasPendingConnections();
@@ -78,27 +73,25 @@ public slots:
         // I don't know why have to use two steps.
         // Step 1:
         auto eFlags = MainWindow::Instance().windowFlags();
-        MainWindow::Instance().setWindowFlags(eFlags|Qt::WindowStaysOnTopHint);
+        MainWindow::Instance().setWindowFlags(eFlags | Qt::WindowStaysOnTopHint);
         MainWindow::Instance().show();
         MainWindow::Instance().setWindowFlags(eFlags);
         MainWindow::Instance().show();
         // Step 2:
-        for ( QWindow* appWindow : QGuiApplication::allWindows() )
-        {
-          appWindow->show(); // Bring window to top on OSX
-          appWindow->raise(); // Bring window from minimized state on OSX
+        for (QWindow* appWindow : QGuiApplication::allWindows()) {
+            appWindow->show();  // Bring window to top on OSX
+            appWindow->raise(); // Bring window from minimized state on OSX
 
-          appWindow->requestActivate(); // Bring window to front/unminimize on windows.
+            appWindow->requestActivate(); // Bring window to front/unminimize on windows.
         }
 #else // defined(Q_OS_LINUX) or defined(Q_OS_OSX)
-        // Not work in Windows, only blink on taskbar.
-         MainWindow::Instance().raise();  // Mac OS
-         MainWindow::Instance().activateWindow(); // Linux OS
+      // Not work in Windows, only blink on taskbar.
+        MainWindow::Instance().raise();          // Mac OS
+        MainWindow::Instance().activateWindow(); // Linux OS
 #endif
     }
 
-    void HandleReadyRead()
-    {
+    void HandleReadyRead() {
         QLocalSocket* socket = static_cast<QLocalSocket*>(sender());
         if (socket == nullptr) {
             qDebug() << "socket is null.";
@@ -126,30 +119,26 @@ public slots:
     }
 
 private:
-    QLocalServer *server_;
-
+    QLocalServer* server_;
 };
 
-class SingleAppClient : public QObject
-{
+class SingleAppClient : public QObject {
     Q_OBJECT
 public:
-    SingleAppClient() : socket_(new QLocalSocket())
-    {
+    SingleAppClient() : socket_(new QLocalSocket()) {
         connect(socket_, SIGNAL(connected()), SLOT(HandleConnected()));
         connect(socket_, SIGNAL(disconnected()), SLOT(HandleDisConnected()));
-        connect(socket_, SIGNAL(error(QLocalSocket::LocalSocketError)), SLOT(HandleError(QLocalSocket::LocalSocketError)));
+        connect(socket_, SIGNAL(error(QLocalSocket::LocalSocketError)),
+                SLOT(HandleError(QLocalSocket::LocalSocketError)));
     }
 
-    ~SingleAppClient()
-    {
+    ~SingleAppClient() {
         socket_->disconnectFromServer();
         delete socket_;
     }
 
 public:
-    bool ConnectToServer(const QString &message, const QString &serverName = Constants::kSingleAppHostName)
-    {
+    bool ConnectToServer(const QString& message, const QString& serverName = Constants::kSingleAppHostName) {
         socket_->connectToServer(serverName);
         if (socket_->waitForConnected()) {
             qDebug() << "connect server success.";
@@ -162,8 +151,7 @@ public:
     }
 
 private:
-    void SendMessage(const QString &msg)
-    {
+    void SendMessage(const QString& msg) {
         // To support unicode chars, should not use 'msg.toStdString().c_str()'
         socket_->write(msg.toLocal8Bit());
         socket_->flush();
@@ -178,36 +166,23 @@ private:
     }
 
 private slots:
-    void HandleConnected()
-    {
-        qDebug() << "connected.";
-    }
+    void HandleConnected() { qDebug() << "connected."; }
 
+    void HandleDisConnected() { qDebug() << "disconnected."; }
 
-    void HandleDisConnected()
-    {
-        qDebug() << "disconnected.";
-    }
-
-    void HandleError(QLocalSocket::LocalSocketError error)
-    {
-        qDebug() << error;
-    }
+    void HandleError(QLocalSocket::LocalSocketError error) { qDebug() << error; }
 
 private:
-    QLocalSocket *socket_;
-
+    QLocalSocket* socket_;
 };
 
-class SingleApp : public QObject
-{
+class SingleApp : public QObject {
     Q_OBJECT
 public:
     SingleApp() = default;
     ~SingleApp() = default;
 
-    bool TryRun(const QString &filePath)
-    {
+    bool TryRun(const QString& filePath) {
         // Already running.
         if (client_.ConnectToServer(filePath.isEmpty() ? "[NO_FILE]" : filePath)) {
             return false;
@@ -221,6 +196,6 @@ private:
     SingleAppClient client_;
     SingleAppServer server_;
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // SINGLEAPP_H

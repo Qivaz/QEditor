@@ -22,19 +22,14 @@
 #include <QSet>
 
 namespace QEditor {
-class FileType : public QObject
-{
+class FileType : public QObject {
     Q_OBJECT
 public:
-    FileType() {
-        fileType_ = kTypeNone;
-    }
-    FileType(const QString &path) : fileInfo_(path) {
-        Check();
-    }
+    FileType() { fileType_ = kTypeNone; }
+    FileType(const QString& path) : fileInfo_(path) { Check(); }
     virtual ~FileType() {}
 
-    void SetPath(const QString &path) {
+    void SetPath(const QString& path) {
         fileInfo_.setFile(path);
         Check();
     }
@@ -53,9 +48,9 @@ public:
     }
 
     enum Type {
-        kTypeNone,  // Not recognition language.
+        kTypeNone, // Not recognition language.
         kTypeTxt,
-        kTypeCpp,   // Treat the same for C and C++.
+        kTypeCpp, // Treat the same for C and C++.
         kTypePython,
         kTypeIr
     };
@@ -84,6 +79,6 @@ private:
     const QSet<QString> irSuffix_ = {"ir", "dat"};
     const QSet<QString> txtSuffix_ = {"txt"};
 };
-}  // namespace QEditor
+} // namespace QEditor
 
 #endif // FILETYPE_H

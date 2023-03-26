@@ -22,33 +22,15 @@
 namespace QEditor {
 DiffHtmlView::DiffHtmlView(QWidget *parent) : QTextEdit(parent) {
     setStyleSheet(
-        "color: darkGray;"
-        "background-color: rgb(28, 28, 28);"
-        "selection-color: lightGray;"
-        "selection-background-color: rgb(9, 71, 113);"
-        "border: none;"
-        /*"font-family: '文泉驿等宽正黑';"*/);
+        "color:rgb(215,215,210); background-color:rgb(28,28,28); selection-color:lightGray; "
+        "selection-background-color:rgb(9,71,113); border:none;");
 
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        } \
-                                        QScrollBar::sub-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        }");
+        "QScrollBar{border:none;} QScrollBar::add-line:vertical{border:none; background:none;} "
+        "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          } \
-                                          QScrollBar::sub-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          }");
+        "QScrollBar{border:none;} QScrollBar::add-line:horizontal{border:none; background:none;} "
+        "QScrollBar::sub-line:horizontal{border:none; background:none;}");
 
     setFont(QFont("Consolas", 11));
     currentFontSize_ = font().pointSize();

@@ -67,55 +67,21 @@ void EditView::Init() {
     setBackgroundVisible(false);
     //    setCenterOnScroll(true);
     setStyleSheet(
-        "color: rgb(215, 215, 210);"
-        "background-color: rgb(28, 28, 28);"
-        "selection-color: lightGray;"
-        "selection-background-color: rgb(9, 71, 113);"  // rgb(76, 76, 167)
-        "border: none;"
-        /*"font-family: '文泉驿等宽正黑';"*/);
+        "color:rgb(215,215,210); background-color:rgb(28,28,28); selection-color:lightGray; "
+        "selection-background-color:rgb(9,71,113); border:none;");
 
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        } \
-                                        QScrollBar::sub-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        }");
+        "QScrollBar{border:none;} QScrollBar::add-line:vertical{border:none; background:none;} "
+        "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          } \
-                                          QScrollBar::sub-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          }");
+        "QScrollBar{border:none;} QScrollBar::add-line:horizontal{border:none; background:none;} "
+        "QScrollBar::sub-line:horizontal{border:none; background:none;}");
     menu_->setStyleSheet(
-        "\
-                     QMenu {\
-                         color: lightGray;\
-                         background-color: rgb(40, 40, 40);\
-                         margin: 2px 2px;\
-                         border: none;\
-                     }\
-                     QMenu::item {\
-                         color: rgb(225, 225, 225);\
-                         background-color: rgb(40, 40, 40);\
-                         padding: 5px 5px;\
-                     }\
-                     QMenu::item:selected {\
-                         background-color: rgb(9, 71, 113);\
-                     }\
-                     QMenu::item:pressed {\
-                         border: 1px solid rgb(60, 60, 60); \
-                         background-color: rgb(29, 91, 133); \
-                     }\
-                     QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
-                    ");
+        "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px; border:none;} "
+        "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "
+        "padding:5px 5px;} QMenu::item:selected{background-color:rgb(9,71,113);}"
+        "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
+        "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
 
     setFont(QFont("Consolas", 11));
     currentFontSize_ = font().pointSize();

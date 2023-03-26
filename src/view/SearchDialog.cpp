@@ -38,31 +38,16 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
     setAttribute(Qt::WA_TranslucentBackground);
     //    setAttribute(Qt::WA_DeleteOnClose);
 
-    qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
+    auto settings = Settings();
+    qreal opa = settings.Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
     historyMenu_->setStyleSheet(
-        "\
-                       QMenu {\
-                           color: lightGray;\
-                           background-color: rgb(40, 40, 40);\
-                           margin: 2px 2px;\
-                           border: none;\
-                       }\
-                       QMenu::item {\
-                           color: rgb(225, 225, 225);\
-                           background-color: rgb(40, 40, 40);\
-                           padding: 5px 5px;\
-                       }\
-                       QMenu::item:selected {\
-                           background-color: rgb(9, 71, 113);\
-                       }\
-                       QMenu::item:pressed {\
-                           border: 1px solid rgb(60, 60, 60); \
-                           background-color: rgb(29, 91, 133); \
-                       }\
-                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
-                      ");
+        "QMenu{color:gray; background-color:rgb(68,68,68); margin:2px 2px; border:none;} QMenu::item{color:gray; "
+        "background-color:rgb(68,68,68); padding:5px 5px;} QMenu::item:selected{color:lightGray; "
+        "background-color:rgb(9,71,113);}"
+        "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
+        "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
 
     ui_->tabWidget->setCurrentIndex(index);
     auto historyLambda = [this](QObject *watched, QEvent *event) -> bool {
@@ -144,13 +129,15 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
     };
     if (index == 0) {  // Find
         ui_->lineEditFindFindWhat->setFocus();
-        // QCoreApplication::postEvent(this, event);
-        ui_->lineEditFindFindWhat->installEventFilter(new LambdaEventFilter(ui_->lineEditFindFindWhat, historyLambda));
     } else {  // Replace
         ui_->lineEditReplaceFindWhat->setFocus();
-        ui_->lineEditReplaceFindWhat->installEventFilter(
-            new LambdaEventFilter(ui_->lineEditFindFindWhat, historyLambda));
     }
+
+    // QCoreApplication::postEvent(this, event);
+    ui_->lineEditFindFindWhat->installEventFilter(new LambdaEventFilter(ui_->lineEditFindFindWhat, historyLambda));
+    ui_->lineEditReplaceFindWhat->installEventFilter(
+        new LambdaEventFilter(ui_->lineEditReplaceFindWhat, historyLambda));
+
     ui_->checkBoxFindWrapAround->setChecked(true);
 
     ui_->lineEditFindFindWhat->setText(GetSelectedText());
@@ -184,6 +171,24 @@ void SearchDialog::Start(int index) {
     }
     setCurrentTabIndex(index);
     show();
+
+    auto settings = Settings();
+    auto backward = settings.Get("searcher", "backward", false).toBool();
+    auto wholeWord = settings.Get("searcher", "whole_word", false).toBool();
+    auto matchCase = settings.Get("searcher", "case_sensitive", false).toBool();
+    auto wrapAround = settings.Get("searcher", "wrap_around", false).toBool();
+    auto searchMode = settings.Get("searcher", "search_mode", 0).toInt();
+    ui_->checkBoxFindBackward->setChecked(backward);
+    ui_->checkBoxFindWholeWord->setChecked(wholeWord);
+    ui_->checkBoxFindMatchCase->setChecked(matchCase);
+    ui_->checkBoxFindWrapAround->setChecked(wrapAround);
+    if (searchMode == 1) {
+        ui_->radioButtonFindExtended->setChecked(true);
+    } else if (searchMode == 2) {
+        ui_->radioButtonFindRe->setChecked(true);
+    } else {
+        ui_->radioButtonFindNormal->setChecked(true);
+    }
 }
 
 void SearchDialog::InitSetting() {
@@ -232,13 +237,6 @@ void SearchDialog::on_pushButtonFindFindNext_clicked() {
     auto cursor = searcher_->FindNext(target, editView()->textCursor());
     if (!cursor.isNull()) {
         editView()->setTextCursor(cursor);
-    }
-}
-
-void SearchDialog::on_radioButtonFindRe_toggled(bool checked) {
-    if (checked) {
-        ui_->checkBoxFindWholeWord->setDisabled(true);
-        ui_->checkBoxFindMatchCase->setDisabled(true);
     }
 }
 
@@ -793,4 +791,43 @@ void Searcher::setCheckBoxFindMatchCase(bool value) { checkBoxFindMatchCase_ = v
 void Searcher::setCheckBoxFindWholeWord(bool value) { checkBoxFindWholeWord_ = value; }
 
 void Searcher::setCheckBoxFindBackward(bool value) { checkBoxFindBackward_ = value; }
+
+void SearchDialog::on_checkBoxFindBackward_toggled(bool checked) { Settings().Set("searcher", "backward", checked); }
+
+void SearchDialog::on_checkBoxFindWholeWord_toggled(bool checked) { Settings().Set("searcher", "whole_word", checked); }
+
+void SearchDialog::on_checkBoxFindMatchCase_toggled(bool checked) {
+    Settings().Set("searcher", "case_sensitive", checked);
+}
+
+void SearchDialog::on_checkBoxFindWrapAround_toggled(bool checked) {
+    Settings().Set("searcher", "wrap_around", checked);
+}
+
+void SearchDialog::on_radioButtonFindNormal_toggled(bool checked) {
+    if (checked) {
+        Settings().Set("searcher", "search_mode", 0);
+    }
+}
+
+void SearchDialog::on_radioButtonFindExtended_toggled(bool checked) {
+    if (checked) {
+        Settings().Set("searcher", "search_mode", 1);
+    }
+}
+
+void SearchDialog::on_radioButtonFindRe_toggled(bool checked) {
+    if (checked) {
+        ui_->checkBoxFindWholeWord->setDisabled(true);
+        ui_->checkBoxFindWholeWord->setHidden(true);
+        ui_->checkBoxFindMatchCase->setDisabled(true);
+        ui_->checkBoxFindMatchCase->setHidden(true);
+        Settings().Set("searcher", "search_mode", 2);
+    } else {
+        ui_->checkBoxFindWholeWord->setEnabled(true);
+        ui_->checkBoxFindWholeWord->setVisible(true);
+        ui_->checkBoxFindMatchCase->setEnabled(true);
+        ui_->checkBoxFindMatchCase->setVisible(true);
+    }
+}
 }  // namespace QEditor

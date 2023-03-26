@@ -31,79 +31,28 @@ namespace QEditor {
 RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget *parent, const QString &rootPath)
     : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(parent)) {
     setStyleSheet(
-        "QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
-        "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-        //                  "QTreeView::branch:has-children:!has-siblings:closed, \
-//                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
-//                  QTreeView::branch:open:has-children:!has-siblings, \
-//                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");
-        "QTreeView::branch:has-siblings:!adjoins-item { \
-                      border-image: none 0;\
-                  }\
-                  QTreeView::branch:has-siblings:adjoins-item {\
-                      border-image: none 0;\
-                  }\
-                  QTreeView::branch:!has-children:!has-siblings:adjoins-item {\
-                      border-image: none 0;\
-                  }\
-                  QTreeView::branch:has-children:!has-siblings:closed,\
-                  QTreeView::branch:closed:has-children:has-siblings {\
-                          border-image: none;\
-                          image: none;\
-                  }\
-                  QTreeView::branch:open:has-children:!has-siblings,\
-                  QTreeView::branch:open:has-children:has-siblings {\
-                          border-image: none;\
-                          image: none;\
-                  }\
-                  QTreeView::item:selected{\
-                          background: rgb(9, 71, 113);\
-                  }\
-                  ");
+        "QTreeView{color:darkGray; background-color:rgb(28,28,28);} "
+        "QTreeView::branch:selected{background-color:rgb(9,71,113);} "
+        "QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;} "
+        "QTreeView::branch:has-siblings:adjoins-item{border-image:none0;} "
+        "QTreeView::branch:!has-children:!has-siblings:adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{ "
+        "border-image:none;image:none;} "
+        "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{ "
+        "border-image:none; image:none;} QTreeView::item:selected{background:rgb(9,71,113);}");
 
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-        "QScrollBar::add-line:vertical { \
-                                            border: none; \
-                                            background: none; \
-                                        } \
-                                        QScrollBar::sub-line:vertical { \
-                                            border: none; \
-                                            background: none; \
-                                        }");
+        "QScrollBar{border:none;} QScrollBar::add-line:vertical{border:none; background:none;} "
+        "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-        "QScrollBar::add-line:horizontal { \
-                                              border: none; \
-                                              background: none; \
-                                          } \
-                                          QScrollBar::sub-line:horizontal { \
-                                              border: none; \
-                                              background: none; \
-                                          }");
-
+        "QScrollBar{border:none;} QScrollBar::add-line:horizontal{border:none;background:none;} "
+        "QScrollBar::sub-line:horizontal{border:none; background:none;}");
     menu_->setStyleSheet(
-        "\
-                       QMenu {\
-                           color: lightGray;\
-                           background-color: rgb(40, 40, 40);\
-                           margin: 2px 2px;\
-                           border: none;\
-                       }\
-                       QMenu::item {\
-                           color: rgb(225, 225, 225);\
-                           background-color: rgb(40, 40, 40);\
-                           padding: 5px 5px;\
-                       }\
-                       QMenu::item:selected {\
-                           background-color: rgb(9, 71, 113);\
-                       }\
-                       QMenu::item:pressed {\
-                           border: 1px solid rgb(60, 60, 60); \
-                           background-color: rgb(29, 91, 133); \
-                       }\
-                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
-                      ");
+        "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px;border:none;} "
+        "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "
+        "padding:5px 5px;} QMenu::item:selected{background-color:rgb(9,71,113);}"
+        "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
+        "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
 
     model_ = new QSsh::SftpFileSystemModel(this);
 

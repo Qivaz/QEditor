@@ -40,24 +40,23 @@ TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
     setMovable(true);
     setTabsClosable(true);
     setStyleSheet(
-        "QTabWidget { color: darkGray; background-color: rgb(28, 28, 28); selection-color: red; "
-        "selection-background-color: green; border: none; }"
-        "QTabBar::tab { color: white; background-color: rgb(54, 54, 54); border: 1px solid rgb(54, 54, 54); "
-        "border-left-style: solid; border-left-width: 0.5px; border-left-color: gray; "
-        "border-right-style: solid; border-right-width: 0.5px; border-right-color: gray;"
-        "padding: 3px; border-top-left-radius: 5px; border-top-right-radius: 5px; }"
-        //                  "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #CBC7FF;
-        //                  border-bottom-width: 3px}"
-        "QTabBar::tab:selected { background: QColor(0, 0, 0); border-bottom-color: #1769AA; border-bottom-width: 3px}"
-        "QTabBar::tab:hover { background-color: QColor(0, 0, 0); }"
-        "QTabBar::close-button { border-image: url(:/images/x-circle.svg); }"
-        "QTabBar::close-button:hover { background: red; border-image: url(:/images/x.svg); }");
+        "QTabWidget{color:darkGray; background-color:rgb(28,28,28); selection-color:red; "
+        "selection-background-color:green; border:none;}"
+        "QTabBar::tab{color:white; background-color:rgb(54,54,54); border:1px solid rgb(54,54,54); "
+        "border-left-style:solid; border-left-width:0.5px; border-left-color:gray; "
+        "border-right-style:solid; border-right-width:0.5px; border-right-color:gray;"
+        "padding:3px; border-top-left-radius:5px; border-top-right-radius:5px;}"
+        "QTabBar::tab:selected{background:QColor(0,0,0); border-bottom-color:#1769AA; border-bottom-width:3px}"
+        "QTabBar::tab:hover{background-color:QColor(0,0,0);}"
+        "QTabBar::close-button{border-image:url(:/images/x-circle.svg);}"
+        "QTabBar::close-button:hover{background:red; border-image:url(:/images/x.svg);}");
 
     menu_->setStyleSheet(
-        "QMenu {color: lightGray;background-color: rgb(40, 40, 40);margin: 2px 2px;border: none;}QMenu::item {color: "
-        "rgb(225, 225, 225);background-color: rgb(40, 40, 40); padding: 5px 5px; } QMenu::item:selected { "
-        "background-color: rgb(9, 71, 113); } QMenu::item:pressed { border: 1px solid rgb(60, 60, 60); "
-        "background-color: rgb(29, 91, 133); } QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
+        "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px;border:none;} "
+        "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "
+        "padding:5px 5px;} QMenu::item:selected{background-color:rgb(9,71,113);}"
+        "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
+        "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
 
     connect(tabBar(), &QTabBar::currentChanged, this, &TabView::HandleCurrentIndexChanged);
     connect(tabBar(), &QTabBar::tabBarDoubleClicked, this, &TabView::HandleTabBarDoubleClicked);

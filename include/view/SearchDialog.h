@@ -67,6 +67,18 @@ class SearchDialog : public QDialog {
 
     void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
 
+    void on_checkBoxFindBackward_toggled(bool checked);
+
+    void on_checkBoxFindWholeWord_toggled(bool checked);
+
+    void on_checkBoxFindMatchCase_toggled(bool checked);
+
+    void on_checkBoxFindWrapAround_toggled(bool checked);
+
+    void on_radioButtonFindNormal_toggled(bool checked);
+
+    void on_radioButtonFindExtended_toggled(bool checked);
+
    private:
     void InitSetting();
     EditView *editView();

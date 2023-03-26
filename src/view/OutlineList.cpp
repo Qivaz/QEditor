@@ -22,25 +22,12 @@
 namespace QEditor {
 OutlineList::OutlineList(IParser *parser) : parser_(parser) {
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-        "QScrollBar::add-line:vertical { \
-                                            border: none; \
-                                            background: none; \
-                                        } \
-                                        QScrollBar::sub-line:vertical { \
-                                            border: none; \
-                                            background: none; \
-                                        }");
+        "QScrollBar{border:none; background-color:rgb(28,28,28);} QScrollBar::add-line:vertical{border:none; "
+        "background:none;} QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-        "QScrollBar::add-line:horizontal { \
-                                              border: none; \
-                                              background: none; \
-                                          } \
-                                          QScrollBar::sub-line:horizontal { \
-                                              border: none; \
-                                              background: none; \
-                                          }");
+        "QScrollBar{border:none; background-color:rgb(28,28,28);} QScrollBar::add-line:horizontal{border:none; "
+        "background:none;} QScrollBar::sub-line:horizontal{border:none; background:none;}");
+
     setHeaderHidden(true);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 

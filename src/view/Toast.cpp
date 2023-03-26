@@ -34,6 +34,9 @@ void Toast::Show(Toast::Level level, const QString &text) {
     // Kill the timer triggered before.
     if (timerId_ != 0) {
         killTimer(timerId_);
+        timerId_ = 0;
+        dialog_->accept();  // Hidden.
+        dialog_->hide();
     }
     int interval = 1000;
     if (level == kWarning) {
@@ -55,7 +58,7 @@ void Toast::timerEvent(QTimerEvent *) {
 ToastDialog::ToastDialog() {
     auto layout = new QHBoxLayout(this);
     label_ = new QLabel(this);
-    label_->setStyleSheet("color: white; background: transparent");
+    label_->setStyleSheet("color:white; background:transparent;");
     label_->setAlignment(Qt::AlignCenter);
     layout->addWidget(label_, 1);
 
@@ -79,9 +82,8 @@ ToastDialog::ToastDialog() {
 void ToastDialog::Show(Toast::Level level, const QString &text) {
 #ifdef FRAME_RADIUS
     const QString qss(
-        "QFrame{background-color:%1; border:none;"
-        "border-top-left-radius:10px; border-top-right-radius:10px;"
-        "border-bottom-left-radius:10px;border-bottom-right-radius:10px;}");
+        "QFrame{background-color:%1; border:none; border-top-left-radius:10px; border-top-right-radius:10px; "
+        "border-bottom-left-radius:10px; border-bottom-right-radius:10px;}");
     if (level == Toast::kInfo) {
         frame_->setStyleSheet(qss.arg("#000000"));
     } else if (level == Toast::kWarning) {

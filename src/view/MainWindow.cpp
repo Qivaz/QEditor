@@ -46,9 +46,8 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     setWindowOpacity(opa);
 
     setStyleSheet(
-        "background: rgb(68, 68, 68); selection-color: lightGray; selection-background-color: rgb(9, 71, "
-        "113); border: 5px, solid, "
-        "rgb(255, 0, 0);");
+        "background:rgb(68,68,68); selection-color:lightGray; selection-background-color:rgb(9,71,113); border:5px, "
+        "solid, rgb(255,0,0);");
     setCentralWidget(tabView_);
 
     CreateActions();
@@ -102,18 +101,17 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
 
 void MainWindow::CreateActions() {
     menuBar()->setStyleSheet(
-        "QMenuBar{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(28, 28, 28); border: none;}\
-                             QMenu{color: lightGray; selection-background-color: rgb(9, 71, 113); background-color: rgb(40, 40, 40); border: none;}\
-                             QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }");
+        "QMenuBar{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(28,28,28); "
+        "border:none;} QMenu{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(40,"
+        "40,40); border:none;} QMenu::separator {height:1px; background-color:rgb(80,80,80);}");
 
     auto toolBarStyle =
-        "QToolBar { color: lightGray;"
-        "background-color: rgb(28, 28, 28); }"
-        "QToolBar QToolButton { border: 2px solid transparent; background-color: rgb(28, 28, 28); }"
-        "QToolBar QToolButton:hover { border: 2px solid transparent; background-color: rgb(54, 54, 54); }"
-        "QToolBar QToolButton:enabled { border: 1.5px solid rgb(40, 40, 40); }"
-        "QToolBar QToolButton:pressed { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}"
-        "QToolBar QToolButton:checked { border: 1.5px solid rgb(9, 71, 113); background-color: rgb(28, 28, 28);}";
+        "QToolBar{color:lightGray; background-color:rgb(28,28,28);} QToolBar QToolButton {border:2px solid "
+        "transparent; background-color:rgb(28,28,28);} QToolBar QToolButton:hover{border:2px solid transparent; "
+        "background-color:rgb(54,54,54);} QToolBar QToolButton:enabled { border:1.5px solid rgb(40,40,40);}"
+        "QToolBar QToolButton:pressed{border:1.5px solid rgb(9,71,113); background-color:rgb(28,28,28);}"
+        "QToolBar QToolButton:checked{border:1.5px solid rgb(9,71,113); background-color:rgb(28,28,28);}";
+
     // File menu.
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
@@ -972,14 +970,12 @@ void MainWindow::HandleCommitData(QSessionManager &manager) {
 
 QString GetToolBarQss(const QString &image_default, const QString &image_enable) {
     QStringList qss;
-    qss.append(QString("QToolBar { background-color: rgb(28, 28, 28); image: %1; }").arg(image_default));
-    qss.append(QString("QToolBar QToolButton { border: 1px solid transparent; background-color: rgb(28, 28, 28); }"));
+    qss.append(QString("QToolBar{background-color:rgb(28,28,28); image:%1;}").arg(image_default));
+    qss.append(QString("QToolBar QToolButton{border:1px solid transparent; background-color:rgb(28,28,28);}"));
+    qss.append(QString("QToolBar QToolButton:hover{border:1px solid transparent; background-color:rgb(60,60,90);}"));
+    qss.append(QString("QToolBar QToolButton:enabled{border:1px solid rgb(80,80,100); image:%1;}").arg(image_enable));
     qss.append(
-        QString("QToolBar QToolButton:hover { border: 1px solid transparent; background-color: rgb(60, 60, 90); }"));
-    qss.append(
-        QString("QToolBar QToolButton:enabled { border: 1px solid rgb(80, 80, 100); image: %1; }").arg(image_enable));
-    qss.append(QString(
-        "QToolBar QToolButton:pressed { border: 1px solid rgb(23, 105, 170); background-color: rgb(28, 28, 28);}"));
+        QString("QToolBar QToolButton:pressed{border:1px solid rgb(23,105,170); background-color:rgb(28,28,28);}"));
     return qss.join("");
 }
 

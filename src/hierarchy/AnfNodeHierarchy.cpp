@@ -22,32 +22,14 @@ namespace QEditor {
 AnfNodeHierarchy::AnfNodeHierarchy(const QString &funcName, IParser *parser, QWidget *parent)
     : QGraphicsView(parent), funcName_(funcName) {
     setStyleSheet(
-        "color: darkGray;"
-        "background-color: rgb(28, 28, 28);"
-        "selection-color: lightGray;"
-        "selection-background-color: rgb(9, 71, 113);"
-        "border: none;");
-
+        "color:darkGray;background-color:rgb(28,28,28);selection-color:lightGray;selection-background-color:rgb(9,71,"
+        "113);border:none;");
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        } \
-                                        QScrollBar::sub-line:vertical { \
-                                          border: none; \
-                                          background: none; \
-                                        }");
+        "QScrollBar{border:none;}QScrollBar::add-line:vertical{border:none;background:none;}QScrollBar::sub-line:"
+        "vertical{border:none;background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar {border: none;}"
-        "QScrollBar::add-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          } \
-                                          QScrollBar::sub-line:horizontal { \
-                                            border: none; \
-                                            background: none; \
-                                          }");
+        "QScrollBar{border:none;}QScrollBar::add-line:horizontal{border:none;background:none;}QScrollBar::sub-line:"
+        "horizontal{border:none;background:none;}");
 
     scene_ = new AnfNodeHierarchyScene(funcName, parser, nullptr, this);
     setScene(scene_);

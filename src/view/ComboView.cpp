@@ -22,44 +22,14 @@
 namespace QEditor {
 ComboView::ComboView(QWidget *parent, bool fixed) : QComboBox(parent), fixed_(fixed) {
     auto qss =
-        "QComboBox {\
-                    color: lightGray; background: transparent;\
-                    border: none;\
-                    padding: 1px 1px 1px 1px;\
-                    min-width: 3px;\
-                    padding-left: 1px;\
-                }"
-        "QComboBox:enabled:hover, QComboBox:enabled:focus {\
-                    color: lightGray; background-color: rgb(68, 68, 68);\
-                    border: 1px solid gray;\
-                    border-radius: 3px;\
-                    padding: 1px 1px 1px 3px;\
-                    min-width: 3px;\
-                    padding-left: 1px;\
-                    }"
-        //                "QComboBox:!editable:on, QComboBox::drop-down:editable:on {\
-//                    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
-//                                                stop: 0 #D3D3D3, stop: 0.4 #D8D8D8,\
-//                                                stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1);\
-//                    }"
-        "QComboBox::drop-down {\
-                    border: none; background: transparent; }"
-        "QComboBox::down-arrow {\
-                    image: url(:images/chevron-down.svg); width: 15px;\
-                    }"
-        "QComboBox QAbstractItemView {\
-                        color: lightGray;\
-                        border: 1px solid rgb(68, 68, 100);\
-                        background: rgb(68, 68, 68);\
-                        outline: rgb(68, 68, 255);\
-                }"
-        "QComboBox QAbstractItemView::item {\
-                        color: lightGray;\
-                }"
-        "QComboBox QAbstractItemView::item:selected {\
-                        background: rgb(232, 241, 250);\
-                        color: rgb(255, 65, 132);\
-                }";
+        "QComboBox{color:lightGray; background:transparent; border:none; padding:1px 1px 1px 1px;"
+        "min-width:3px; padding-left:1px;} QComboBox:enabled:hover,QComboBox:enabled:focus{color:lightGray; "
+        "background-color:rgb(68,68,68); border:1px solid gray; "
+        "border-radius:3px; padding:1px 1px 1px 3px; min-width:3px; padding-left:1px;} QComboBox::drop-down{"
+        "border:none; background:transparent;} QComboBox::down-arrow{image:url(:images/chevron-down.svg); width:15px;} "
+        "QComboBox QAbstractItemView{color:lightGray; border:1pxsolidrgb(68,68,100); background:rgb(68,68,68); "
+        "outline:rgb(68,68,255);} QComboBox QAbstractItemView::item{color:lightGray;} "
+        "QComboBox QAbstractItemView::item:selected{background:rgb(232,241,250); color:rgb(255,65,132);}";
 
     auto qssStr = QString(qss);
 

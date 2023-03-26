@@ -24,17 +24,17 @@
 namespace QEditor {
 class AnfNodeHierarchyScene : public HierarchyScene {
     Q_OBJECT
-public:
-    explicit AnfNodeHierarchyScene(const QString& funcName, IParser* parser, QMenu* itemMenu,
-                                   QObject* parent = nullptr);
+   public:
+    explicit AnfNodeHierarchyScene(const QString &funcName, IParser *parser, QMenu *itemMenu,
+                                   QObject *parent = nullptr);
 
-private:
-    std::pair<int, int> PaintNodeCalls(const QString& nodeName, const QMap<QString, NodeInfo>& nodesMap, int startX,
+   private:
+    std::pair<int, int> PaintNodeCalls(const QString &nodeName, const QMap<QString, NodeInfo> &nodesMap, int startX,
                                        int startY);
 
-    std::pair<AnfNodeItem*, bool> GetNode(const QString& inputName, const NodeInfo& info) {
-        const QString& nodeName = "%" + inputName + "(" + info.operatorName_ + ")";
-        AnfNodeItem* startNode;
+    std::pair<AnfNodeItem *, bool> GetNode(const QString &inputName, const NodeInfo &info) {
+        const QString &nodeName = "%" + inputName + "(" + info.operatorName_ + ")";
+        AnfNodeItem *startNode;
         bool exist;
         auto iter = nodes_.find(nodeName);
         if (iter == nodes_.end()) {
@@ -51,9 +51,9 @@ private:
         return {startNode, exist};
     }
 
-    IParser* parser_{nullptr};
-    QMap<QString, AnfNodeItem*> nodes_;
+    IParser *parser_{nullptr};
+    QMap<QString, AnfNodeItem *> nodes_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // NODEHIERARCHYSCENE_H
+#endif  // NODEHIERARCHYSCENE_H

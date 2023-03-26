@@ -18,7 +18,7 @@
 #include "Toast.h"
 
 namespace QEditor {
-IrParser::IrParser(EditView* editView, QObject* parent) : IParser(parent), editView_(editView) { ParseFuncGraph(); }
+IrParser::IrParser(EditView *editView, QObject *parent) : IParser(parent), editView_(editView) { ParseFuncGraph(); }
 
 void IrParser::ParseFuncGraph() {
     auto funcStartCursor = editView_->textCursor();
@@ -29,7 +29,7 @@ void IrParser::ParseFuncGraph() {
     funcStartCursor.setPosition(0, QTextCursor::MoveAnchor);
 
     auto entryCursor = editView_->document()->find(kIrEntry, funcStartCursor);
-    const auto& entryBlockText = entryCursor.block().text();
+    const auto &entryBlockText = entryCursor.block().text();
     constexpr auto entryStart = "@";
     auto entryStartPos = entryBlockText.indexOf(entryStart);
     if (entryStartPos == -1) {
@@ -66,7 +66,7 @@ void IrParser::ParseFuncGraph() {
             break;
         }
         // Return variable name
-        const auto& returnLineText = returnStartCursor.block().text();
+        const auto &returnLineText = returnStartCursor.block().text();
         auto returnVariableStart = returnLineText.indexOf(kSubGraphReturnStart);
         if (returnVariableStart == -1) {
             Toast::Instance().Show(Toast::kError,
@@ -98,16 +98,16 @@ void IrParser::ParseFuncGraph() {
             Toast::Instance().Show(Toast::kError, QString(tr("Incomplete subgraph @%1")).arg(subgraphName));
             break;
         }
-        int funcEnd = funcEndCursor.selectionEnd() + 1; // Set the end after '}'.
+        int funcEnd = funcEndCursor.selectionEnd() + 1;  // Set the end after '}'.
         qDebug() << funcEndCursor.selectedText();
 
         // Find all callees.
         QVector<QString> callees;
         QSet<QString> calleeSet;
         auto startBlock = funcStartCursor.block();
-        const auto& endBlock = funcEndCursor.block();
+        const auto &endBlock = funcEndCursor.block();
         do {
-            const auto& startBlockText = startBlock.text();
+            const auto &startBlockText = startBlock.text();
             // Direct call.
             constexpr auto calleeStartStr = "call @";
             constexpr auto calleeStartLen = 6;
@@ -306,9 +306,9 @@ void IrParser::ParseFuncGraph() {
     }
 }
 
-const QMap<QString, NodeInfo>& IrParser::ParseNodes(const QString& funcName) {
+const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
     nodesMap_.clear();
-    const FuncGraphInfo& funcGraphInfo = GetFuncGraphInfo(funcName);
+    const FuncGraphInfo &funcGraphInfo = GetFuncGraphInfo(funcName);
     if (funcGraphInfo.pos_ == -1) {
         qDebug() << "FuncGraphInfo is invalid, " << funcGraphInfo.name_;
         return nodesMap_;
@@ -319,7 +319,7 @@ const QMap<QString, NodeInfo>& IrParser::ParseNodes(const QString& funcName) {
         return nodesMap_;
     }
     endCursor.setPosition(funcGraphInfo.end_ - 1, QTextCursor::MoveAnchor);
-    const auto& endBlock = endCursor.block();
+    const auto &endBlock = endCursor.block();
     auto startCursor = editView_->textCursor();
     startCursor.setPosition(funcGraphInfo.start_, QTextCursor::MoveAnchor);
     auto startBlock = startCursor.block();
@@ -327,7 +327,7 @@ const QMap<QString, NodeInfo>& IrParser::ParseNodes(const QString& funcName) {
     constexpr auto assignOperation = " = ";
     const auto assignOperationLen = strlen(assignOperation);
     do {
-        const auto& startBlockText = startBlock.text();
+        const auto &startBlockText = startBlock.text();
         auto variableDefStart = startBlockText.indexOf(kNodeVariableDef);
         if (variableDefStart != -1) {
             variableDefStart += variableDefLen;
@@ -385,14 +385,14 @@ const QMap<QString, NodeInfo>& IrParser::ParseNodes(const QString& funcName) {
                 }
 
                 auto argumentsStr = cursor.selectedText();
-                argumentsStr = argumentsStr.mid(1, argumentsStr.length() - 2); // Remove start '(' and end ')'.
+                argumentsStr = argumentsStr.mid(1, argumentsStr.length() - 2);  // Remove start '(' and end ')'.
                 qDebug() << "argumentsStr: " << argumentsStr;
                 constexpr auto argsSeparator = ", ";
                 QStringList args = argumentsStr.split(argsSeparator);
                 bool hasConstantInput = false;
-                for (const auto& arg : args) {
+                for (const auto &arg : args) {
                     if (arg.startsWith("%")) {
-                        const auto& argName = arg.mid(1);
+                        const auto &argName = arg.mid(1);
                         qDebug() << "argName: " << argName;
                         inputs.push_back(argName);
                     } else {
@@ -411,4 +411,4 @@ const QMap<QString, NodeInfo>& IrParser::ParseNodes(const QString& funcName) {
     } while (startBlock != endBlock);
     return nodesMap_;
 }
-} // namespace QEditor
+}  // namespace QEditor

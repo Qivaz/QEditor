@@ -21,7 +21,7 @@
 #include <QWidget>
 
 namespace QEditor {
-DockView::DockView(QWidget* parent) : QDockWidget(parent) {
+DockView::DockView(QWidget *parent) : QDockWidget(parent) {
     QPalette pal;
     pal.setColor(QPalette::Background, QColor(28, 28, 28));
     setAutoFillBackground(true);
@@ -30,8 +30,8 @@ DockView::DockView(QWidget* parent) : QDockWidget(parent) {
     SetDockQss(this, "9pt", "rgb(255, 255, 255)", "rgb(54, 54, 54)", "2px", "5px");
 }
 
-void DockView::SetDockQss(QDockWidget* dockView, const QString& fontSize, const QString& textColor,
-                          const QString& backColor, const QString& leftPadding, const QString& topPadding) {
+void DockView::SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
+                          const QString &backColor, const QString &leftPadding, const QString &topPadding) {
     QStringList qss;
     qss.append(QString("QDockWidget{font-size:%1;color: %2;}").arg(fontSize).arg(textColor));
     qss.append(QString("QDockWidget::title{background:%1;padding-left: %2; padding-top: %3;}")
@@ -39,10 +39,11 @@ void DockView::SetDockQss(QDockWidget* dockView, const QString& fontSize, const 
                    .arg(leftPadding)
                    .arg(topPadding));
     qss.append(QString("QDockWidget::close-button, QDockWidget::float-button { border-image: url(:/images/x.svg); }"));
-    qss.append(QString("QDockWidget::close-button:hover, QDockWidget::float-button:hover { border-image: "
-                       "url(:/images/x.svg); background: red; }"));
+    qss.append(
+        QString("QDockWidget::close-button:hover, QDockWidget::float-button:hover { border-image: "
+                "url(:/images/x.svg); background: red; }"));
     qss.append(QString(
         "QDockWidget::close-button:pressed, QDockWidget::float-button:pressed { padding: 1px -1px -1px 1px; }"));
     dockView->setStyleSheet(qss.join(""));
 }
-} // namespace QEditor
+}  // namespace QEditor

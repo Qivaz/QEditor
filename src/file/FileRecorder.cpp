@@ -22,7 +22,7 @@
 #include <QFile>
 
 namespace QEditor {
-FileRecorder::FileRecorder(QObject* parent) : QObject(parent) {}
+FileRecorder::FileRecorder(QObject *parent) : QObject(parent) {}
 
 void FileRecorder::StoreFiles() {
     qDebug() << "kAppInternalPath_: " << kAppInternalPath_;
@@ -38,8 +38,8 @@ void FileRecorder::StoreFiles() {
     FileList fileList;
     fileList.pos_ = pos_;
     for (int i = 0; i < editViews_.size(); ++i) {
-        auto const& editView = editViews_[i];
-        auto terminalView = qobject_cast<TerminalView*>(editView);
+        auto const &editView = editViews_[i];
+        auto terminalView = qobject_cast<TerminalView *>(editView);
         if (terminalView == nullptr) {
             int pos = i;
             // Open file edit, not change, or empty new file edit.
@@ -57,7 +57,7 @@ void FileRecorder::StoreFiles() {
 
     // Store each file.
     for (int i = 0; i < editViews_.size(); ++i) {
-        auto const& editView = editViews_[i];
+        auto const &editView = editViews_[i];
         // Open file edit, not change, or empty new file edit.
         if (!editView->ShouldSave()) {
             continue;
@@ -100,7 +100,7 @@ void FileRecorder::LoadFiles() {
     // Load each file.
     qDebug() << ", loadedFileInfos_.size: " << loadedFileInfos_.size();
     for (size_t i = 0; i < loadedFileInfos_.size(); ++i) {
-        auto const& fileInfo = loadedFileInfos_[i];
+        auto const &fileInfo = loadedFileInfos_[i];
         // Terminal view.
         if (fileInfo.IsTerminal()) {
             continue;
@@ -108,7 +108,7 @@ void FileRecorder::LoadFiles() {
         // Open file edit, not change, or empty new file edit.
         if (fileInfo.IsNewFileOrOriginalOpenFile()) {
             texts_.emplace_back(QString(""));
-            mibEnums_.emplace_back(106); // UTF-8 in default.
+            mibEnums_.emplace_back(106);  // UTF-8 in default.
             continue;
         }
         // New file edit, or open file edit, has change.
@@ -126,4 +126,4 @@ void FileRecorder::LoadFiles() {
         mibEnums_.emplace_back(fileData.mibEnum_);
     }
 }
-} // namespace QEditor
+}  // namespace QEditor

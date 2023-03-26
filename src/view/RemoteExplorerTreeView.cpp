@@ -28,15 +28,16 @@
 #include <QTreeView>
 
 namespace QEditor {
-RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& rootPath)
+RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget *parent, const QString &rootPath)
     : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(parent)) {
-    setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
-                  "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-                  //                  "QTreeView::branch:has-children:!has-siblings:closed, \
+    setStyleSheet(
+        "QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
+        "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
+        //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
 //                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");
-                  "QTreeView::branch:has-siblings:!adjoins-item { \
+        "QTreeView::branch:has-siblings:!adjoins-item { \
                       border-image: none 0;\
                   }\
                   QTreeView::branch:has-siblings:adjoins-item {\
@@ -60,8 +61,9 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& r
                   }\
                   ");
 
-    verticalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-                                       "QScrollBar::add-line:vertical { \
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
+        "QScrollBar::add-line:vertical { \
                                             border: none; \
                                             background: none; \
                                         } \
@@ -69,8 +71,9 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& r
                                             border: none; \
                                             background: none; \
                                         }");
-    horizontalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-                                         "QScrollBar::add-line:horizontal { \
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
+        "QScrollBar::add-line:horizontal { \
                                               border: none; \
                                               background: none; \
                                           } \
@@ -79,7 +82,8 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& r
                                               background: none; \
                                           }");
 
-    menu_->setStyleSheet("\
+    menu_->setStyleSheet(
+        "\
                        QMenu {\
                            color: lightGray;\
                            background-color: rgb(40, 40, 40);\
@@ -122,7 +126,7 @@ RemoteExplorerTreeView::RemoteExplorerTreeView(QWidget* parent, const QString& r
     connect(this, &QTreeView::expanded, this, &RemoteExplorerTreeView::HandleExpanded);
 }
 
-void RemoteExplorerTreeView::HandleExpanded(const QModelIndex& index) {
+void RemoteExplorerTreeView::HandleExpanded(const QModelIndex &index) {
     qDebug() << "index: " << index.row() << index.column() << index.parent().data().toString()
              << index.data().toString();
 
@@ -131,7 +135,7 @@ void RemoteExplorerTreeView::HandleExpanded(const QModelIndex& index) {
              << modelIndex.data().toString();
 }
 
-void RemoteExplorerTreeView::HandleIndexPress(const QModelIndex& index) {
+void RemoteExplorerTreeView::HandleIndexPress(const QModelIndex &index) {
     if (QApplication::mouseButtons() != Qt::RightButton) {
         return;
     }
@@ -143,7 +147,7 @@ void RemoteExplorerTreeView::HandleIndexPress(const QModelIndex& index) {
              << modelIndex.data().toString();
 }
 
-void RemoteExplorerTreeView::HandleIndexClick(const QModelIndex& index) {
+void RemoteExplorerTreeView::HandleIndexClick(const QModelIndex &index) {
     qCritical() << "index: " << index.row() << index.column() << index.parent().data().toString()
                 << index.data().toString();
     QModelIndex modelIndex = index.model()->index(index.row(), index.column(), index.parent());
@@ -151,7 +155,7 @@ void RemoteExplorerTreeView::HandleIndexClick(const QModelIndex& index) {
                 << modelIndex.data().toString();
 }
 
-void RemoteExplorerTreeView::HandleDirLoaded(const QString& path) {
+void RemoteExplorerTreeView::HandleDirLoaded(const QString &path) {
     qDebug() << "path: " << path;
     if (path == gotoDir_) {
         gotoForLoaded_ = true;
@@ -159,7 +163,7 @@ void RemoteExplorerTreeView::HandleDirLoaded(const QString& path) {
     }
 }
 
-void RemoteExplorerTreeView::timerEvent(QTimerEvent* event) {}
+void RemoteExplorerTreeView::timerEvent(QTimerEvent *event) {}
 
-void RemoteExplorerTreeView::GotoPathPosition(const QString& path) {}
-} // namespace QEditor
+void RemoteExplorerTreeView::GotoPathPosition(const QString &path) {}
+}  // namespace QEditor

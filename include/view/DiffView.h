@@ -23,51 +23,51 @@
 namespace QEditor {
 class DiffHtmlView : public QTextEdit {
     Q_OBJECT
-public:
-    DiffHtmlView(QWidget* parent = nullptr);
+   public:
+    DiffHtmlView(QWidget *parent = nullptr);
     ~DiffHtmlView() = default;
 
     void ZoomIn();
     void ZoomOut();
 
-    const EditView* diffFormerEditView() const { return diffFormerEditView_; }
-    void setDiffFormerEditView(const EditView* diffFormerEditView) { diffFormerEditView_ = diffFormerEditView; }
-    const EditView* diffLatterEditView() const { return diffLatterEditView_; }
-    void setDiffLatterEditView(const EditView* diffLatterEditView) { diffLatterEditView_ = diffLatterEditView; }
+    const EditView *diffFormerEditView() const { return diffFormerEditView_; }
+    void setDiffFormerEditView(const EditView *diffFormerEditView) { diffFormerEditView_ = diffFormerEditView; }
+    const EditView *diffLatterEditView() const { return diffLatterEditView_; }
+    void setDiffLatterEditView(const EditView *diffLatterEditView) { diffLatterEditView_ = diffLatterEditView; }
 
-protected:
-    void wheelEvent(QWheelEvent* event);
+   protected:
+    void wheelEvent(QWheelEvent *event);
 
-private:
+   private:
     int currentFontSize_{font().pointSize()};
 
-    const EditView* diffFormerEditView_{nullptr};
-    const EditView* diffLatterEditView_{nullptr};
+    const EditView *diffFormerEditView_{nullptr};
+    const EditView *diffLatterEditView_{nullptr};
 };
 
 class DiffTextView : public EditView {
     Q_OBJECT
-public:
-    DiffTextView(QWidget* parent = nullptr);
+   public:
+    DiffTextView(QWidget *parent = nullptr);
     ~DiffTextView() = default;
 
-    const EditView* diffFormerEditView() const { return diffFormerEditView_; }
-    void setDiffFormerEditView(const EditView* diffFormerEditView) { diffFormerEditView_ = diffFormerEditView; }
-    const EditView* diffLatterEditView() const { return diffLatterEditView_; }
-    void setDiffLatterEditView(const EditView* diffLatterEditView) { diffLatterEditView_ = diffLatterEditView; }
+    const EditView *diffFormerEditView() const { return diffFormerEditView_; }
+    void setDiffFormerEditView(const EditView *diffFormerEditView) { diffFormerEditView_ = diffFormerEditView; }
+    const EditView *diffLatterEditView() const { return diffLatterEditView_; }
+    void setDiffLatterEditView(const EditView *diffLatterEditView) { diffLatterEditView_ = diffLatterEditView; }
 
     void SetModifiedIcon(bool) override {}
     void SetModified(bool) override {}
-    void Hover(QTextCursor&) override {}
+    void Hover(QTextCursor &) override {}
 
-protected:
+   protected:
     void UnderpaintCurrentBlock() override {
         // Clear all previous selections.
         QList<QTextEdit::ExtraSelection> extraSelections;
         setExtraSelections(extraSelections);
     }
 
-    void keyPressEvent(QKeyEvent* event) override {
+    void keyPressEvent(QKeyEvent *event) override {
         // ReadOnly
         if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down || event->key() == Qt::Key_Left ||
             event->key() == Qt::Key_Right || event->key() == Qt::Key_Home || event->key() == Qt::Key_End ||
@@ -75,7 +75,7 @@ protected:
             QPlainTextEdit::keyPressEvent(event);
         }
     }
-    void keyReleaseEvent(QKeyEvent* event) override {
+    void keyReleaseEvent(QKeyEvent *event) override {
         // ReadOnly
         if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down || event->key() == Qt::Key_Left ||
             event->key() == Qt::Key_Right || event->key() == Qt::Key_Home || event->key() == Qt::Key_End ||
@@ -84,9 +84,9 @@ protected:
         }
     }
 
-private:
-    const EditView* diffFormerEditView_{nullptr};
-    const EditView* diffLatterEditView_{nullptr};
+   private:
+    const EditView *diffFormerEditView_{nullptr};
+    const EditView *diffLatterEditView_{nullptr};
 };
 
 #define USE_DIFF_TEXT_VIEW
@@ -95,6 +95,6 @@ using DiffView = DiffTextView;
 #else
 using DiffView = DiffHtmlView;
 #endif
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // DIFFVIEW_H
+#endif  // DIFFVIEW_H

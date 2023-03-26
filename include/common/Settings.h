@@ -21,23 +21,23 @@
 
 namespace QEditor {
 class Settings final {
-public:
+   public:
     Settings();
     ~Settings() { delete settings_; }
 
-    void Set(const QString& nodeName, const QString& keyName, const QVariant& var) {
+    void Set(const QString &nodeName, const QString &keyName, const QVariant &var) {
         settings_->setValue(QString("/%1/%2").arg(nodeName).arg(keyName), var);
     }
 
-    QVariant Get(const QString& nodeName, const QString& keyName, const QVariant& defaultValue) {
+    QVariant Get(const QString &nodeName, const QString &keyName, const QVariant &defaultValue) {
         QVariant var = settings_->value(QString("/%1/%2").arg(nodeName).arg(keyName), defaultValue);
         return var;
     }
 
-private:
+   private:
     QString settingsFile_;
-    QSettings* settings_{nullptr};
+    QSettings *settings_{nullptr};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // SETTINGS_H
+#endif  // SETTINGS_H

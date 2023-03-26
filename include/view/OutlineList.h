@@ -22,25 +22,25 @@
 
 namespace QEditor {
 class OverviewItem : public QTreeWidgetItem {
-public:
+   public:
     OverviewItem(int num) : num_(num) {}
     int num() { return num_; }
 
-private:
+   private:
     int num_;
 };
 
 class OutlineList : public QTreeWidget {
-public:
-    OutlineList(IParser* parser);
+   public:
+    OutlineList(IParser *parser);
 
-    void HandleItemClicked(QTreeWidgetItem* item, int column);
+    void HandleItemClicked(QTreeWidgetItem *item, int column);
 
     int GetIndexByCursorPos(int cursorPos);
 
-private:
-    IParser* parser_{nullptr};
+   private:
+    IParser *parser_{nullptr};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // OUTLINELIST_H
+#endif  // OUTLINELIST_H

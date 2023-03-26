@@ -24,16 +24,16 @@
 namespace QEditor {
 class SearchTargets : public QObject {
     Q_OBJECT
-public:
-    static void UpdateTargets(const QString&);
+   public:
+    static void UpdateTargets(const QString &);
     static void Clear();
 
     static void StoreTargets();
     static void LoadTargets();
 
-    static const QStringList& targets() { return targets_; }
+    static const QStringList &targets() { return targets_; }
 
-private:
+   private:
     static QStringList targets_;
 
     static const QString kAppInternalSearchTargetsDirName_;
@@ -41,6 +41,6 @@ private:
 
     static const int kMaxSearchTargetsNum_ = Constants::kMaxSearchTargetsNum;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // SEARCHTARGETS_H
+#endif  // SEARCHTARGETS_H

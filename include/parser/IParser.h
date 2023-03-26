@@ -32,8 +32,8 @@ struct FuncGraphInfo {
 };
 
 struct NodeInfo {
-    QString variableName_; // Variable name
-    QString operatorName_; // Operator name
+    QString variableName_;  // Variable name
+    QString operatorName_;  // Operator name
     int pos_{-1};
     QVector<QString> varInputs_;
     bool hasConstantInput_;
@@ -41,18 +41,18 @@ struct NodeInfo {
 
 class IParser : public QObject {
     Q_OBJECT
-public:
-    explicit IParser(QObject* parent = nullptr) : QObject(parent) {}
+   public:
+    explicit IParser(QObject *parent = nullptr) : QObject(parent) {}
     virtual ~IParser() = default;
 
     virtual void ParseFuncGraph() = 0;
-    virtual const QString& GetEntry() const = 0;
-    virtual FuncGraphInfo GetFuncGraphInfo(const QString& funcName) const = 0;
-    virtual const QVector<FuncGraphInfo>& funcGraphInfos() const = 0;
+    virtual const QString &GetEntry() const = 0;
+    virtual FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const = 0;
+    virtual const QVector<FuncGraphInfo> &funcGraphInfos() const = 0;
     virtual int GetIndexByCursorPosition(int cursorPos) const = 0;
 
-    virtual const QMap<QString, NodeInfo>& ParseNodes(const QString& funcName) = 0;
+    virtual const QMap<QString, NodeInfo> &ParseNodes(const QString &funcName) = 0;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // IPARSER_H
+#endif  // IPARSER_H

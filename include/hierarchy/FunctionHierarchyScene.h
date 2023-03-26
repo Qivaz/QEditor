@@ -24,15 +24,15 @@
 namespace QEditor {
 class FunctionHierarchyScene : public HierarchyScene {
     Q_OBJECT
-public:
-    explicit FunctionHierarchyScene(IParser* parser, QMenu* itemMenu, QObject* parent = nullptr);
+   public:
+    explicit FunctionHierarchyScene(IParser *parser, QMenu *itemMenu, QObject *parent = nullptr);
 
-private:
-    std::pair<int, int> PaintFunctionCalls(const QString& funcName, int startX, int startY);
-    std::pair<int, int> PaintFunctionCalls(const QString& funcName, int depth);
+   private:
+    std::pair<int, int> PaintFunctionCalls(const QString &funcName, int startX, int startY);
+    std::pair<int, int> PaintFunctionCalls(const QString &funcName, int depth);
 
-    std::pair<FunctionItem*, bool> GetNode(const QString& funcName) {
-        FunctionItem* startNode;
+    std::pair<FunctionItem *, bool> GetNode(const QString &funcName) {
+        FunctionItem *startNode;
         bool exist;
         auto iter = nodes_.find(funcName);
         if (iter == nodes_.end()) {
@@ -49,9 +49,9 @@ private:
         return {startNode, exist};
     }
 
-    IParser* parser_{nullptr};
-    QMap<QString, FunctionItem*> nodes_;
+    IParser *parser_{nullptr};
+    QMap<QString, FunctionItem *> nodes_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // FUNCTIONHIERARCHYSCENE_H
+#endif  // FUNCTIONHIERARCHYSCENE_H

@@ -27,7 +27,7 @@
 // Q_IMPORT_PLUGIN(QIbusPlatformInputContextPlugin)
 // Q_IMPORT_PLUGIN(StaticQIbusPlatformInputContextPluginInstance)
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QEditor::Constants::kAppPath = QApplication::applicationDirPath();
     QEditor::Constants::kAppInternalPath =

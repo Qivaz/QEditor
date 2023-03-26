@@ -29,7 +29,7 @@
 namespace QEditor {
 class SingleAppServer : public QObject {
     Q_OBJECT
-public:
+   public:
     SingleAppServer() : server_(new QLocalServer()) {
         connect(server_, SIGNAL(newConnection()), this, SLOT(HandleNewConnection()));
     }
@@ -56,13 +56,13 @@ public:
         qDebug() << "Run server success.";
     }
 
-public slots:
+   public slots:
     void HandleNewConnection() {
         qDebug() << "New Connection.";
         qDebug() << "listen: " << server_->serverName();
         qDebug() << "hasPendingConnections: " << server_->hasPendingConnections();
 
-        QLocalSocket* socket = server_->nextPendingConnection();
+        QLocalSocket *socket = server_->nextPendingConnection();
         connect(socket, SIGNAL(readyRead()), this, SLOT(HandleReadyRead()));
         connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
     }
@@ -78,24 +78,24 @@ public slots:
         MainWindow::Instance().setWindowFlags(eFlags);
         MainWindow::Instance().show();
         // Step 2:
-        for (QWindow* appWindow : QGuiApplication::allWindows()) {
+        for (QWindow *appWindow : QGuiApplication::allWindows()) {
             if (appWindow != MainWindow::Instance().windowHandle()) {
                 continue;
             }
-            appWindow->show();  // Bring window to top on OSX
-            appWindow->raise(); // Bring window from minimized state on OSX
+            appWindow->show();   // Bring window to top on OSX
+            appWindow->raise();  // Bring window from minimized state on OSX
 
-            appWindow->requestActivate(); // Bring window to front/unminimize on windows.
+            appWindow->requestActivate();  // Bring window to front/unminimize on windows.
         }
-#else // defined(Q_OS_LINUX) or defined(Q_OS_OSX)
-      // Not work in Windows, only blink on taskbar.
-        MainWindow::Instance().raise();          // Mac OS
-        MainWindow::Instance().activateWindow(); // Linux OS
+#else  // defined(Q_OS_LINUX) or defined(Q_OS_OSX)
+       // Not work in Windows, only blink on taskbar.
+        MainWindow::Instance().raise();           // Mac OS
+        MainWindow::Instance().activateWindow();  // Linux OS
 #endif
     }
 
     void HandleReadyRead() {
-        QLocalSocket* socket = static_cast<QLocalSocket*>(sender());
+        QLocalSocket *socket = static_cast<QLocalSocket *>(sender());
         if (socket == nullptr) {
             qDebug() << "socket is null.";
             return;
@@ -121,13 +121,13 @@ public slots:
         socket->flush();
     }
 
-private:
-    QLocalServer* server_;
+   private:
+    QLocalServer *server_;
 };
 
 class SingleAppClient : public QObject {
     Q_OBJECT
-public:
+   public:
     SingleAppClient() : socket_(new QLocalSocket()) {
         connect(socket_, SIGNAL(connected()), SLOT(HandleConnected()));
         connect(socket_, SIGNAL(disconnected()), SLOT(HandleDisConnected()));
@@ -140,8 +140,8 @@ public:
         delete socket_;
     }
 
-public:
-    bool ConnectToServer(const QString& message, const QString& serverName = Constants::kSingleAppHostName) {
+   public:
+    bool ConnectToServer(const QString &message, const QString &serverName = Constants::kSingleAppHostName) {
         socket_->connectToServer(serverName);
         if (socket_->waitForConnected()) {
             qDebug() << "connect server success.";
@@ -153,8 +153,8 @@ public:
         }
     }
 
-private:
-    void SendMessage(const QString& msg) {
+   private:
+    void SendMessage(const QString &msg) {
         // To support unicode chars, should not use 'msg.toStdString().c_str()'
         socket_->write(msg.toLocal8Bit());
         socket_->flush();
@@ -168,24 +168,24 @@ private:
         qDebug() << "Read data from server: " << respond;
     }
 
-private slots:
+   private slots:
     void HandleConnected() { qDebug() << "connected."; }
 
     void HandleDisConnected() { qDebug() << "disconnected."; }
 
     void HandleError(QLocalSocket::LocalSocketError error) { qDebug() << error; }
 
-private:
-    QLocalSocket* socket_;
+   private:
+    QLocalSocket *socket_;
 };
 
 class SingleApp : public QObject {
     Q_OBJECT
-public:
+   public:
     SingleApp() = default;
     ~SingleApp() = default;
 
-    bool TryRun(const QString& filePath) {
+    bool TryRun(const QString &filePath) {
         // Already running.
         if (client_.ConnectToServer(filePath.isEmpty() ? "[NO_FILE]" : filePath)) {
             return false;
@@ -195,10 +195,10 @@ public:
         return true;
     }
 
-private:
+   private:
     SingleAppClient client_;
     SingleAppServer server_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // SINGLEAPP_H
+#endif  // SINGLEAPP_H

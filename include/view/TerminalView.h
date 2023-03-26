@@ -23,16 +23,16 @@
 namespace QEditor {
 class TerminalView : public EditView {
     Q_OBJECT
-public:
-    TerminalView(const QString& ip, int port, const QString& user, const QString& pwd, QWidget* parent = nullptr);
+   public:
+    TerminalView(const QString &ip, int port, const QString &user, const QString &pwd, QWidget *parent = nullptr);
     ~TerminalView() {
         if (sshClient_ != nullptr) {
             delete sshClient_;
         }
     }
 
-    SshClient* sshClient() const { return sshClient_; }
-    void setSshClient(SshClient* sshClient) { sshClient_ = sshClient; }
+    SshClient *sshClient() const { return sshClient_; }
+    void setSshClient(SshClient *sshClient) { sshClient_ = sshClient; }
 
     void CreateConnection();
 
@@ -44,29 +44,29 @@ public:
 
     QString pwd() const;
 
-private:
-    void HandleAnsiEscapeCode(const QString& constMsg, QTextCursor& cursor);
+   private:
+    void HandleAnsiEscapeCode(const QString &constMsg, QTextCursor &cursor);
 
-protected:
-    void keyPressEvent(QKeyEvent* event) override;
-    void keyReleaseEvent(QKeyEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
-    void contextMenuEvent(QContextMenuEvent* event) override;
+   protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
-private slots:
-    void HandleConnectStateChanged(bool state, const QString& ip, int port);
-    void HandleShellConnected(const QString& ip, int port);
-    void HandleShellDataArrived(const QString& msg, const QString& ip, int port);
+   private slots:
+    void HandleConnectStateChanged(bool state, const QString &ip, int port);
+    void HandleShellConnected(const QString &ip, int port);
+    void HandleShellDataArrived(const QString &msg, const QString &ip, int port);
 
-signals:
-    void sigShellSend(const QString& msg);
+   signals:
+    void sigShellSend(const QString &msg);
     void sigDisconnected();
 
-private:
+   private:
     // SSH Terminal.
-    SshClient* sshClient_{nullptr};
+    SshClient *sshClient_{nullptr};
 
     QString ip_;
     int port_;
@@ -84,6 +84,6 @@ private:
 
     QTextCharFormat savedCharFormat_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // TERMINALVIEW_H
+#endif  // TERMINALVIEW_H

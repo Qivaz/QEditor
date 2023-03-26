@@ -33,16 +33,16 @@ class Arrow;
 class IParser;
 
 class FunctionItem : public NodeItem {
-public:
-    FunctionItem(const QString& name, IParser* parser, NodeType diagramType, QMenu* contextMenu,
-                 QGraphicsItem* parent = nullptr);
+   public:
+    FunctionItem(const QString &name, IParser *parser, NodeType diagramType, QMenu *contextMenu,
+                 QGraphicsItem *parent = nullptr);
 
-protected:
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+   protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
-    IParser* parser_{nullptr};
+   private:
+    IParser *parser_{nullptr};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // FUNCTIONITEM_H
+#endif  // FUNCTIONITEM_H

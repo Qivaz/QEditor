@@ -22,12 +22,12 @@
 namespace QEditor {
 class DockView : public QDockWidget {
     Q_OBJECT
-public:
-    DockView(QWidget* parent = nullptr);
+   public:
+    DockView(QWidget *parent = nullptr);
     ~DockView() { setWidget(nullptr); }
 
-    void SetDockQss(QDockWidget* dockView, const QString& fontSize, const QString& textColor, const QString& backColor,
-                    const QString& leftPadding, const QString& topPadding);
+    void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor, const QString &backColor,
+                    const QString &leftPadding, const QString &topPadding);
 
     int savedMaxWidth() const { return savedMaxWidth_; }
     void setSavedMaxWidth(int savedMaxWidth) {
@@ -36,9 +36,9 @@ public:
         }
     }
 
-private:
+   private:
     int savedMaxWidth_{0};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // DOCKVIEW_H
+#endif  // DOCKVIEW_H

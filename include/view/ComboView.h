@@ -23,8 +23,8 @@
 namespace QEditor {
 class ComboView : public QComboBox {
     Q_OBJECT
-public:
-    ComboView(QWidget* parent = nullptr, bool fixed = true);
+   public:
+    ComboView(QWidget *parent = nullptr, bool fixed = true);
     virtual ~ComboView() { delete lineEdit(); }
 
     void ShrinkForPopup();
@@ -33,10 +33,10 @@ public:
     void showPopup() override;
     void hidePopup() override;
 
-private:
+   private:
     bool fixed_{false};
     qreal maxWidth_{0};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // COMBOVIEW_H
+#endif  // COMBOVIEW_H

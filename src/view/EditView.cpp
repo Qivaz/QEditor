@@ -38,8 +38,8 @@ namespace QEditor {
 QVector<bool> NewFileNum::numbers_use_status_;
 
 // Open file edit.
-EditView::EditView(const QFileInfo& fileInfo, QWidget* parent)
-    : tabView_((TabView*)parent),
+EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
+    : tabView_((TabView *)parent),
       fileName_(fileInfo.fileName()),
       filePath_(fileInfo.canonicalFilePath()),
       fileType_(filePath_),
@@ -52,13 +52,13 @@ EditView::EditView(const QFileInfo& fileInfo, QWidget* parent)
 }
 
 // New file edit.
-EditView::EditView(const QString& fileName, QWidget* parent)
-    : tabView_((TabView*)parent), fileName_(fileName), filePath_(""), menu_(new QMenu(parent)) {
+EditView::EditView(const QString &fileName, QWidget *parent)
+    : tabView_((TabView *)parent), fileName_(fileName), filePath_(""), menu_(new QMenu(parent)) {
     Init();
 }
 
-EditView::EditView(QWidget* parent)
-    : tabView_((TabView*)parent), fileName_(""), filePath_(""), menu_(new QMenu(parent)) {
+EditView::EditView(QWidget *parent)
+    : tabView_((TabView *)parent), fileName_(""), filePath_(""), menu_(new QMenu(parent)) {
     EditView("", parent);
     Init();
 }
@@ -66,15 +66,17 @@ EditView::EditView(QWidget* parent)
 void EditView::Init() {
     setBackgroundVisible(false);
     //    setCenterOnScroll(true);
-    setStyleSheet("color: rgb(215, 215, 210);"
-                  "background-color: rgb(28, 28, 28);"
-                  "selection-color: lightGray;"
-                  "selection-background-color: rgb(9, 71, 113);" // rgb(76, 76, 167)
-                  "border: none;"
-                  /*"font-family: '文泉驿等宽正黑';"*/);
+    setStyleSheet(
+        "color: rgb(215, 215, 210);"
+        "background-color: rgb(28, 28, 28);"
+        "selection-color: lightGray;"
+        "selection-background-color: rgb(9, 71, 113);"  // rgb(76, 76, 167)
+        "border: none;"
+        /*"font-family: '文泉驿等宽正黑';"*/);
 
-    verticalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                       "QScrollBar::add-line:vertical { \
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:vertical { \
                                           border: none; \
                                           background: none; \
                                         } \
@@ -82,8 +84,9 @@ void EditView::Init() {
                                           border: none; \
                                           background: none; \
                                         }");
-    horizontalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                         "QScrollBar::add-line:horizontal { \
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:horizontal { \
                                             border: none; \
                                             background: none; \
                                           } \
@@ -91,7 +94,8 @@ void EditView::Init() {
                                             border: none; \
                                             background: none; \
                                           }");
-    menu_->setStyleSheet("\
+    menu_->setStyleSheet(
+        "\
                      QMenu {\
                          color: lightGray;\
                          background-color: rgb(40, 40, 40);\
@@ -169,14 +173,14 @@ void EditView::ApplyTabCharNum() {
     setTabStopDistance(monoSingleSpace * num);
 }
 
-void EditView::setFileEncoding(FileEncoding&& fileEncoding) {
+void EditView::setFileEncoding(FileEncoding &&fileEncoding) {
     fileEncoding_ = std::move(fileEncoding);
 
     // Update status bar info. if file encoding changes.
     MainWindow::Instance().UpdateStatusBarRareInfo("Unix", fileEncoding_.name(), 0);
 }
 
-void EditView::ChangeFileEncoding(FileEncoding&& fileEncoding) {
+void EditView::ChangeFileEncoding(FileEncoding &&fileEncoding) {
     if (fileEncoding.hasBom() == fileEncoding_.hasBom() && fileEncoding.mibEnum() == fileEncoding_.mibEnum()) {
         return;
     }
@@ -210,7 +214,7 @@ void EditView::ChangeFileEncoding(FileEncoding&& fileEncoding) {
 }
 
 // Jump to the position of text cursor.
-void EditView::GotoCursor(const QTextCursor& cursor) {
+void EditView::GotoCursor(const QTextCursor &cursor) {
     setTextCursor(cursor);
     setFocus();
 }
@@ -284,7 +288,7 @@ void EditView::SelectCurrentBlock(int lineCount) {
     setTextCursor(cursor);
 }
 
-void EditView::AddMarkText(const QString& str) {
+void EditView::AddMarkText(const QString &str) {
     if (str == '.' || str == '*' || str == '+' || str == ',' || str == '^' || str == '&' || str == '?') {
         return;
     }
@@ -294,7 +298,7 @@ void EditView::AddMarkText(const QString& str) {
     markTexts_.push_back(str);
 }
 
-bool EditView::RemoveMarkText(const QString& str) {
+bool EditView::RemoveMarkText(const QString &str) {
     if (str == '\\') {
         return markTexts_.removeOne("\\\\");
     }
@@ -321,7 +325,7 @@ QColor EditView::GetMarkTextBackground(int i) {
 
 void EditView::HighlightMarkTexts() {
     for (int i = 0; i < markTexts_.size(); ++i) {
-        const auto& text = markTexts_[i];
+        const auto &text = markTexts_[i];
         HighlightVisibleChars(text, QColor(Qt::white), GetMarkTextBackground(i));
     }
 }
@@ -339,7 +343,8 @@ int EditView::GetLineNumberAreaWidth() {
     if (minSpace == -1) {
         qreal monoSingleSpace = QFontMetricsF(font()).horizontalAdvance(QLatin1Char('9'));
         Constants::kMonoSingleSpace = monoSingleSpace;
-        qDebug() << "EditView::lineNumberAreaWidth, singleSpace: " << Constants::kMonoSingleSpace << ", font: " << font();
+        qDebug() << "EditView::lineNumberAreaWidth, singleSpace: " << Constants::kMonoSingleSpace
+                 << ", font: " << font();
         minSpace = 10 + Constants::kMonoSingleSpace + padding;
     }
     qreal space = Constants::kMonoSingleSpace * digits + padding;
@@ -354,12 +359,12 @@ void EditView::HandleBlockCountChanged(int newBlockCount) {
     setViewportMargins(GetLineNumberAreaWidth(), 0, 0, 0);
 }
 
-void EditView::HandleUpdateRequest(const QRect& rect, int dy) {
+void EditView::HandleUpdateRequest(const QRect &rect, int dy) {
     qDebug() << "rect: " << rect;
     UpdateLineNumberArea(rect, dy);
 }
 
-void EditView::UpdateLineNumberArea(const QRect& rect, int dy) {
+void EditView::UpdateLineNumberArea(const QRect &rect, int dy) {
     qDebug() << "EditView::updateLineNumberArea";
     if (dy) {
         lineNumberArea_->scroll(0, dy);
@@ -372,7 +377,7 @@ void EditView::UpdateLineNumberArea(const QRect& rect, int dy) {
     }
 }
 
-void EditView::SetCurrentFile(const QString& filePath) {
+void EditView::SetCurrentFile(const QString &filePath) {
     filePath_ = filePath;
     document()->setModified(false);
 
@@ -383,7 +388,7 @@ void EditView::SetCurrentFile(const QString& filePath) {
     setWindowFilePath(shownName);
 }
 
-bool EditView::SaveFile(const QString& filePath) {
+bool EditView::SaveFile(const QString &filePath) {
     QString errorMessage;
 
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
@@ -419,12 +424,12 @@ bool EditView::SaveFile(const QString& filePath) {
 }
 
 bool EditView::Save() {
-    if (filePath_.isEmpty()) { // New file.
+    if (filePath_.isEmpty()) {  // New file.
         if (document()->isEmpty()) {
             return true;
         }
         return SaveAs();
-    } else { // Open file.
+    } else {  // Open file.
         return MaybeSave();
     }
 }
@@ -441,7 +446,7 @@ bool EditView::SaveAs() {
 
 // Return true if save or discard, otherwise false.
 bool EditView::MaybeSave() {
-    if (!ShouldSave()) { // Not use document()->isModified() any more.
+    if (!ShouldSave()) {  // Not use document()->isModified() any more.
         return true;
     }
     QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName),
@@ -453,14 +458,14 @@ bool EditView::MaybeSave() {
     warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
     int res = warningBox.exec();
     switch (res) {
-    case QMessageBox::Save:
-        return SaveFile(filePath_);
-    case QMessageBox::Discard:
-        return true;
-    case QMessageBox::Cancel:
-        return false;
-    default:
-        break;
+        case QMessageBox::Save:
+            return SaveFile(filePath_);
+        case QMessageBox::Discard:
+            return true;
+        case QMessageBox::Cancel:
+            return false;
+        default:
+            break;
     }
     return true;
 }
@@ -497,7 +502,7 @@ void EditView::HandleSelectionChanged() {
 void EditView::HighlightFocusChars() { HighlightVisibleChars(selectedText_); }
 
 // Hightlight the 'text' only in the visible region.
-void EditView::HighlightVisibleChars(const QString& text, const QColor& foreground, const QColor& background) {
+void EditView::HighlightVisibleChars(const QString &text, const QColor &foreground, const QColor &background) {
     if (text.isEmpty()) {
         return;
     }
@@ -538,7 +543,7 @@ void EditView::HighlightVisibleChars(const QString& text, const QColor& foregrou
             qDebug() << "lineAt[" << i << "]: position: " << block.layout()->lineAt(i).position()
                      << ", rect: " << block.layout()->lineAt(i).rect();
         }
-#endif // DEBUG_BLOCK_LINE
+#endif  // DEBUG_BLOCK_LINE
 
         startCursor = document()->find(text, startCursor);
         if (startCursor.isNull()) {
@@ -560,7 +565,7 @@ void EditView::HighlightVisibleChars(const QString& text, const QColor& foregrou
             return;
         }
     }
-#else // BLOCK_POS_SEARCH
+#else  // BLOCK_POS_SEARCH
     int start = 0;
     while (block.isValid() && block.isVisible() && block.position() < visibleBottomPos) {
         qDebug() << "visibleBottomPos: " << visibleBottomPos << ", pos: " << block.position();
@@ -573,8 +578,8 @@ void EditView::HighlightVisibleChars(const QString& text, const QColor& foregrou
             qDebug() << "lineAt[" << i << "]: position: " << block.layout()->lineAt(i).position()
                      << ", rect: " << block.layout()->lineAt(i).rect();
         }
-#endif // DEBUG_BLOCK_LINE
-       // Check the line, not the block.
+#endif  // DEBUG_BLOCK_LINE
+        // Check the line, not the block.
         start = block.text().indexOf(text, 0);
         while (start != -1) {
             auto posInText = block.position() + start;
@@ -597,12 +602,12 @@ void EditView::HighlightVisibleChars(const QString& text, const QColor& foregrou
         // Continue the next block.
         block = block.next();
     }
-#endif // BLOCK_POS_SEARCH
+#endif  // BLOCK_POS_SEARCH
 }
 
 void EditView::UpdateStatusBarWithCursor() {
     // Update status bar with cursor.
-    const QTextCursor& cursor = textCursor();
+    const QTextCursor &cursor = textCursor();
     QString posOrSel;
     if (cursor.hasSelection()) {
         posOrSel = tr("Sel: ") + QString::number(cursor.selectedText().length());
@@ -714,7 +719,7 @@ void EditView::TrigerParser() {
     }
 }
 
-void EditView::Hover(QTextCursor& cursor) {
+void EditView::Hover(QTextCursor &cursor) {
     auto hoverPos = cursor.position();
     if (hoverPos == hoverPos_) {
         return;
@@ -722,7 +727,7 @@ void EditView::Hover(QTextCursor& cursor) {
     hoverPos_ = hoverPos;
 
     if (jumpAvailable_) {
-        HighlightFocus(); // Clear the chars marked before.
+        HighlightFocus();  // Clear the chars marked before.
     }
     // If ctrl not pressed, ignore.
     if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
@@ -738,7 +743,7 @@ QString EditView::GetCursorText() {
     return GetCursorText(cursor);
 }
 
-QString EditView::GetCursorText(QTextCursor& textCursor) {
+QString EditView::GetCursorText(QTextCursor &textCursor) {
     if (!textCursor.hasSelection()) {
         textCursor.select(QTextCursor::WordUnderCursor);
     }
@@ -747,11 +752,11 @@ QString EditView::GetCursorText(QTextCursor& textCursor) {
     return text;
 }
 
-void EditView::JumpHint(QTextCursor& cursor) {
+void EditView::JumpHint(QTextCursor &cursor) {
     if (!cursor.hasSelection()) {
         cursor.select(QTextCursor::WordUnderCursor);
     }
-    const auto& text = cursor.selectedText();
+    const auto &text = cursor.selectedText();
     funcGraphInfo_ = parser_->GetFuncGraphInfo(text);
     if (funcGraphInfo_.pos_ != -1) {
         HighlightChars(cursor.selectionStart(), cursor.selectionEnd() - cursor.selectionStart(), QColor(16, 126, 172),
@@ -769,8 +774,8 @@ void EditView::Jump() {
 }
 
 std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor cursor, QTextCursor::MoveOperation direct,
-                                                                const QChar& startBracketChar,
-                                                                const QChar& endBracketChar) {
+                                                                const QChar &startBracketChar,
+                                                                const QChar &endBracketChar) {
     // Always start at outside of bracket, so jump one firstly.
     if (direct == QTextCursor::Left) {
         cursor.movePosition(direct, QTextCursor::MoveAnchor);
@@ -791,7 +796,7 @@ std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor curs
         }
 
         auto doc = document();
-        auto charactor = doc->characterAt(cursor.position()); // Get the char on the right hand of position.
+        auto charactor = doc->characterAt(cursor.position());  // Get the char on the right hand of position.
         qDebug() << "current char: " << charactor;
         if (charactor == startBracketChar) {
             qDebug() << "Match more start bracket char: " << startBracketChar;
@@ -811,7 +816,7 @@ std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor curs
     return std::make_pair(cursor, false);
 }
 
-bool EditView::HighlightChars(int startPos, int count, const QColor& foreground, const QColor& background,
+bool EditView::HighlightChars(int startPos, int count, const QColor &foreground, const QColor &background,
                               bool underline) {
     QList<QTextEdit::ExtraSelection> markExtraSelections = extraSelections();
     qDebug() << ", startPos: " << startPos << ", count: " << count << ", char: " << document()->characterAt(startPos)
@@ -832,7 +837,7 @@ bool EditView::HighlightChars(int startPos, int count, const QColor& foreground,
     qDebug() << "To mark chars: " << startCursor.selectedText() << ", at line: " << startCursor.blockNumber();
     QTextEdit::ExtraSelection selection;
     selection.format.setForeground(foreground);
-    selection.format.setBackground(background); // QColor(255, 54, 100)
+    selection.format.setBackground(background);  // QColor(255, 54, 100)
     selection.format.setFontUnderline(underline);
     selection.cursor = startCursor;
     markExtraSelections.append(selection);
@@ -841,7 +846,7 @@ bool EditView::HighlightChars(int startPos, int count, const QColor& foreground,
     return true;
 }
 
-void EditView::HighlightBrackets(const QTextCursor& leftCursor, const QTextCursor& rightCursor) {
+void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCursor &rightCursor) {
     qDebug() << "left char: " << document()->characterAt(leftCursor.position());
     qDebug() << "right char: " << document()->characterAt(rightCursor.position());
 
@@ -866,7 +871,7 @@ void EditView::HighlightBrackets(const QTextCursor& leftCursor, const QTextCurso
         }
     }
     QTextEdit::ExtraSelection selection;
-    QColor markColor = QColor(52, 58, 64); // QColor(60, 60, 90);
+    QColor markColor = QColor(52, 58, 64);  // QColor(60, 60, 90);
     selection.format.setBackground(markColor);
     // TODO: Why setFontItalic() not work, but setFontUnderline works ok?
     // selection.format.setFontItalic(true);
@@ -906,8 +911,8 @@ void EditView::HighlightFocus() {
     UnderpaintCurrentBlock();
     HighlightFocusNearBracket();
     HighlightMarkTexts();
-    HighlightVisibleChars("�", QColor(Qt::lightGray), QColor(255, 54, 54)); // Mark the unrecognized char.
-    HighlightFocusChars(); // Focused highlight is high priority, so put it at last.
+    HighlightVisibleChars("�", QColor(Qt::lightGray), QColor(255, 54, 54));  // Mark the unrecognized char.
+    HighlightFocusChars();  // Focused highlight is high priority, so put it at last.
 }
 
 void EditView::HighlightFocusNearBracket() {
@@ -1070,7 +1075,7 @@ void EditView::ZoomOut() {
     currentFontSize_ = currentFont.pointSize();
 }
 
-void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent* event) {
+void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent *event) {
     auto currentFont = font();
     currentFont.setPointSize(currentFontSize_ + 1);
     lineNumberArea_->setFont(currentFont);
@@ -1106,7 +1111,7 @@ void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent* event) {
     }
 }
 
-void EditView::paintEvent(QPaintEvent* event) {
+void EditView::paintEvent(QPaintEvent *event) {
     QPlainTextEdit::paintEvent(event);
     if (highlighterInvalid()) {
         HighlightFocus();
@@ -1114,7 +1119,7 @@ void EditView::paintEvent(QPaintEvent* event) {
     }
 }
 
-void EditView::showEvent(QShowEvent* event) {
+void EditView::showEvent(QShowEvent *event) {
     qDebug() << "event: " << event << ", " << fileName() << ": " << undoAvail() << ", " << redoAvail();
 
     MainWindow::Instance().SetUndoAvailable(undoAvail());
@@ -1127,7 +1132,7 @@ void EditView::showEvent(QShowEvent* event) {
     QPlainTextEdit::showEvent(event);
 }
 
-void EditView::resizeEvent(QResizeEvent* event) {
+void EditView::resizeEvent(QResizeEvent *event) {
     qDebug() << "EditView::resizeEvent";
     QPlainTextEdit::resizeEvent(event);
 
@@ -1138,7 +1143,7 @@ void EditView::resizeEvent(QResizeEvent* event) {
     qDebug() << "firstVisibleBlock.rect: " << blockBoundingRect(firstVisibleBlock());
 }
 
-void EditView::wheelEvent(QWheelEvent* event) {
+void EditView::wheelEvent(QWheelEvent *event) {
     if (false && blockCount() > 10000) {
         // Decrease highlight times for performance.
         highlighterInvalid_ = false;
@@ -1167,7 +1172,7 @@ void EditView::wheelEvent(QWheelEvent* event) {
     }
 }
 
-void EditView::keyPressEvent(QKeyEvent* event) {
+void EditView::keyPressEvent(QKeyEvent *event) {
     qDebug() << "event: " << event;
     if (event->key() == Qt::Key_Control) {
         auto cursor = textCursor();
@@ -1178,18 +1183,18 @@ void EditView::keyPressEvent(QKeyEvent* event) {
     QPlainTextEdit::keyPressEvent(event);
 }
 
-void EditView::keyReleaseEvent(QKeyEvent* event) {
+void EditView::keyReleaseEvent(QKeyEvent *event) {
     qDebug() << "event: " << event;
     if (event->key() == Qt::Key_Control) {
-        HighlightFocus(); // Clear the chars marked by keyPressEvent(Key_Control)
+        HighlightFocus();  // Clear the chars marked by keyPressEvent(Key_Control)
         jumpAvailable_ = false;
     }
     QPlainTextEdit::keyReleaseEvent(event);
 }
 
-void EditView::mousePressEvent(QMouseEvent* event) { QPlainTextEdit::mousePressEvent(event); }
+void EditView::mousePressEvent(QMouseEvent *event) { QPlainTextEdit::mousePressEvent(event); }
 
-void EditView::mouseReleaseEvent(QMouseEvent* event) {
+void EditView::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         if (jumpAvailable_) {
             Jump();
@@ -1198,7 +1203,7 @@ void EditView::mouseReleaseEvent(QMouseEvent* event) {
     QPlainTextEdit::mouseReleaseEvent(event);
 }
 
-void EditView::timerEvent(QTimerEvent* event) {
+void EditView::timerEvent(QTimerEvent *event) {
     if (event->timerId() == timerId_) {
         qDebug() << "event: " << event;
         HighlightFocus();
@@ -1215,35 +1220,35 @@ bool EditView::MarkUnmarkCursorText() { return MainWindow::Instance().MarkUnmark
 
 bool EditView::UnmarkAll() { return MainWindow::Instance().UnmarkAll(); }
 
-void EditView::contextMenuEvent(QContextMenuEvent* event) {
+void EditView::contextMenuEvent(QContextMenuEvent *event) {
     menu_->clear();
     if (!selectedText_.isEmpty()) {
-        QAction* findAction = new QAction(tr("Find..."), this);
+        QAction *findAction = new QAction(tr("Find..."), this);
         connect(findAction, &QAction::triggered, this, &EditView::Find);
         menu_->addAction(findAction);
-        QAction* replaceAction = new QAction(tr("Replace..."), this);
+        QAction *replaceAction = new QAction(tr("Replace..."), this);
         connect(replaceAction, &QAction::triggered, this, &EditView::Replace);
         menu_->addAction(replaceAction);
 
         menu_->addSeparator();
-        QAction* markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu_->addAction(markUnmarkAction);
-        QAction* unmarkAllAction = new QAction(tr("Unmark All"), this);
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
         menu_->addAction(unmarkAllAction);
 
         menu_->addSeparator();
-        QAction* selectTextToDiffAction = new QAction(tr("Select Text for View Diff"), this);
+        QAction *selectTextToDiffAction = new QAction(tr("Select Text for View Diff"), this);
         connect(selectTextToDiffAction, &QAction::triggered, this,
                 [this]() { tabView()->setFormerDiffStr(selectedText_); });
         menu_->addAction(selectTextToDiffAction);
         if (!tabView()->formerDiffStr().isEmpty()) {
-            QAction* diffWithPreviousAction = new QAction(tr("View Diff with Previous Selection"), this);
+            QAction *diffWithPreviousAction = new QAction(tr("View Diff with Previous Selection"), this);
             connect(diffWithPreviousAction, &QAction::triggered, this, [this]() {
                 tabView()->ViewDiff(tabView()->formerDiffStr(), selectedText_);
                 tabView()->setFormerDiffStr("");
@@ -1251,12 +1256,12 @@ void EditView::contextMenuEvent(QContextMenuEvent* event) {
             menu_->addAction(diffWithPreviousAction);
         }
     } else {
-        QAction* markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
+        QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
         auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu_->addAction(markUnmarkAction);
-        QAction* unmarkAllAction = new QAction(tr("Unmark All"), this);
+        QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
         auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
@@ -1308,9 +1313,9 @@ void EditView::contextMenuEvent(QContextMenuEvent* event) {
 
 QSize LineNumberArea::sizeHint() const { return QSize(editView_->GetLineNumberAreaWidth(), 0); }
 
-void LineNumberArea::paintEvent(QPaintEvent* event) { editView_->HandleLineNumberAreaPaintEvent(event); }
+void LineNumberArea::paintEvent(QPaintEvent *event) { editView_->HandleLineNumberAreaPaintEvent(event); }
 
-void LineNumberArea::mousePressEvent(QMouseEvent* event) {
+void LineNumberArea::mousePressEvent(QMouseEvent *event) {
     qDebug() << event;
     if (event->button() == Qt::LeftButton) {
         auto blockNumber = editView_->GetBlockNumber(event->pos().ry());
@@ -1320,7 +1325,7 @@ void LineNumberArea::mousePressEvent(QMouseEvent* event) {
     }
 }
 
-void LineNumberArea::mouseMoveEvent(QMouseEvent* event) {
+void LineNumberArea::mouseMoveEvent(QMouseEvent *event) {
     qDebug() << event;
     if (startBlockNumber_ != -1) {
         auto blockNumber = editView_->GetBlockNumber(event->pos().ry());
@@ -1328,13 +1333,13 @@ void LineNumberArea::mouseMoveEvent(QMouseEvent* event) {
     }
 }
 
-void LineNumberArea::mouseReleaseEvent(QMouseEvent* event) { startBlockNumber_ = -1; }
+void LineNumberArea::mouseReleaseEvent(QMouseEvent *event) { startBlockNumber_ = -1; }
 
-void LineNumberArea::mouseDoubleClickEvent(QMouseEvent* event) {
+void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         auto blockNumber = editView_->GetBlockNumber(event->pos().ry());
         auto lineCount = editView_->GotoBlock(blockNumber);
         editView_->SelectCurrentBlock(lineCount);
     }
 }
-} // namespace QEditor
+}  // namespace QEditor

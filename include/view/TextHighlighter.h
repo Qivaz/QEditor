@@ -24,15 +24,15 @@
 namespace QEditor {
 class TextHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
-public:
-    TextHighlighter(const FileType& fileType, QTextDocument* parent = 0, const QString& focused_str = "",
+   public:
+    TextHighlighter(const FileType &fileType, QTextDocument *parent = 0, const QString &focused_str = "",
                     const QVector<QString> markUpText = QVector<QString>());
 
-protected:
-    void highlightBlock(const QString& text) override;
+   protected:
+    void highlightBlock(const QString &text) override;
 
-private:
-    void SetupSelectedText(const QString& text);
+   private:
+    void SetupSelectedText(const QString &text);
     void SetupMakeText(const QVector<QString> markUpText);
     void SetupCLang();
     void SetupMindIRLang();
@@ -52,6 +52,6 @@ private:
         QColor(250, 128, 114), QColor(255, 215, 0), QColor(192, 255, 62), QColor(127, 255, 212), QColor(255, 99, 71),
         QColor(200, 0, 100),   QColor(0, 255, 127), QColor(255, 0, 255),  QColor(0, 255, 255),   QColor(132, 112, 255)};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // TEXTHIGHLIGHTER_H
+#endif  // TEXTHIGHLIGHTER_H

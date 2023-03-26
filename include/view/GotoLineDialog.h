@@ -28,23 +28,23 @@ class UIGotoLineDialog;
 namespace QEditor {
 class GotoLineDialog : public QDialog {
     Q_OBJECT
-public:
-    explicit GotoLineDialog(QWidget* parent = nullptr);
+   public:
+    explicit GotoLineDialog(QWidget *parent = nullptr);
     ~GotoLineDialog();
 
-    EditView* editView();
-    TabView* tabView();
+    EditView *editView();
+    TabView *tabView();
 
-    void showEvent(QShowEvent*) override;
+    void showEvent(QShowEvent *) override;
 
-private slots:
+   private slots:
     void on_pushButtonOk_clicked();
 
     void on_pushButtonCacel_clicked();
 
-private:
-    Ui::UIGotoLineDialog* ui_;
+   private:
+    Ui::UIGotoLineDialog *ui_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // GOTOLINEDIALOG_H
+#endif  // GOTOLINEDIALOG_H

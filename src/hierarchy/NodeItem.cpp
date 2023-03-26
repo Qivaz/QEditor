@@ -24,8 +24,8 @@
 #include <QPainter>
 
 namespace QEditor {
-NodeItem::NodeItem(const QString& name, const QColor& color, NodeType nodeType, QMenu* contextMenu,
-                   QGraphicsItem* parent)
+NodeItem::NodeItem(const QString &name, const QColor &color, NodeType nodeType, QMenu *contextMenu,
+                   QGraphicsItem *parent)
     : QGraphicsPolygonItem(parent), name_(name), nodeType_(nodeType), contextMenu_(contextMenu) {
     textItem_ = new QGraphicsTextItem(name, this);
     auto rect = textItem_->boundingRect();
@@ -35,18 +35,18 @@ NodeItem::NodeItem(const QString& name, const QColor& color, NodeType nodeType, 
     qDebug() << rect << rect.height() << rect.width();
 
     switch (nodeType_) {
-    case Conditional:
-        polygon_ << QPointF(-100, 0) << QPointF(0, 100) << QPointF(100, 0) << QPointF(0, -100) << QPointF(-100, 0);
-        break;
-    case Process:
-        polygon_ << QPointF(-10 - rect.width() / 2, -25) << QPointF(10 + rect.width() / 2, -25)
-                 << QPointF(10 + rect.width() / 2, 25) << QPointF(-10 - rect.width() / 2, 25)
-                 << QPointF(-10 - rect.width() / 2, -25);
-        break;
-    default:
-        polygon_ << QPointF(-120, -80) << QPointF(-70, 80) << QPointF(120, 80) << QPointF(70, -80)
-                 << QPointF(-120, -80);
-        break;
+        case Conditional:
+            polygon_ << QPointF(-100, 0) << QPointF(0, 100) << QPointF(100, 0) << QPointF(0, -100) << QPointF(-100, 0);
+            break;
+        case Process:
+            polygon_ << QPointF(-10 - rect.width() / 2, -25) << QPointF(10 + rect.width() / 2, -25)
+                     << QPointF(10 + rect.width() / 2, 25) << QPointF(-10 - rect.width() / 2, 25)
+                     << QPointF(-10 - rect.width() / 2, -25);
+            break;
+        default:
+            polygon_ << QPointF(-120, -80) << QPointF(-70, 80) << QPointF(120, 80) << QPointF(70, -80)
+                     << QPointF(-120, -80);
+            break;
     }
     setPolygon(polygon_);
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -56,13 +56,13 @@ NodeItem::NodeItem(const QString& name, const QColor& color, NodeType nodeType, 
     //    setOpacity(0.8);
 }
 
-void NodeItem::removeArrow(Arrow* arrow) { arrows_.removeAll(arrow); }
+void NodeItem::removeArrow(Arrow *arrow) { arrows_.removeAll(arrow); }
 
 void NodeItem::removeArrows() {
     // Need a copy here since removeArrow() will
     // modify the arrows container
     const auto arrowsCopy = arrows_;
-    for (Arrow* arrow : arrowsCopy) {
+    for (Arrow *arrow : arrowsCopy) {
         arrow->startItem()->removeArrow(arrow);
         arrow->endItem()->removeArrow(arrow);
         scene()->removeItem(arrow);
@@ -70,7 +70,7 @@ void NodeItem::removeArrows() {
     }
 }
 
-void NodeItem::addArrow(Arrow* arrow) { arrows_.append(arrow); }
+void NodeItem::addArrow(Arrow *arrow) { arrows_.append(arrow); }
 
 QPixmap NodeItem::image() const {
     QPixmap pixmap(250, 250);
@@ -83,7 +83,7 @@ QPixmap NodeItem::image() const {
     return pixmap;
 }
 
-void NodeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
+void NodeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
     scene()->clearSelection();
     setSelected(true);
     if (contextMenu_ != nullptr) {
@@ -91,12 +91,11 @@ void NodeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
     }
 }
 
-QVariant NodeItem::itemChange(GraphicsItemChange change, const QVariant& value) {
+QVariant NodeItem::itemChange(GraphicsItemChange change, const QVariant &value) {
     if (change == QGraphicsItem::ItemPositionChange) {
-        for (Arrow* arrow : qAsConst(arrows_))
-            arrow->updatePosition();
+        for (Arrow *arrow : qAsConst(arrows_)) arrow->updatePosition();
     }
 
     return value;
 }
-} // namespace QEditor
+}  // namespace QEditor

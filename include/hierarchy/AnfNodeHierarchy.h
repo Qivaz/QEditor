@@ -24,15 +24,15 @@
 
 namespace QEditor {
 class AnfNodeHierarchy : public QGraphicsView {
-public:
-    AnfNodeHierarchy(const QString& funcName, IParser* parser = new DummyParser(), QWidget* parent = nullptr);
+   public:
+    AnfNodeHierarchy(const QString &funcName, IParser *parser = new DummyParser(), QWidget *parent = nullptr);
 
-    const QString& funcName() const { return funcName_; }
+    const QString &funcName() const { return funcName_; }
 
-private:
-    AnfNodeHierarchyScene* scene_{nullptr};
+   private:
+    AnfNodeHierarchyScene *scene_{nullptr};
     QString funcName_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // NODEHIERARCHY_H
+#endif  // NODEHIERARCHY_H

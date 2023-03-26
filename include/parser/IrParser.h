@@ -24,19 +24,19 @@
 namespace QEditor {
 class DummyParser : public IParser {
     Q_OBJECT
-public:
-    explicit DummyParser(QObject* parent = nullptr) : IParser(parent) {}
+   public:
+    explicit DummyParser(QObject *parent = nullptr) : IParser(parent) {}
     virtual ~DummyParser() = default;
 
     void ParseFuncGraph() override {}
-    const QString& GetEntry() const override { return entryFunc_; };
-    FuncGraphInfo GetFuncGraphInfo(const QString&) const override { return FuncGraphInfo(); }
-    const QVector<FuncGraphInfo>& funcGraphInfos() const override { return funcGraphInfos_; }
+    const QString &GetEntry() const override { return entryFunc_; };
+    FuncGraphInfo GetFuncGraphInfo(const QString &) const override { return FuncGraphInfo(); }
+    const QVector<FuncGraphInfo> &funcGraphInfos() const override { return funcGraphInfos_; }
     int GetIndexByCursorPosition(int) const override { return 0; }
 
-    const QMap<QString, NodeInfo>& ParseNodes(const QString&) override { return QMap<QString, NodeInfo>(); }
+    const QMap<QString, NodeInfo> &ParseNodes(const QString &) override { return QMap<QString, NodeInfo>(); }
 
-private:
+   private:
     QVector<FuncGraphInfo> funcGraphInfos_;
     QString entryFunc_;
     QMap<QString, NodeInfo> nodesMap_;
@@ -44,23 +44,23 @@ private:
 
 class IrParser : public IParser {
     Q_OBJECT
-public:
-    explicit IrParser(EditView* editView, QObject* parent = nullptr);
+   public:
+    explicit IrParser(EditView *editView, QObject *parent = nullptr);
     virtual ~IrParser() = default;
 
     void ParseFuncGraph() override;
-    const QString& GetEntry() const override { return entryFunc_; };
-    FuncGraphInfo GetFuncGraphInfo(const QString& funcName) const override {
-        const auto& simpleFuncName = funcName.section('.', 0, 0);
+    const QString &GetEntry() const override { return entryFunc_; };
+    FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const override {
+        const auto &simpleFuncName = funcName.section('.', 0, 0);
         return funcGraphNameInfoMap_.value(simpleFuncName);
     }
-    const QVector<FuncGraphInfo>& funcGraphInfos() const override { return funcGraphInfos_; }
+    const QVector<FuncGraphInfo> &funcGraphInfos() const override { return funcGraphInfos_; }
     int GetIndexByCursorPosition(int cursorPos) const override { return funcGraphPos_.at(cursorPos); }
 
-    const QMap<QString, NodeInfo>& ParseNodes(const QString& funcName) override;
+    const QMap<QString, NodeInfo> &ParseNodes(const QString &funcName) override;
 
-private:
-    const QMap<QString, NodeInfo>& ParseNodes(const FuncGraphInfo&);
+   private:
+    const QMap<QString, NodeInfo> &ParseNodes(const FuncGraphInfo &);
 
     constexpr static auto kIrEntry = "#IR entry      : ";
     constexpr static auto kSubGraph = "subgraph";
@@ -79,13 +79,13 @@ private:
 
     constexpr static auto kNodeVariableDef = "  %";
 
-    EditView* editView_;
+    EditView *editView_;
     QVector<FuncGraphInfo> funcGraphInfos_;
     RangeMap<int, int> funcGraphPos_;
     QMap<QString, FuncGraphInfo> funcGraphNameInfoMap_;
     QString entryFunc_;
     QMap<QString, NodeInfo> nodesMap_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // IRPARSER_H
+#endif  // IRPARSER_H

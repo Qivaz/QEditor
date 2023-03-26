@@ -26,36 +26,36 @@
 
 namespace QEditor {
 class CustSortFilterProxyModel : public QSortFilterProxyModel {
-protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
-    bool filterAcceptsColumn(int source_column, const QModelIndex& source_parent) const override;
-    bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+   protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    bool filterAcceptsColumn(int source_column, const QModelIndex &source_parent) const override;
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
 class ExplorerTreeView : public QTreeView {
     Q_OBJECT
-public:
-    ExplorerTreeView(QWidget* parent = nullptr, const QString& rootPath = QString());
+   public:
+    ExplorerTreeView(QWidget *parent = nullptr, const QString &rootPath = QString());
     ~ExplorerTreeView() = default;
 
-    void HandleIndexClick(const QModelIndex& index);
-    void HandleExpanded(const QModelIndex& index);
-    void HandleIndexPress(const QModelIndex& index);
-    void HandleDirLoaded(const QString& path);
+    void HandleIndexClick(const QModelIndex &index);
+    void HandleExpanded(const QModelIndex &index);
+    void HandleIndexPress(const QModelIndex &index);
+    void HandleDirLoaded(const QString &path);
 
-    void GotoPathPosition(const QString& path);
+    void GotoPathPosition(const QString &path);
 
-    bool event(QEvent* event) override {
+    bool event(QEvent *event) override {
         qDebug() << event->type();
         return QTreeView::event(event);
     }
 
-private:
-    void timerEvent(QTimerEvent* event) override;
+   private:
+    void timerEvent(QTimerEvent *event) override;
 
-    QFileSystemModel* model_;
-    CustSortFilterProxyModel* proxyModel_;
-    QMenu* menu_;
+    QFileSystemModel *model_;
+    CustSortFilterProxyModel *proxyModel_;
+    QMenu *menu_;
     QString gotoDir_;
     QString gotoPath_;
     QString rootPath_;
@@ -63,9 +63,9 @@ private:
 };
 
 class FileIconProvider : public QFileIconProvider {
-public:
-    QIcon icon(const QFileInfo& info) const override;
+   public:
+    QIcon icon(const QFileInfo &info) const override;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // EXPLORERTREEVIEW_H
+#endif  // EXPLORERTREEVIEW_H

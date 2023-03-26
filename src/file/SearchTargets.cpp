@@ -31,7 +31,7 @@ void SearchTargets::Clear() {
     StoreTargets();
 }
 
-void SearchTargets::UpdateTargets(const QString& target) {
+void SearchTargets::UpdateTargets(const QString &target) {
     auto size = targets_.size();
     auto exist = targets_.removeOne(target);
     if (!exist && size >= kMaxSearchTargetsNum_) {
@@ -73,4 +73,4 @@ void SearchTargets::LoadTargets() {
     QDataStream filesInfoStream(&filesInfoFile);
     filesInfoStream >> targets_;
 }
-} // namespace QEditor
+}  // namespace QEditor

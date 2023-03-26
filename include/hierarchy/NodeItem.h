@@ -31,35 +31,35 @@ namespace QEditor {
 class Arrow;
 class IParser;
 class NodeItem : public QGraphicsPolygonItem {
-public:
+   public:
     enum { Type = UserType + 15 };
     enum NodeType { Process, Conditional, Io };
 
-    NodeItem(const QString& name, const QColor& color, NodeType diagramType, QMenu* contextMenu,
-             QGraphicsItem* parent = nullptr);
+    NodeItem(const QString &name, const QColor &color, NodeType diagramType, QMenu *contextMenu,
+             QGraphicsItem *parent = nullptr);
 
-    void removeArrow(Arrow* arrow);
+    void removeArrow(Arrow *arrow);
     void removeArrows();
     NodeType diagramType() const { return nodeType_; }
     QPolygonF polygon() const { return polygon_; }
-    void addArrow(Arrow* arrow);
+    void addArrow(Arrow *arrow);
     QPixmap image() const;
     int type() const override { return Type; }
 
-protected:
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+   protected:
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     QString name_;
 
-private:
+   private:
     NodeType nodeType_;
     QPolygonF polygon_;
-    QMenu* contextMenu_;
-    QVector<Arrow*> arrows_;
+    QMenu *contextMenu_;
+    QVector<Arrow *> arrows_;
 
-    QGraphicsTextItem* textItem_;
+    QGraphicsTextItem *textItem_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // NODEITEM_H
+#endif  // NODEITEM_H

@@ -24,12 +24,12 @@
 
 namespace QEditor {
 class FunctionHierarchy : public QGraphicsView {
-public:
-    FunctionHierarchy(IParser* parser = new DummyParser(), QWidget* parent = nullptr);
+   public:
+    FunctionHierarchy(IParser *parser = new DummyParser(), QWidget *parent = nullptr);
 
-private:
-    FunctionHierarchyScene* scene_{nullptr};
+   private:
+    FunctionHierarchyScene *scene_{nullptr};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // FUNCTIONHIERARCHY_H
+#endif  // FUNCTIONHIERARCHY_H

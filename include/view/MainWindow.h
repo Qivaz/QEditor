@@ -38,12 +38,12 @@ QT_END_NAMESPACE
 namespace QEditor {
 class MainWindow : public QMainWindow {
     Q_OBJECT
-private:
+   private:
     MainWindow();
 
-public:
-    MainWindow(const MainWindow&) = delete;
-    MainWindow(const MainWindow&&) = delete;
+   public:
+    MainWindow(const MainWindow &) = delete;
+    MainWindow(const MainWindow &&) = delete;
     ~MainWindow() {
         if (encoding_ != nullptr) {
             delete encoding_;
@@ -57,56 +57,56 @@ public:
         }
     }
 
-    static MainWindow& Instance() {
+    static MainWindow &Instance() {
         static MainWindow _mainWindow;
         return _mainWindow;
     }
 
     void HandleCurrentTabChanged(int index);
 
-    EditView* editView() {
-        auto editView = qobject_cast<EditView*>(tabView_->currentWidget());
+    EditView *editView() {
+        auto editView = qobject_cast<EditView *>(tabView_->currentWidget());
         if (editView == nullptr) {
             return nullptr;
         }
         return editView;
     }
-    DiffView* diffView() {
-        auto diffView = qobject_cast<DiffView*>(tabView_->currentWidget());
+    DiffView *diffView() {
+        auto diffView = qobject_cast<DiffView *>(tabView_->currentWidget());
         if (diffView == nullptr) {
             return nullptr;
         }
         return diffView;
     }
-    TabView* tabView() { return tabView_; }
+    TabView *tabView() { return tabView_; }
 
     void ShowSearchDockView();
-    DockView* CreateSearchDockView();
+    DockView *CreateSearchDockView();
 
     bool IsExplorerDockViewShowing();
-    void SetExplorerDockViewPosition(const QString& path);
+    void SetExplorerDockViewPosition(const QString &path);
     void ShowExplorerDockView();
     void HideExplorerDockView();
-    DockView* CreateExplorerDockView();
+    DockView *CreateExplorerDockView();
 
     bool IsOutlineDockViewShowing();
     void SetOutlineDockViewPosition(int cursorPos);
-    void UpdateOutlineDockView(OutlineList* list);
+    void UpdateOutlineDockView(OutlineList *list);
     void ShowOutlineDockView();
     void HideOutlineDockView();
-    DockView* CreateOutlineDockView();
+    DockView *CreateOutlineDockView();
 
     bool IsHierarchyDockViewShowing();
-    void UpdateHierarchyDockView(FunctionHierarchy* view);
+    void UpdateHierarchyDockView(FunctionHierarchy *view);
     void ShowHierarchyDockView();
     void HideHierarchyDockView();
-    DockView* CreateHierarchyDockView();
+    DockView *CreateHierarchyDockView();
 
     bool IsNodeHierarchyDockViewShowing();
-    void UpdateNodeHierarchyDockView(AnfNodeHierarchy* view);
+    void UpdateNodeHierarchyDockView(AnfNodeHierarchy *view);
     void ShowNodeHierarchyDockView();
     void HideNodeHierarchyDockView();
-    DockView* CreateNodeHierarchyDockView();
+    DockView *CreateNodeHierarchyDockView();
 
     void SelectAll();
     void GotoLine();
@@ -135,25 +135,25 @@ public:
 
     int tabCharNum() { return tabCharNum_; }
 
-    void UpdateStatusBarFrequentInfo(const QString& ln, const QString& col, const QString& pos, const QString& len,
-                                     const QString& lines);
-    void UpdateStatusBarRareInfo(const QString& newLineSeq, const QString& encodingSeq, const QString& insertModeSeq);
+    void UpdateStatusBarFrequentInfo(const QString &ln, const QString &col, const QString &pos, const QString &len,
+                                     const QString &lines);
+    void UpdateStatusBarRareInfo(const QString &newLineSeq, const QString &encodingSeq, const QString &insertModeSeq);
 
-    void dragEnterEvent(QDragEnterEvent* event) override;
-    void dropEvent(QDropEvent* event) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 
     void RequestShow() { emit Show(); }
 
     void UpdateRecentFilesMenu();
 
     QString searchingString() const;
-    void setSearchingString(const QString& searchingString);
+    void setSearchingString(const QString &searchingString);
 
-    SearchResultList* GetSearchResultList();
+    SearchResultList *GetSearchResultList();
 
-    Searcher* GetSearcher();
+    Searcher *GetSearcher();
 
-public slots:
+   public slots:
     bool Find();
     bool FindNext();
     bool FindPrevious();
@@ -162,17 +162,17 @@ public slots:
     bool MarkUnmarkCursorText();
     bool UnmarkAll();
 
-protected:
-    void showEvent(QShowEvent* event) override;
-    void closeEvent(QCloseEvent* event) override;
-    bool eventFilter(QObject* obj, QEvent* event) override;
+   protected:
+    void showEvent(QShowEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
-private slots:
+   private slots:
     void OpenRecentFile();
 
     void NewFile();
     void Open();
-    void OpenWith(const QString& filePath);
+    void OpenWith(const QString &filePath);
     bool Save();
     bool SaveAll();
     bool SaveAs();
@@ -183,7 +183,7 @@ private slots:
     void About();
 
 #ifndef QT_NO_SESSIONMANAGER
-    void HandleCommitData(QSessionManager&);
+    void HandleCommitData(QSessionManager &);
 #endif
     void HandleNewLineCharChanged(int index);
     void HandleEncodingChanged(int index);
@@ -191,35 +191,35 @@ private slots:
     bool StepBack();
     bool StepForward();
 
-signals:
+   signals:
     void Show();
 
-private:
+   private:
     void CreateActions();
     void CreateStatusBar();
     void ReadSettings();
     void WriteSettings();
     bool MaybeSave();
 
-    bool IsLeftOrRightSeparator(const QPoint& pos);
+    bool IsLeftOrRightSeparator(const QPoint &pos);
 
     bool init_{false};
-    TabView* tabView_{nullptr};
-    DockView* searchDockView_{nullptr};
-    SearchDialog* searchDialog_{nullptr};
+    TabView *tabView_{nullptr};
+    DockView *searchDockView_{nullptr};
+    SearchDialog *searchDialog_{nullptr};
 
-    DockView* explorerDockView_{nullptr};
-    DockView* outlineDockView_{nullptr};
-    DockView* hierarchyDockView_{nullptr};
-    DockView* nodeHierarchyDockView_{nullptr};
-    AnfNodeHierarchy* anfNodeHierarchy_{nullptr};
+    DockView *explorerDockView_{nullptr};
+    DockView *outlineDockView_{nullptr};
+    DockView *hierarchyDockView_{nullptr};
+    DockView *nodeHierarchyDockView_{nullptr};
+    AnfNodeHierarchy *anfNodeHierarchy_{nullptr};
 
     bool moveSeparatorToHide_{false};
 
-    QAction* copyAct_{nullptr};
-    QAction* cutAct_{nullptr};
-    QAction* undoAct_{nullptr};
-    QAction* redoAct_{nullptr};
+    QAction *copyAct_{nullptr};
+    QAction *cutAct_{nullptr};
+    QAction *undoAct_{nullptr};
+    QAction *redoAct_{nullptr};
 
     // TODO: Save in settings.
     bool shouldWrapText_{true};
@@ -231,14 +231,14 @@ private:
     int tabCharNum_{2};
 
     // Status bar items.
-    QLabel* line_{nullptr};
-    QLabel* column_{nullptr};
-    QLabel* position_{nullptr};
-    QLabel* lines_{nullptr};
-    QLabel* length_{nullptr};
-    ComboView* encoding_{nullptr};
-    ComboView* newLineChar_{nullptr};
-    QLabel* insertMode_{nullptr};
+    QLabel *line_{nullptr};
+    QLabel *column_{nullptr};
+    QLabel *position_{nullptr};
+    QLabel *lines_{nullptr};
+    QLabel *length_{nullptr};
+    ComboView *encoding_{nullptr};
+    ComboView *newLineChar_{nullptr};
+    QLabel *insertMode_{nullptr};
 
     // We reuse the 'QComboBox::currentIndexChanged()' for its display
     // changing(Init&Sync) triggered by 'setCurrentIndex()' and user click.
@@ -246,13 +246,13 @@ private:
     // True for Init&Sync, otherwise user click.
     bool statusBarComboNonUserClick_{false};
 
-    QMenu* recentFilesMenu_{nullptr};
-    QList<QAction*> recentFileActions_;
+    QMenu *recentFilesMenu_{nullptr};
+    QList<QAction *> recentFileActions_;
 
-    SearchResultList* searchResultList_{nullptr};
-    Searcher* searcher_{nullptr};
+    SearchResultList *searchResultList_{nullptr};
+    Searcher *searcher_{nullptr};
     QString searchingString_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
 #endif

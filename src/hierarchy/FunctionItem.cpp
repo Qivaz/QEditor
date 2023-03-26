@@ -24,16 +24,16 @@
 #include <QPainter>
 
 namespace QEditor {
-FunctionItem::FunctionItem(const QString& name, IParser* parser, NodeType nodeType, QMenu* contextMenu,
-                           QGraphicsItem* parent)
+FunctionItem::FunctionItem(const QString &name, IParser *parser, NodeType nodeType, QMenu *contextMenu,
+                           QGraphicsItem *parent)
     : NodeItem(name, QColor(Qt::white), nodeType, contextMenu, parent), parser_(parser) {}
 
-void FunctionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
+void FunctionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     auto editView = MainWindow::Instance().editView();
     if (editView == nullptr) {
         return;
     }
-    const auto& itemInfo = parser_->GetFuncGraphInfo(name_);
+    const auto &itemInfo = parser_->GetFuncGraphInfo(name_);
     if (itemInfo.pos_ == -1) {
         return;
     }
@@ -45,4 +45,4 @@ void FunctionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
 
     QGraphicsItem::mouseDoubleClickEvent(event);
 }
-} // namespace QEditor
+}  // namespace QEditor

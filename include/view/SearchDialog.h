@@ -31,8 +31,8 @@ class Searcher;
 
 class SearchDialog : public QDialog {
     Q_OBJECT
-public:
-    explicit SearchDialog(QWidget* parent = nullptr, int index = 0);
+   public:
+    explicit SearchDialog(QWidget *parent = nullptr, int index = 0);
     ~SearchDialog();
 
     void Start(int index);
@@ -40,11 +40,11 @@ public:
     int currentTabIndex();
     void setCurrentTabIndex(int index);
 
-protected:
-    void closeEvent(QCloseEvent*) override;
-    void hideEvent(QHideEvent* event) override;
+   protected:
+    void closeEvent(QCloseEvent *) override;
+    void hideEvent(QHideEvent *event) override;
 
-private slots:
+   private slots:
     void on_pushButtonFindFindNext_clicked();
 
     void on_radioButtonFindRe_toggled(bool checked);
@@ -63,21 +63,21 @@ private slots:
 
     void on_pushButtonReplaceReplaceAll_clicked();
 
-    void on_lineEditFindFindWhat_textChanged(const QString& arg1);
+    void on_lineEditFindFindWhat_textChanged(const QString &arg1);
 
-    void on_lineEditReplaceFindWhat_textChanged(const QString& arg1);
+    void on_lineEditReplaceFindWhat_textChanged(const QString &arg1);
 
-private:
+   private:
     void InitSetting();
-    EditView* editView();
+    EditView *editView();
     const QString GetSelectedText();
 
-private:
-    Ui::UISearchDialog* ui_;
-    SearchResultList* searchResultList_{nullptr};
-    Searcher* searcher_{nullptr};
+   private:
+    Ui::UISearchDialog *ui_;
+    SearchResultList *searchResultList_{nullptr};
+    Searcher *searcher_{nullptr};
 
-    QMenu* historyMenu_;
+    QMenu *historyMenu_;
 
     int historyIndex_{-1};
     QString searchInput_;
@@ -85,17 +85,17 @@ private:
 
 class Searcher : public QObject {
     Q_OBJECT
-public:
+   public:
     Searcher() = default;
     ~Searcher() = default;
 
-    QTextCursor FindNext(const QString& text, const QTextCursor& startCursor);
-    QTextCursor FindPrevious(const QString& text, const QTextCursor& startCursor);
+    QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
+    QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
 
-    std::vector<QTextCursor> FindAll(const QString& target);
+    std::vector<QTextCursor> FindAll(const QString &target);
 
-    void Replace(const QString& target, const QString& text, bool backward);
-    int ReplaceAll(const QString& target, const QString& text);
+    void Replace(const QString &target, const QString &text, bool backward);
+    int ReplaceAll(const QString &target, const QString &text);
 
     void setCheckBoxFindBackward(bool value);
 
@@ -112,21 +112,21 @@ public:
     void setRadioButtonFindRe(bool value);
 
     QString info() const;
-    void setInfo(const QString& info);
+    void setInfo(const QString &info);
 
-private:
-    QTextCursor _FindNext(const QString& text, const QTextCursor& startCursor, bool backward);
-    QTextCursor _FindPrevious(const QString& text, const QTextCursor& startCursor, bool backward);
+   private:
+    QTextCursor _FindNext(const QString &text, const QTextCursor &startCursor, bool backward);
+    QTextCursor _FindPrevious(const QString &text, const QTextCursor &startCursor, bool backward);
 
-    bool _Find(const QStringList& target, const QTextCursor& startCursor, QTextCursor& targetCursor, bool backward);
+    bool _Find(const QStringList &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward);
     template <class T>
-    bool _Find(const T& target, const QTextCursor& startCursor, QTextCursor& targetCursor, bool backward,
+    bool _Find(const T &target, const QTextCursor &startCursor, QTextCursor &targetCursor, bool backward,
                bool first = true);
 
-    EditView* editView();
-    TabView* tabView();
+    EditView *editView();
+    TabView *tabView();
 
-private:
+   private:
     bool checkBoxFindBackward_;
     bool checkBoxFindWholeWord_;
     bool checkBoxFindMatchCase_;
@@ -142,10 +142,11 @@ private:
 // template<typename ...ARGS>
 class LambdaEventFilter : public QObject {
     Q_OBJECT
-public:
-    bool eventFilter(QObject* watched, QEvent* event) override { return lambdaContainer->CallLambda(watched, event); }
+   public:
+    bool eventFilter(QObject *watched, QEvent *event) override { return lambdaContainer->CallLambda(watched, event); }
 
-    template <typename LAMBDA> LambdaEventFilter(QObject* parent, LAMBDA lambda /*, ARGS... args*/) : QObject(parent) {
+    template <typename LAMBDA>
+    LambdaEventFilter(QObject *parent, LAMBDA lambda /*, ARGS... args*/) : QObject(parent) {
         lambdaContainer = new LambdaContainer<LAMBDA>(lambda /*, args...*/);
     }
 
@@ -156,28 +157,29 @@ public:
         }
     }
 
-private:
+   private:
     class AbstractLambdaContainer : public QObject {
-    public:
-        virtual bool CallLambda(QObject* watched, QEvent* event) = 0;
+       public:
+        virtual bool CallLambda(QObject *watched, QEvent *event) = 0;
     };
 
-    template <typename LAMBDA> class LambdaContainer : public AbstractLambdaContainer {
-    public:
+    template <typename LAMBDA>
+    class LambdaContainer : public AbstractLambdaContainer {
+       public:
         LambdaContainer(LAMBDA lambda /*, ARGS... args*/) : lambda_(lambda) /*, args_(std::make_tuple(args...))*/ {}
 
-        bool CallLambda(QObject* watched, QEvent* event) {
+        bool CallLambda(QObject *watched, QEvent *event) {
             auto args = std::tuple_cat(std::make_tuple(watched, event) /*, args_*/);
             return std::apply(lambda_, args);
         }
 
-    private:
+       private:
         LAMBDA lambda_;
         //        std::tuple<ARGS...> args_;
     };
 
-    AbstractLambdaContainer* lambdaContainer;
+    AbstractLambdaContainer *lambdaContainer;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // DIALOG_H
+#endif  // DIALOG_H

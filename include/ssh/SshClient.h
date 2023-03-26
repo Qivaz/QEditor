@@ -24,58 +24,58 @@
 #include <sshconnection.h>
 #include <sshremoteprocess.h>
 
-#define RECONNET_SPAN_TIME (1000 * 10) //连接状态心跳
+#define RECONNET_SPAN_TIME (1000 * 10)  //连接状态心跳
 
 namespace QEditor {
 class SshClient : public QObject {
     Q_OBJECT
-public:
-    explicit SshClient(const QString& ip, int port, const QString& user, const QString& pwd);
+   public:
+    explicit SshClient(const QString &ip, int port, const QString &user, const QString &pwd);
     ~SshClient();
 
     void Initialize();
     void Uninitialize();
 
-    int Send(const QString& message);
+    int Send(const QString &message);
     bool connected() const { return connected_; }
 
-signals:
+   signals:
     void sigInitializeInThread();
-    void sigConnectStateChanged(bool state, const QString& ip, int port);
-    void sigShellConnected(const QString& ip, int port);
-    void sigShellDataArrived(const QString& msg, const QString& ip, int port);
+    void sigConnectStateChanged(bool state, const QString &ip, int port);
+    void sigShellConnected(const QString &ip, int port);
+    void sigShellDataArrived(const QString &msg, const QString &ip, int port);
 
-private:
+   private:
     QString IpAndPort() { return ip_ + ":" + QString::number(port_); }
 
-public slots:
+   public slots:
     void HandleDisconnected();
-    void HandleResetConnection(const QString& ipPort);
-    void HandleShellSend(const QString& message);
+    void HandleResetConnection(const QString &ipPort);
+    void HandleShellSend(const QString &message);
     void HandleShellReceived();
 
-private slots:
+   private slots:
     void HandleInitializeInThread();
     void HandleCreateConnection();
     void HandleConnected();
     void HandleThreadFinished();
-    void HandleSshConnectError(const QSsh::SshError& sshError);
+    void HandleSshConnectError(const QSsh::SshError &sshError);
 
     void HandleShellStart();
     void HandleShellError();
 
     void HandleChannelInitialized();
-    void HandleChannelInitializationFailure(const QString&);
-    void HandleChannelJobFinished(const QSsh::SftpJobId, const QString&);
+    void HandleChannelInitializationFailure(const QString &);
+    void HandleChannelJobFinished(const QSsh::SftpJobId, const QString &);
     void HandleChannelClosed();
-    void HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo>& fileInfoList);
+    void HandleFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList);
 
-private:
-    QThread* thread_{nullptr};
+   private:
+    QThread *thread_{nullptr};
     bool connected_{false};
     bool shellConnected_{false};
 
-    QTimer* timer_{nullptr};
+    QTimer *timer_{nullptr};
 
     QString ip_ = "";
     int port_ = -1;
@@ -84,10 +84,10 @@ private:
     QString ipPort_;
 
     QSsh::SshConnectionParameters parameters_;
-    QSsh::SshConnection* sshConnection_ = nullptr;
+    QSsh::SshConnection *sshConnection_ = nullptr;
     QSharedPointer<QSsh::SshRemoteProcess> shell_;
     QSharedPointer<QSsh::SftpChannel> channel_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // SSHCLIENT_H
+#endif  // SSHCLIENT_H

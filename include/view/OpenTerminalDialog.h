@@ -11,19 +11,19 @@ class OpenTerminalDialog;
 namespace QEditor {
 class OpenTerminalDialog : public QDialog {
     Q_OBJECT
-public:
-    explicit OpenTerminalDialog(QWidget* parent = nullptr);
+   public:
+    explicit OpenTerminalDialog(QWidget *parent = nullptr);
     ~OpenTerminalDialog();
 
-    TabView* tabView();
+    TabView *tabView();
 
-private slots:
+   private slots:
     void on_pushButtonConnect_clicked();
     void on_pushButtonCancel_clicked();
 
-private:
-    Ui::OpenTerminalDialog* ui_;
+   private:
+    Ui::OpenTerminalDialog *ui_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // OPENTERMINALDIALOG_H
+#endif  // OPENTERMINALDIALOG_H

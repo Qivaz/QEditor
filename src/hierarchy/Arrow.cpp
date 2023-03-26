@@ -21,7 +21,7 @@
 #include <QtMath>
 
 namespace QEditor {
-Arrow::Arrow(NodeItem* startItem, NodeItem* endItem, QGraphicsItem* parent)
+Arrow::Arrow(NodeItem *startItem, NodeItem *endItem, QGraphicsItem *parent)
     : QGraphicsLineItem(parent), startNode_(startItem), endNode_(endItem) {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setPen(QPen(lineColor_, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -46,9 +46,8 @@ void Arrow::updatePosition() {
     setLine(line);
 }
 
-void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-    if (startNode_->collidesWithItem(endNode_))
-        return;
+void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+    if (startNode_->collidesWithItem(endNode_)) return;
 
     QPen arrayPen = pen();
     arrayPen.setColor(lineColor_);
@@ -64,8 +63,7 @@ void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) 
         QPointF p2 = endPolygon.at(i) + endNode_->pos();
         QLineF polyLine = QLineF(p1, p2);
         QLineF::IntersectionType intersectionType = polyLine.intersects(centerLine, &intersectPoint);
-        if (intersectionType == QLineF::BoundedIntersection)
-            break;
+        if (intersectionType == QLineF::BoundedIntersection) break;
         p1 = p2;
     }
 
@@ -91,4 +89,4 @@ void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) 
         painter->drawLine(arrowLine);
     }
 }
-} // namespace QEditor
+}  // namespace QEditor

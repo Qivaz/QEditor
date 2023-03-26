@@ -24,12 +24,12 @@
 namespace QEditor {
 Toast::Toast() { dialog_ = new ToastDialog(); }
 
-Toast& Toast::Instance() {
+Toast &Toast::Instance() {
     static Toast _toast;
     return _toast;
 }
 
-void Toast::Show(Toast::Level level, const QString& text) {
+void Toast::Show(Toast::Level level, const QString &text) {
     dialog_->Show(level, text);
     // Kill the timer triggered before.
     if (timerId_ != 0) {
@@ -45,10 +45,10 @@ void Toast::Show(Toast::Level level, const QString& text) {
     MainWindow::Instance().statusBar()->showMessage(text, 10000);
 }
 
-void Toast::timerEvent(QTimerEvent*) {
+void Toast::timerEvent(QTimerEvent *) {
     killTimer(timerId_);
     timerId_ = 0;
-    dialog_->accept(); // Hidden.
+    dialog_->accept();  // Hidden.
     dialog_->hide();
 }
 
@@ -76,11 +76,12 @@ ToastDialog::ToastDialog() {
     // setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void ToastDialog::Show(Toast::Level level, const QString& text) {
+void ToastDialog::Show(Toast::Level level, const QString &text) {
 #ifdef FRAME_RADIUS
-    const QString qss("QFrame{background-color:%1; border:none;"
-                      "border-top-left-radius:10px; border-top-right-radius:10px;"
-                      "border-bottom-left-radius:10px;border-bottom-right-radius:10px;}");
+    const QString qss(
+        "QFrame{background-color:%1; border:none;"
+        "border-top-left-radius:10px; border-top-right-radius:10px;"
+        "border-bottom-left-radius:10px;border-bottom-right-radius:10px;}");
     if (level == Toast::kInfo) {
         frame_->setStyleSheet(qss.arg("#000000"));
     } else if (level == Toast::kWarning) {
@@ -105,4 +106,4 @@ void ToastDialog::Show(Toast::Level level, const QString& text) {
     show();
 }
 
-} // namespace QEditor
+}  // namespace QEditor

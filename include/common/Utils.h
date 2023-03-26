@@ -22,26 +22,26 @@
 
 namespace QEditor {
 namespace Utils {
-    static inline QString mkdir(const QString& path) {
-        QDir dir(path);
-        if (dir.exists(path)) {
-            return path;
-        }
-        auto pos = path.lastIndexOf('/');
-        if (pos == -1) {
-            qDebug() << "Can not create dir: " << path;
-            qFatal("Create dir failed.");
-            return path;
-        }
-        auto parentPath = mkdir(path.mid(0, pos));
-        auto currentDirName = path.mid(path.lastIndexOf('/') + 1);
-        if (!currentDirName.isEmpty()) {
-            QDir parentDir(parentPath);
-            parentDir.mkpath(currentDirName);
-        }
+static inline QString mkdir(const QString &path) {
+    QDir dir(path);
+    if (dir.exists(path)) {
         return path;
     }
-} // namespace Utils
-} // namespace QEditor
+    auto pos = path.lastIndexOf('/');
+    if (pos == -1) {
+        qDebug() << "Can not create dir: " << path;
+        qFatal("Create dir failed.");
+        return path;
+    }
+    auto parentPath = mkdir(path.mid(0, pos));
+    auto currentDirName = path.mid(path.lastIndexOf('/') + 1);
+    if (!currentDirName.isEmpty()) {
+        QDir parentDir(parentPath);
+        parentDir.mkpath(currentDirName);
+    }
+    return path;
+}
+}  // namespace Utils
+}  // namespace QEditor
 
-#endif // UTILS_H
+#endif  // UTILS_H

@@ -23,21 +23,21 @@
 #include <QTextCursor>
 
 namespace QEditor {
-HierarchyScene::HierarchyScene(QMenu* itemMenu, QObject* parent) : QGraphicsScene(parent) { itemMenu_ = itemMenu; }
+HierarchyScene::HierarchyScene(QMenu *itemMenu, QObject *parent) : QGraphicsScene(parent) { itemMenu_ = itemMenu; }
 
-void HierarchyScene::setLineColor(const QColor& color) {
+void HierarchyScene::setLineColor(const QColor &color) {
     lineColor_ = color;
     if (ItemChanged(Arrow::Type)) {
-        Arrow* item = qgraphicsitem_cast<Arrow*>(selectedItems().first());
+        Arrow *item = qgraphicsitem_cast<Arrow *>(selectedItems().first());
         item->setColor(lineColor_);
         update();
     }
 }
 
-void HierarchyScene::setItemColor(const QColor& color) {
+void HierarchyScene::setItemColor(const QColor &color) {
     itemColor_ = color;
     if (ItemChanged(AnfNodeItem::Type)) {
-        AnfNodeItem* item = qgraphicsitem_cast<AnfNodeItem*>(selectedItems().first());
+        AnfNodeItem *item = qgraphicsitem_cast<AnfNodeItem *>(selectedItems().first());
         item->setBrush(itemColor_);
     }
 }
@@ -46,34 +46,33 @@ void HierarchyScene::setMode(Mode mode) { mode_ = mode; }
 
 void HierarchyScene::setItemType(AnfNodeItem::NodeType type) { itemType_ = type; }
 
-void HierarchyScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) {
-    if (mouseEvent->button() != Qt::LeftButton)
-        return;
+void HierarchyScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+    if (mouseEvent->button() != Qt::LeftButton) return;
 
-    AnfNodeItem* item;
+    AnfNodeItem *item;
     switch (mode_) {
-    case InsertItem:
-        item = new AnfNodeItem("Dummy", NodeInfo(), itemType_, itemMenu_);
-        item->setBrush(itemColor_);
-        addItem(item);
-        qWarning() << "scenePos: " << mouseEvent->scenePos();
-        item->setPos(mouseEvent->scenePos());
-        emit itemInserted(item);
-        break;
+        case InsertItem:
+            item = new AnfNodeItem("Dummy", NodeInfo(), itemType_, itemMenu_);
+            item->setBrush(itemColor_);
+            addItem(item);
+            qWarning() << "scenePos: " << mouseEvent->scenePos();
+            item->setPos(mouseEvent->scenePos());
+            emit itemInserted(item);
+            break;
 
-    case InsertLine:
-        line_ = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
-        line_->setPen(QPen(lineColor_, 2));
-        addItem(line_);
-        break;
+        case InsertLine:
+            line_ = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
+            line_->setPen(QPen(lineColor_, 2));
+            addItem(line_);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
-void HierarchyScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) {
+void HierarchyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if (mode_ == InsertLine && line_ != nullptr) {
         QLineF newLine(line_->line().p1(), mouseEvent->scenePos());
         line_->setLine(newLine);
@@ -82,23 +81,21 @@ void HierarchyScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) {
     }
 }
 
-void HierarchyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) {
+void HierarchyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if (line_ != nullptr && mode_ == InsertLine) {
-        QList<QGraphicsItem*> startItems = items(line_->line().p1());
-        if (startItems.count() && startItems.first() == line_)
-            startItems.removeFirst();
-        QList<QGraphicsItem*> endItems = items(line_->line().p2());
-        if (endItems.count() && endItems.first() == line_)
-            endItems.removeFirst();
+        QList<QGraphicsItem *> startItems = items(line_->line().p1());
+        if (startItems.count() && startItems.first() == line_) startItems.removeFirst();
+        QList<QGraphicsItem *> endItems = items(line_->line().p2());
+        if (endItems.count() && endItems.first() == line_) endItems.removeFirst();
 
         removeItem(line_);
         delete line_;
 
         if (startItems.count() > 0 && endItems.count() > 0 && startItems.first()->type() == AnfNodeItem::Type &&
             endItems.first()->type() == AnfNodeItem::Type && startItems.first() != endItems.first()) {
-            AnfNodeItem* startItem = qgraphicsitem_cast<AnfNodeItem*>(startItems.first());
-            AnfNodeItem* endItem = qgraphicsitem_cast<AnfNodeItem*>(endItems.first());
-            Arrow* arrow = new Arrow(startItem, endItem);
+            AnfNodeItem *startItem = qgraphicsitem_cast<AnfNodeItem *>(startItems.first());
+            AnfNodeItem *endItem = qgraphicsitem_cast<AnfNodeItem *>(endItems.first());
+            Arrow *arrow = new Arrow(startItem, endItem);
             arrow->setColor(lineColor_);
             startItem->addArrow(arrow);
             endItem->addArrow(arrow);
@@ -112,8 +109,8 @@ void HierarchyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) {
 }
 
 bool HierarchyScene::ItemChanged(int type) const {
-    const QList<QGraphicsItem*> items = selectedItems();
-    const auto cb = [type](const QGraphicsItem* item) { return item->type() == type; };
+    const QList<QGraphicsItem *> items = selectedItems();
+    const auto cb = [type](const QGraphicsItem *item) { return item->type() == type; };
     return std::find_if(items.begin(), items.end(), cb) != items.end();
 }
-} // namespace QEditor
+}  // namespace QEditor

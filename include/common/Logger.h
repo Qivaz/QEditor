@@ -91,7 +91,7 @@ static std::string GetProcName() {
     return app_name.substr(pos + 1);
 }
 
-static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
+static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     QTextStream cin(stdin, QIODevice::ReadOnly);
     QTextStream cout(stdout, QIODevice::WriteOnly);
     QTextStream cerr(stderr, QIODevice::WriteOnly);
@@ -104,66 +104,66 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext&
     ss << "(" << std::this_thread::get_id() << "," << GetProcName() << ")";
 #endif
     QString pidInfo = QString::fromStdString(ss.str());
-    const auto& currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+    const auto &currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
     switch (type) {
-    case QtDebugMsg:
-        return;
-        text = QString("[DEBUG] %1:%2 [%3:%4@%5] %6\n")
-                   .arg(pidInfo)
-                   .arg(currentTime)
-                   .arg(context.file)
-                   .arg(context.line)
-                   .arg(context.function)
-                   .arg(localMsg.constData());
-        cout << text;
-        break;
-    case QtInfoMsg:
-        return;
-        text = QString("[INFO] %1:%2 [%3:%4@%5] %6\n")
-                   .arg(pidInfo)
-                   .arg(currentTime)
-                   .arg(context.file)
-                   .arg(context.line)
-                   .arg(context.function)
-                   .arg(localMsg.constData());
-        cout << text;
-        break;
-    case QtWarningMsg:
-        return;
-        text = QString("[WARNING] %1:%2 [%3:%4@%5] %6\n")
-                   .arg(pidInfo)
-                   .arg(currentTime)
-                   .arg(context.file)
-                   .arg(context.line)
-                   .arg(context.function)
-                   .arg(localMsg.constData());
-        cout << text;
-        break;
-    case QtCriticalMsg:
-        text = QString("[CRITIAL] %1:%2 [%3:%4@%5] %6\n")
-                   .arg(pidInfo)
-                   .arg(currentTime)
-                   .arg(context.file)
-                   .arg(context.line)
-                   .arg(context.function)
-                   .arg(localMsg.constData());
-        cerr << text;
-        break;
-    case QtFatalMsg:
-        text = QString("[FATAL] %1:%2 [%3:%4@%5] %6\n")
-                   .arg(pidInfo)
-                   .arg(currentTime)
-                   .arg(context.file)
-                   .arg(context.line)
-                   .arg(context.function)
-                   .arg(localMsg.constData());
-        cerr << text;
-        break;
-    default:
-        break;
+        case QtDebugMsg:
+            return;
+            text = QString("[DEBUG] %1:%2 [%3:%4@%5] %6\n")
+                       .arg(pidInfo)
+                       .arg(currentTime)
+                       .arg(context.file)
+                       .arg(context.line)
+                       .arg(context.function)
+                       .arg(localMsg.constData());
+            cout << text;
+            break;
+        case QtInfoMsg:
+            return;
+            text = QString("[INFO] %1:%2 [%3:%4@%5] %6\n")
+                       .arg(pidInfo)
+                       .arg(currentTime)
+                       .arg(context.file)
+                       .arg(context.line)
+                       .arg(context.function)
+                       .arg(localMsg.constData());
+            cout << text;
+            break;
+        case QtWarningMsg:
+            return;
+            text = QString("[WARNING] %1:%2 [%3:%4@%5] %6\n")
+                       .arg(pidInfo)
+                       .arg(currentTime)
+                       .arg(context.file)
+                       .arg(context.line)
+                       .arg(context.function)
+                       .arg(localMsg.constData());
+            cout << text;
+            break;
+        case QtCriticalMsg:
+            text = QString("[CRITIAL] %1:%2 [%3:%4@%5] %6\n")
+                       .arg(pidInfo)
+                       .arg(currentTime)
+                       .arg(context.file)
+                       .arg(context.line)
+                       .arg(context.function)
+                       .arg(localMsg.constData());
+            cerr << text;
+            break;
+        case QtFatalMsg:
+            text = QString("[FATAL] %1:%2 [%3:%4@%5] %6\n")
+                       .arg(pidInfo)
+                       .arg(currentTime)
+                       .arg(context.file)
+                       .arg(context.line)
+                       .arg(context.function)
+                       .arg(localMsg.constData());
+            cerr << text;
+            break;
+        default:
+            break;
     }
 #ifdef OUTPUT_LOG_FILE
-    const auto& logPath = GetLogsPath();
+    const auto &logPath = GetLogsPath();
     QFile file(logPath);
     static QMutex mutex;
     mutex.lock();
@@ -198,4 +198,4 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext&
 //#define qCritical QT_NO_QDEBUG_MACRO
 //#define qFatal QT_NO_QDEBUG_MACRO
 #endif
-#endif // LOGGER_H
+#endif  // LOGGER_H

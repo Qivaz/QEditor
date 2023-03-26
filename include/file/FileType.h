@@ -24,12 +24,12 @@
 namespace QEditor {
 class FileType : public QObject {
     Q_OBJECT
-public:
+   public:
     FileType() { fileType_ = kTypeNone; }
-    FileType(const QString& path) : fileInfo_(path) { Check(); }
+    FileType(const QString &path) : fileInfo_(path) { Check(); }
     virtual ~FileType() {}
 
-    void SetPath(const QString& path) {
+    void SetPath(const QString &path) {
         fileInfo_.setFile(path);
         Check();
     }
@@ -48,16 +48,16 @@ public:
     }
 
     enum Type {
-        kTypeNone, // Not recognition language.
+        kTypeNone,  // Not recognition language.
         kTypeTxt,
-        kTypeCpp, // Treat the same for C and C++.
+        kTypeCpp,  // Treat the same for C and C++.
         kTypePython,
         kTypeIr
     };
 
     Type fileType() const { return fileType_; }
 
-private:
+   private:
     void Check() {
         if (txtSuffix_.contains(fileInfo_.suffix())) {
             fileType_ = kTypeTxt;
@@ -79,6 +79,6 @@ private:
     const QSet<QString> irSuffix_ = {"ir", "dat"};
     const QSet<QString> txtSuffix_ = {"txt"};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // FILETYPE_H
+#endif  // FILETYPE_H

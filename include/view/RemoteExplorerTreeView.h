@@ -36,28 +36,28 @@ namespace QEditor {
 // };
 
 class RemoteExplorerTreeView : public QTreeView {
-public:
-    RemoteExplorerTreeView(QWidget* parent = nullptr, const QString& rootPath = QString());
+   public:
+    RemoteExplorerTreeView(QWidget *parent = nullptr, const QString &rootPath = QString());
     ~RemoteExplorerTreeView() = default;
 
-    void HandleIndexClick(const QModelIndex& index);
-    void HandleExpanded(const QModelIndex& index);
-    void HandleIndexPress(const QModelIndex& index);
-    void HandleDirLoaded(const QString& path);
+    void HandleIndexClick(const QModelIndex &index);
+    void HandleExpanded(const QModelIndex &index);
+    void HandleIndexPress(const QModelIndex &index);
+    void HandleDirLoaded(const QString &path);
 
-    void GotoPathPosition(const QString& path);
+    void GotoPathPosition(const QString &path);
 
-    bool event(QEvent* event) override {
+    bool event(QEvent *event) override {
         qDebug() << event->type();
         return QTreeView::event(event);
     }
 
-private:
-    void timerEvent(QTimerEvent* event) override;
+   private:
+    void timerEvent(QTimerEvent *event) override;
 
-    QSsh::SftpFileSystemModel* model_;
+    QSsh::SftpFileSystemModel *model_;
     //    CustSortFilterProxyModel *proxyModel_;
-    QMenu* menu_;
+    QMenu *menu_;
     QString gotoDir_;
     QString gotoPath_;
     QString rootPath_;
@@ -69,6 +69,6 @@ private:
 // public:
 //     QIcon icon(const QFileInfo &info) const override;
 // };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // REMOTEEXPLORERTREEVIEW_H
+#endif  // REMOTEEXPLORERTREEVIEW_H

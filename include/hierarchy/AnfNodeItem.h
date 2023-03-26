@@ -33,16 +33,16 @@ namespace QEditor {
 class Arrow;
 
 class AnfNodeItem : public NodeItem {
-public:
-    AnfNodeItem(const QString& name, const NodeInfo& info, NodeType diagramType, QMenu* contextMenu,
-                QGraphicsItem* parent = nullptr);
+   public:
+    AnfNodeItem(const QString &name, const NodeInfo &info, NodeType diagramType, QMenu *contextMenu,
+                QGraphicsItem *parent = nullptr);
 
-protected:
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+   protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
+   private:
     NodeInfo nodeInfo_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // ANFNODEITEM_H
+#endif  // ANFNODEITEM_H

@@ -247,13 +247,13 @@ QMap<QString, int> FileEncoding::encodingNameToMib_ = {
 
 QStringList FileEncoding::encodingNames() { return encodingNameList_; }
 
-QString FileEncoding::ProcessAnsi(QFile& file) {
+QString FileEncoding::ProcessAnsi(QFile &file) {
     // If no BOM, we try to decode by UTF8 firstly,
     // then decode by other codeces if failed.
-    const QByteArray& data = file.readAll();
+    const QByteArray &data = file.readAll();
     QTextCodec::ConverterState state;
     // FileEncoding.codec is UTF8 in default.
-    QTextCodec* utf8Codec = QTextCodec::codecForMib(106);
+    QTextCodec *utf8Codec = QTextCodec::codecForMib(106);
     QString ansiText = utf8Codec->toUnicode(data.constData(), data.size(), &state);
     qDebug() << "codec: " << utf8Codec->name() << ", invalidChars: " << state.invalidChars
              << ", text: " << ansiText.mid(0, 15) << "..., bytearry: " << data.mid(0, 15).data() << "...";
@@ -263,28 +263,28 @@ QString FileEncoding::ProcessAnsi(QFile& file) {
     }
 
     // Use System.
-    auto systemCodec = QTextCodec::codecForLocale();               // QTextCodec::codecForName("System"); //
-                                                                   // QTextCodec::codecForMib(0); // Use system codec.
-    if (systemCodec != nullptr && systemCodec->mibEnum() != 106) { // Not UTF-8.
+    auto systemCodec = QTextCodec::codecForLocale();                // QTextCodec::codecForName("System"); //
+                                                                    // QTextCodec::codecForMib(0); // Use system codec.
+    if (systemCodec != nullptr && systemCodec->mibEnum() != 106) {  // Not UTF-8.
         qDebug() << "systemCodec: " << systemCodec << ", " << systemCodec->name() << ", " << systemCodec->mibEnum();
         setCodec(systemCodec);
-        const auto& ansiText = systemCodec->toUnicode(data.constData());
+        const auto &ansiText = systemCodec->toUnicode(data.constData());
         return ansiText;
     }
 
     // Use GBK.
-    auto gbkCodec = QTextCodec::codecForMib(113); // GBK
+    auto gbkCodec = QTextCodec::codecForMib(113);  // GBK
     if (gbkCodec != nullptr) {
         qDebug() << "gbkCodec: " << gbkCodec << ", " << gbkCodec->name() << ", " << gbkCodec->mibEnum();
         setCodec(gbkCodec);
-        const auto& ansiText = gbkCodec->toUnicode(data.constData());
+        const auto &ansiText = gbkCodec->toUnicode(data.constData());
         return ansiText;
     }
 
     // If no BOM, and not UTF-8..., we try to find proper codec.
-    QTextCodec* bestCodec;
+    QTextCodec *bestCodec;
     int minInvalidCharsNum = data.size();
-    for (const auto& name : encodingNames()) {
+    for (const auto &name : encodingNames()) {
         auto codec = QTextCodec::codecForName(name.toLocal8Bit().data());
         if (codec == nullptr) {
             continue;
@@ -308,11 +308,11 @@ QString FileEncoding::ProcessAnsi(QFile& file) {
     return ansiText;
 }
 
-int FileEncoding::GetMibByName(const QString& name) {
+int FileEncoding::GetMibByName(const QString &name) {
     auto iter = encodingNameToMib_.find(name);
     if (iter != encodingNameToMib_.end()) {
         return iter.value();
     }
     return -1;
 }
-} // namespace QEditor
+}  // namespace QEditor

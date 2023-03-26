@@ -20,16 +20,18 @@
 #include <QWheelEvent>
 
 namespace QEditor {
-DiffHtmlView::DiffHtmlView(QWidget* parent) : QTextEdit(parent) {
-    setStyleSheet("color: darkGray;"
-                  "background-color: rgb(28, 28, 28);"
-                  "selection-color: lightGray;"
-                  "selection-background-color: rgb(9, 71, 113);"
-                  "border: none;"
-                  /*"font-family: '文泉驿等宽正黑';"*/);
+DiffHtmlView::DiffHtmlView(QWidget *parent) : QTextEdit(parent) {
+    setStyleSheet(
+        "color: darkGray;"
+        "background-color: rgb(28, 28, 28);"
+        "selection-color: lightGray;"
+        "selection-background-color: rgb(9, 71, 113);"
+        "border: none;"
+        /*"font-family: '文泉驿等宽正黑';"*/);
 
-    verticalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                       "QScrollBar::add-line:vertical { \
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:vertical { \
                                           border: none; \
                                           background: none; \
                                         } \
@@ -37,8 +39,9 @@ DiffHtmlView::DiffHtmlView(QWidget* parent) : QTextEdit(parent) {
                                           border: none; \
                                           background: none; \
                                         }");
-    horizontalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                         "QScrollBar::add-line:horizontal { \
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:horizontal { \
                                             border: none; \
                                             background: none; \
                                           } \
@@ -51,7 +54,7 @@ DiffHtmlView::DiffHtmlView(QWidget* parent) : QTextEdit(parent) {
     currentFontSize_ = font().pointSize();
 }
 
-void DiffHtmlView::wheelEvent(QWheelEvent* event) {
+void DiffHtmlView::wheelEvent(QWheelEvent *event) {
     // If Ctrl-Key pressed.
     if (QApplication::keyboardModifiers() != Qt::ControlModifier) {
         QTextEdit::wheelEvent(event);
@@ -79,9 +82,9 @@ void DiffHtmlView::ZoomOut() {
     currentFontSize_ = currentFont.pointSize();
 }
 
-DiffTextView::DiffTextView(QWidget* parent) : EditView(parent) {
+DiffTextView::DiffTextView(QWidget *parent) : EditView(parent) {
     setFont(QFont("Consolas", 11));
     //    setReadOnly(true);
     //    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 }
-} // namespace QEditor
+}  // namespace QEditor

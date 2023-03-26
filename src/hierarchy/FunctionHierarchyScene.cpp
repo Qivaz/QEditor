@@ -24,7 +24,7 @@
 #include <QTextCursor>
 
 namespace QEditor {
-FunctionHierarchyScene::FunctionHierarchyScene(IParser* parser, QMenu* itemMenu, QObject* parent)
+FunctionHierarchyScene::FunctionHierarchyScene(IParser *parser, QMenu *itemMenu, QObject *parent)
     : HierarchyScene(itemMenu, parent), parser_(parser) {
     itemMenu_ = itemMenu;
     mode_ = MoveItem;
@@ -33,7 +33,7 @@ FunctionHierarchyScene::FunctionHierarchyScene(IParser* parser, QMenu* itemMenu,
     itemColor_ = QColor(106, 106, 106);
     lineColor_ = QColor(0, 122, 204);
 
-    const auto& entryName = parser_->GetEntry();
+    const auto &entryName = parser_->GetEntry();
     constexpr auto startY = 100;
     constexpr auto distanceY = 100;
     constexpr auto startX = 50;
@@ -43,11 +43,11 @@ FunctionHierarchyScene::FunctionHierarchyScene(IParser* parser, QMenu* itemMenu,
     setSceneRect(QRectF(0, 0, (maxX + distanceX) * 1.1, (maxY + distanceY) * 2));
 }
 
-std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& funcName, int startX, int startY) {
+std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &funcName, int startX, int startY) {
     constexpr auto distanceY = 100;
     constexpr auto distanceX = 300;
     qDebug() << "funcName: " << funcName;
-    const auto& info = parser_->GetFuncGraphInfo(funcName);
+    const auto &info = parser_->GetFuncGraphInfo(funcName);
     if (info.pos_ == -1) {
         return {0, 0};
     }
@@ -60,7 +60,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
     maxY = std::max(maxY, startY);
 
     for (int i = 0; i < info.callees_.size(); ++i) {
-        const auto& callee = info.callees_[i];
+        const auto &callee = info.callees_[i];
         qDebug() << "callee: " << callee << ", x: " << (startX + distanceX * i) << ", y: " << (startY + distanceY);
         auto [endNode, exist] = GetNode(callee);
         if (!exist) {
@@ -71,9 +71,9 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
             maxY = std::max(maxY, newY);
         }
 
-        FunctionItem* startItem = qgraphicsitem_cast<FunctionItem*>(startNode);
-        FunctionItem* endItem = qgraphicsitem_cast<FunctionItem*>(endNode);
-        Arrow* arrow = new Arrow(startItem, endItem);
+        FunctionItem *startItem = qgraphicsitem_cast<FunctionItem *>(startNode);
+        FunctionItem *endItem = qgraphicsitem_cast<FunctionItem *>(endNode);
+        Arrow *arrow = new Arrow(startItem, endItem);
         arrow->setColor(lineColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
@@ -90,11 +90,11 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
     return {maxX, maxY};
 }
 
-std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& funcName, int depth) {
+std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &funcName, int depth) {
     constexpr auto distanceY = 100;
     constexpr auto distanceX = 200;
     qDebug() << "funcName: " << funcName;
-    const auto& info = parser_->GetFuncGraphInfo(funcName);
+    const auto &info = parser_->GetFuncGraphInfo(funcName);
     if (info.pos_ == -1) {
         return {0, 0};
     }
@@ -115,7 +115,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
 
     ++depth;
     for (int i = 0; i < info.callees_.size(); ++i) {
-        const auto& callee = info.callees_[i];
+        const auto &callee = info.callees_[i];
         auto [endNode, exist] = GetNode(callee);
         if (!exist) {
             if (depth == xPos_.size()) {
@@ -133,9 +133,9 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
             maxY = std::max(maxY, newY);
         }
 
-        FunctionItem* startItem = qgraphicsitem_cast<FunctionItem*>(startNode);
-        FunctionItem* endItem = qgraphicsitem_cast<FunctionItem*>(endNode);
-        Arrow* arrow = new Arrow(startItem, endItem);
+        FunctionItem *startItem = qgraphicsitem_cast<FunctionItem *>(startNode);
+        FunctionItem *endItem = qgraphicsitem_cast<FunctionItem *>(endNode);
+        Arrow *arrow = new Arrow(startItem, endItem);
         arrow->setColor(lineColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
@@ -151,4 +151,4 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString& fu
     }
     return {maxX, maxY};
 }
-} // namespace QEditor
+}  // namespace QEditor

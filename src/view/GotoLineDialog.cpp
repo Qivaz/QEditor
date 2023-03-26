@@ -25,11 +25,11 @@ namespace WinTheme {
 extern bool IsDarkTheme();
 extern void SetDark_qApp();
 extern void SetDarkTitleBar(HWND hwnd);
-} // namespace WinTheme
+}  // namespace WinTheme
 #endif
 
 namespace QEditor {
-GotoLineDialog::GotoLineDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::UIGotoLineDialog) {
+GotoLineDialog::GotoLineDialog(QWidget *parent) : QDialog(parent), ui_(new Ui::UIGotoLineDialog) {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -41,11 +41,11 @@ GotoLineDialog::GotoLineDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::U
 
 GotoLineDialog::~GotoLineDialog() { delete ui_; }
 
-EditView* GotoLineDialog::editView() { return MainWindow::Instance().editView(); }
+EditView *GotoLineDialog::editView() { return MainWindow::Instance().editView(); }
 
-TabView* GotoLineDialog::tabView() { return MainWindow::Instance().tabView(); }
+TabView *GotoLineDialog::tabView() { return MainWindow::Instance().tabView(); }
 
-void GotoLineDialog::showEvent(QShowEvent*) {
+void GotoLineDialog::showEvent(QShowEvent *) {
 #define FORCE_DARK_THEME
 #ifdef Q_OS_WIN
 #ifdef FORCE_DARK_THEME
@@ -72,4 +72,4 @@ void GotoLineDialog::on_pushButtonOk_clicked() {
 }
 
 void GotoLineDialog::on_pushButtonCacel_clicked() { hide(); }
-} // namespace QEditor
+}  // namespace QEditor

@@ -24,16 +24,16 @@
 namespace QEditor {
 class RecentFiles : public QObject {
     Q_OBJECT
-public:
-    static void UpdateFiles(const QString& filePath);
+   public:
+    static void UpdateFiles(const QString &filePath);
     static void Clear();
 
     static void StoreFiles();
     static void LoadFiles();
 
-    static const QStringList& files() { return files_; }
+    static const QStringList &files() { return files_; }
 
-private:
+   private:
     static QStringList files_;
 
     static const QString kAppInternalRecentFilesDirName_;
@@ -41,6 +41,6 @@ private:
 
     static const int kMaxRecentFilesNum_ = Constants::kMaxOpenRecentFilesNum;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // RECENTFILES_H
+#endif  // RECENTFILES_H

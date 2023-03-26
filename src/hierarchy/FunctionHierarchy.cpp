@@ -19,15 +19,17 @@
 #include <QScrollBar>
 
 namespace QEditor {
-FunctionHierarchy::FunctionHierarchy(IParser* parser, QWidget* parent) : QGraphicsView(parent) {
-    setStyleSheet("color: darkGray;"
-                  "background-color: rgb(28, 28, 28);"
-                  "selection-color: lightGray;"
-                  "selection-background-color: rgb(9, 71, 113);"
-                  "border: none;");
+FunctionHierarchy::FunctionHierarchy(IParser *parser, QWidget *parent) : QGraphicsView(parent) {
+    setStyleSheet(
+        "color: darkGray;"
+        "background-color: rgb(28, 28, 28);"
+        "selection-color: lightGray;"
+        "selection-background-color: rgb(9, 71, 113);"
+        "border: none;");
 
-    verticalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                       "QScrollBar::add-line:vertical { \
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:vertical { \
                                           border: none; \
                                           background: none; \
                                         } \
@@ -35,8 +37,9 @@ FunctionHierarchy::FunctionHierarchy(IParser* parser, QWidget* parent) : QGraphi
                                           border: none; \
                                           background: none; \
                                         }");
-    horizontalScrollBar()->setStyleSheet("QScrollBar {border: none;}"
-                                         "QScrollBar::add-line:horizontal { \
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none;}"
+        "QScrollBar::add-line:horizontal { \
                                             border: none; \
                                             background: none; \
                                           } \
@@ -49,4 +52,4 @@ FunctionHierarchy::FunctionHierarchy(IParser* parser, QWidget* parent) : QGraphi
     setScene(scene_);
     scrollContentsBy(0, 0);
 }
-} // namespace QEditor
+}  // namespace QEditor

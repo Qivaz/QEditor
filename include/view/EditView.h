@@ -35,7 +35,7 @@ class FunctionHierarchy;
 
 class NewFileNum : public QObject {
     Q_OBJECT
-public:
+   public:
     // Starts from 1.
     static int GetNumber() {
         for (int i = 0; i < numbers_use_status_.size(); ++i) {
@@ -70,36 +70,36 @@ public:
         qDebug() << "Expand to number: " << numbers_use_status_.size();
     }
 
-private:
+   private:
     static QVector<bool> numbers_use_status_;
 };
 
 class EditView : public QPlainTextEdit {
     Q_OBJECT
-public:
-    EditView(QWidget* parent = nullptr);
-    EditView(const QString& fileName, QWidget* parent = nullptr);
-    EditView(const QFileInfo& fileInfo, QWidget* parent = nullptr);
+   public:
+    EditView(QWidget *parent = nullptr);
+    EditView(const QString &fileName, QWidget *parent = nullptr);
+    EditView(const QFileInfo &fileInfo, QWidget *parent = nullptr);
     ~EditView() = default;
 
     void Init();
 
-    void SetCurrentFile(const QString& filePath);
-    bool SaveFile(const QString& filePath);
+    void SetCurrentFile(const QString &filePath);
+    bool SaveFile(const QString &filePath);
     bool Save();
     bool SaveAs();
     bool MaybeSave();
     void Close();
 
-    void HandleLineNumberAreaPaintEvent(QPaintEvent* event);
+    void HandleLineNumberAreaPaintEvent(QPaintEvent *event);
     int GetLineNumberAreaWidth();
 
     int newFileNum() const { return newFileNum_; }
     void setNewFileNum(int fileNum) { newFileNum_ = fileNum; }
     QString fileName() const { return fileName_; }
-    void setFileName(const QString& fileName) { fileName_ = fileName; }
+    void setFileName(const QString &fileName) { fileName_ = fileName; }
     QString filePath() const { return filePath_; }
-    void setFilePath(const QString& filePath) {
+    void setFilePath(const QString &filePath) {
         filePath_ = filePath;
         if (!fileType_.IsUnknown()) {
             qCritical() << "Not allowed to change file type, current type is: " << fileType_.fileType();
@@ -111,21 +111,21 @@ public:
         }
     }
 
-    void GotoCursor(const QTextCursor& cursor);
+    void GotoCursor(const QTextCursor &cursor);
     int GotoBlock(int blockNumber);
     void SelectCurrentBlock(int lineCount);
     void SelectBlocks(int startBlockNumber, int endBlockNumber);
 
     QVector<QString> markTexts() const { return markTexts_; }
     void setMarkTexts(const QVector<QString> strs) { markTexts_ = strs; }
-    void AddMarkText(const QString& str);
-    bool RemoveMarkText(const QString& str);
+    void AddMarkText(const QString &str);
+    bool RemoveMarkText(const QString &str);
     void ClearMarkTexts() { markTexts_.clear(); }
     QColor GetMarkTextBackground(int i);
     void HighlightMarkTexts();
 
     std::pair<QTextCursor, bool> FindPairingBracketCursor(QTextCursor cursor, QTextCursor::MoveOperation direct,
-                                                          const QChar& startBracketChar, const QChar& endBracketChar);
+                                                          const QChar &startBracketChar, const QChar &endBracketChar);
 
     int visibleBlockCount() {
         QPoint bottomRight(viewport()->width() - 1, viewport()->height() - 1);
@@ -147,7 +147,7 @@ public:
     bool fileLoaded() { return fileLoaded_; };
     void setFileLoaded(bool fileLoaded) { fileLoaded_ = fileLoaded; }
 
-    TabView* tabView() { return tabView_; }
+    TabView *tabView() { return tabView_; }
 
     bool undoAvail() { return undoAvail_; };
     bool redoAvail() { return redoAvail_; };
@@ -156,9 +156,9 @@ public:
     void ApplySpecialCharsVisible();
     void ApplyTabCharNum();
 
-    FileEncoding& fileEncoding() { return fileEncoding_; }
-    void setFileEncoding(FileEncoding&& fileEncoding);
-    void ChangeFileEncoding(FileEncoding&& fileEncoding);
+    FileEncoding &fileEncoding() { return fileEncoding_; }
+    void setFileEncoding(FileEncoding &&fileEncoding);
+    void ChangeFileEncoding(FileEncoding &&fileEncoding);
 
     void UpdateStatusBarWithCursor();
 
@@ -166,12 +166,12 @@ public:
 
     void TrigerParser();
 
-    virtual void Hover(QTextCursor& cursor);
+    virtual void Hover(QTextCursor &cursor);
 
     QString GetCursorText();
-    QString GetCursorText(QTextCursor& cursor);
+    QString GetCursorText(QTextCursor &cursor);
 
-    void JumpHint(QTextCursor& cursor);
+    void JumpHint(QTextCursor &cursor);
     void Jump();
 
     bool CanParse() {
@@ -183,25 +183,25 @@ public:
                 document()->characterCount() <= Constants::kMaxParseCharNum);
     }
 
-protected:
-    void showEvent(QShowEvent*) override;
-    void paintEvent(QPaintEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
-    void wheelEvent(QWheelEvent* event) override;
-    void keyPressEvent(QKeyEvent* event) override;
-    void keyReleaseEvent(QKeyEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-    void timerEvent(QTimerEvent* event) override;
-    void contextMenuEvent(QContextMenuEvent* event) override;
+   protected:
+    void showEvent(QShowEvent *) override;
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
     virtual void UnderpaintCurrentBlock();
 
-private slots:
+   private slots:
     void HandleBlockCountChanged(int newBlockCount);
     void HandleCursorPositionChanged();
     void HandleSelectionChanged();
-    void HandleUpdateRequest(const QRect& rect, int dy);
+    void HandleUpdateRequest(const QRect &rect, int dy);
     void HandleTextChanged();
     void HandleContentsChange(int from, int charsRemoved, int charsAdded);
     void HandleContentsChanged();
@@ -215,26 +215,26 @@ private slots:
     bool MarkUnmarkCursorText();
     bool UnmarkAll();
 
-private:
-    void UpdateLineNumberArea(const QRect& rect, int dy);
+   private:
+    void UpdateLineNumberArea(const QRect &rect, int dy);
 
     void HighlightFocusChars();
     void HighlightFocusNearBracket();
-    void HighlightBrackets(const QTextCursor& leftCursor, const QTextCursor& rightCursor);
+    void HighlightBrackets(const QTextCursor &leftCursor, const QTextCursor &rightCursor);
 
-    void HighlightVisibleChars(const QString& text, const QColor& foreground = QColor(Qt::lightGray),
-                               const QColor& background = QColor(52, 58, 64)); // QColor(54, 54, 100)
+    void HighlightVisibleChars(const QString &text, const QColor &foreground = QColor(Qt::lightGray),
+                               const QColor &background = QColor(52, 58, 64));  // QColor(54, 54, 100)
     // Return false if too many highlighting times.
-    bool HighlightChars(int startPos, int count, const QColor& foreground = QColor(Qt::lightGray),
-                        const QColor& background = QColor(52, 58, 64), // QColor(54, 54, 100)
+    bool HighlightChars(int startPos, int count, const QColor &foreground = QColor(Qt::lightGray),
+                        const QColor &background = QColor(52, 58, 64),  // QColor(54, 54, 100)
                         bool underline = false);
     bool highlighterInvalid() {
         // If mark texts change, or selected text changes.
         return highlighterInvalid_;
     }
 
-    TabView* tabView_;
-    QWidget* lineNumberArea_;
+    TabView *tabView_;
+    QWidget *lineNumberArea_;
     int currentBlockNumber_{0};
     int visibleBlockCount_{0};
     int currentFontSize_{font().pointSize()};
@@ -249,7 +249,7 @@ private:
     // We not use QSyntaxHighlighter for user interacting, to set false if want quick highlight to work.
     bool highlighterInvalid_{true};
     QString selectedText_;
-    TextHighlighter* highlighter_{nullptr};
+    TextHighlighter *highlighter_{nullptr};
     QVector<QString> markTexts_;
     const QMap<QString, QString> leftBrackets_ = {{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"}};
     const QMap<QString, QString> rightBrackets_ = {{")", "("}, {"]", "["}, {"}", "{"}, {">", "<"}};
@@ -262,37 +262,37 @@ private:
 
     FileEncoding fileEncoding_ /*{106}*/;
 
-    IParser* parser_{nullptr};
-    OutlineList* overviewList_{nullptr};
-    FunctionHierarchy* hierarchy_{nullptr};
+    IParser *parser_{nullptr};
+    OutlineList *overviewList_{nullptr};
+    FunctionHierarchy *hierarchy_{nullptr};
 
     int hoverPos_;
     bool jumpAvailable_{false};
     FuncGraphInfo funcGraphInfo_;
 
     int timerId_{0};
-    QMenu* menu_;
+    QMenu *menu_;
 };
 
 class LineNumberArea : public QWidget {
     Q_OBJECT
-public:
-    LineNumberArea(EditView* editView) : QWidget(editView), editView_(editView) {}
+   public:
+    LineNumberArea(EditView *editView) : QWidget(editView), editView_(editView) {}
 
     QSize sizeHint() const override;
 
-protected:
-    void paintEvent(QPaintEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
+   protected:
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-private:
-    EditView* editView_{nullptr};
+   private:
+    EditView *editView_{nullptr};
 
     int startBlockNumber_{-1};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // EDITVIEW_H
+#endif  // EDITVIEW_H

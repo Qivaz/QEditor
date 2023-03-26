@@ -23,29 +23,29 @@ namespace QEditor {
 class NodeItem;
 
 class Arrow : public QGraphicsLineItem {
-public:
+   public:
     enum { Type = UserType + 4 };
 
-    Arrow(NodeItem* startItem, NodeItem* endItem, QGraphicsItem* parent = nullptr);
+    Arrow(NodeItem *startItem, NodeItem *endItem, QGraphicsItem *parent = nullptr);
 
     int type() const override { return Type; }
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
-    void setColor(const QColor& color) { lineColor_ = color; }
-    NodeItem* startItem() const { return startNode_; }
-    NodeItem* endItem() const { return endNode_; }
+    void setColor(const QColor &color) { lineColor_ = color; }
+    NodeItem *startItem() const { return startNode_; }
+    NodeItem *endItem() const { return endNode_; }
 
     void updatePosition();
 
-protected:
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+   protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-private:
-    NodeItem* startNode_;
-    NodeItem* endNode_;
+   private:
+    NodeItem *startNode_;
+    NodeItem *endNode_;
     QPolygonF arrowPolygon_;
     QColor lineColor_ = Qt::blue;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // ARROW_H
+#endif  // ARROW_H

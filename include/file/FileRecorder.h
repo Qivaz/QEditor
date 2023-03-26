@@ -25,20 +25,20 @@
 namespace QEditor {
 class FileRecorder : public QObject {
     Q_OBJECT
-public:
-    explicit FileRecorder(QObject* parent = nullptr);
+   public:
+    explicit FileRecorder(QObject *parent = nullptr);
 
     class FileInfo {
-    public:
+       public:
         FileInfo() = default;
-        FileInfo(int pos, int num, const QString& path)
+        FileInfo(int pos, int num, const QString &path)
             : index_(pos), num_(num), path_(path), ip_(""), port_(-1), user_(""), pwd_("") {}
 
-        FileInfo(const QString& ip, int port, const QString& user, const QString& pwd)
+        FileInfo(const QString &ip, int port, const QString &user, const QString &pwd)
             : index_(-1), num_(0), path_(""), ip_(ip), port_(port), user_(user), pwd_(pwd) {}
 
         // Store data.
-        friend QDataStream& operator<<(QDataStream& stream, const FileInfo& data) {
+        friend QDataStream &operator<<(QDataStream &stream, const FileInfo &data) {
             // New file or open file.
             stream << data.index_;
             stream << data.num_;
@@ -52,7 +52,7 @@ public:
             return stream;
         }
         // Load into data.
-        friend QDataStream& operator>>(QDataStream& stream, FileInfo& data) {
+        friend QDataStream &operator>>(QDataStream &stream, FileInfo &data) {
             // New file or open file.
             stream >> data.index_;
             stream >> data.num_;
@@ -68,17 +68,17 @@ public:
 
         ///////////////////////////////////////////
         /// New file or open file.
-        int index_; // Used as file name for storing data.
-                    // -1 if no need to store or load. Such as: Open file edit but not change, or empty new file edit.
-        int num_;   // New file edit, "* new xxx".
-        QString path_; // Open file edit.
-                       // Empty if new file.
+        int index_;  // Used as file name for storing data.
+                     // -1 if no need to store or load. Such as: Open file edit but not change, or empty new file edit.
+        int num_;    // New file edit, "* new xxx".
+        QString path_;  // Open file edit.
+                        // Empty if new file.
 
         /// Terminal session.
-        QString ip_;   // Terminal SSH IP
-        int port_;     // Terminal SSH port, -1 means new file or open file, otherwise terminal data.
-        QString user_; // Terminal SSH user name
-        QString pwd_;  // Terminal SSH password
+        QString ip_;    // Terminal SSH IP
+        int port_;      // Terminal SSH port, -1 means new file or open file, otherwise terminal data.
+        QString user_;  // Terminal SSH user name
+        QString pwd_;   // Terminal SSH password
         ///////////////////////////////////////////
 
         bool IsTerminal() const { return port_ != -1; }
@@ -94,16 +94,16 @@ public:
     };
 
     class FileList {
-    public:
+       public:
         FileList() = default;
 
         // Store data.
-        friend QDataStream& operator<<(QDataStream& stream, const FileList& data) {
+        friend QDataStream &operator<<(QDataStream &stream, const FileList &data) {
             stream << data.pos_ << data.fileInfos_;
             return stream;
         }
         // Load into data.
-        friend QDataStream& operator>>(QDataStream& stream, FileList& data) {
+        friend QDataStream &operator>>(QDataStream &stream, FileList &data) {
             stream >> data.pos_ >> data.fileInfos_;
             return stream;
         }
@@ -113,17 +113,17 @@ public:
     };
 
     class FileData {
-    public:
+       public:
         FileData() = default;
-        FileData(int mibEnum, const QString& text) : mibEnum_(mibEnum), text_(std::move(text)) {}
+        FileData(int mibEnum, const QString &text) : mibEnum_(mibEnum), text_(std::move(text)) {}
 
         // Store data.
-        friend QDataStream& operator<<(QDataStream& stream, const FileData& data) {
+        friend QDataStream &operator<<(QDataStream &stream, const FileData &data) {
             stream << data.mibEnum_ << data.text_;
             return stream;
         }
         // Load into data.
-        friend QDataStream& operator>>(QDataStream& stream, FileData& data) {
+        friend QDataStream &operator>>(QDataStream &stream, FileData &data) {
             stream >> data.mibEnum_ >> data.text_;
             return stream;
         }
@@ -135,7 +135,7 @@ public:
     // Set EditViews before store.
     // To call before StoreFiles().
     void SetPos(int pos) { pos_ = pos; }
-    void SetEditViews(QVector<EditView*> editViews) { editViews_ = std::move(editViews); }
+    void SetEditViews(QVector<EditView *> editViews) { editViews_ = std::move(editViews); }
 
     // Get loaded text for each tab.
     // To call after LoadFiles().
@@ -150,7 +150,7 @@ public:
     int GetMibEnum(int index) {
         if ((size_t)index >= mibEnums_.size()) {
             qCritical() << "Wrong index: " << index << ", mib enum size: " << mibEnums_.size();
-            return 106; // UTF-8 in default.
+            return 106;  // UTF-8 in default.
         }
         return mibEnums_[index];
     }
@@ -160,12 +160,12 @@ public:
     void StoreFiles();
     void LoadFiles();
 
-private:
+   private:
     QDataStream fileListStream_;
     QDataStream fileDataStream_;
 
-    int pos_; // Focused edit view.
-    QVector<EditView*> editViews_;
+    int pos_;  // Focused edit view.
+    QVector<EditView *> editViews_;
 
     std::vector<QString> texts_;
     std::vector<int> mibEnums_;
@@ -176,6 +176,6 @@ private:
     const QString kAppInternalAutoSaveDirName_ = Constants::kAppInternalAutoSaveDirName;
     const QString kAppInternalFilesInfoFileName_ = Constants::kAppInternalFilesInfoFileName;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // FILERECORD_H
+#endif  // FILERECORD_H

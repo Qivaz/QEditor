@@ -18,7 +18,7 @@
 #include "Logger.h"
 
 namespace QEditor {
-TextHighlighter::TextHighlighter(const FileType& fileType, QTextDocument* parent, const QString& focused_str,
+TextHighlighter::TextHighlighter(const FileType &fileType, QTextDocument *parent, const QString &focused_str,
                                  const QVector<QString> markUpText)
     : QSyntaxHighlighter(parent) {
     if (fileType.IsCpp()) {
@@ -38,7 +38,7 @@ TextHighlighter::TextHighlighter(const FileType& fileType, QTextDocument* parent
     }
 }
 
-void TextHighlighter::SetupSelectedText(const QString& text) {
+void TextHighlighter::SetupSelectedText(const QString &text) {
     // Highlight all texts as focused text.
     HighlightingRule rule;
     rule.pattern = QRegularExpression(/*"\\b" + */ text /* + "\\b"*/);
@@ -52,7 +52,7 @@ void TextHighlighter::SetupSelectedText(const QString& text) {
 void TextHighlighter::SetupMakeText(const QVector<QString> markTexts) {
     // Highlight mark up text with preset colors.
     for (int i = 0; i < markTexts.size() && i < presetMarkColors_.size(); ++i) {
-        const auto& text = markTexts[i];
+        const auto &text = markTexts[i];
         HighlightingRule rule;
         rule.pattern = QRegularExpression(/*"\\b" + */ text /* + "\\b"*/);
         QTextCharFormat markUpFormat;
@@ -68,7 +68,7 @@ void TextHighlighter::SetupMakeText(const QVector<QString> markTexts) {
     int g = 20;
     int b = 150;
     for (int i = presetMarkColors_.size(); i < markTexts.size(); ++i) {
-        const auto& text = markTexts[i];
+        const auto &text = markTexts[i];
         HighlightingRule rule;
         rule.pattern = QRegularExpression("\\b" + text + "\\b");
         QTextCharFormat markUpFormat;
@@ -100,7 +100,7 @@ void TextHighlighter::SetupMindIRLang() {
         QStringLiteral("\\bundeterminate\\b"), QStringLiteral("\\bconst\\b"),     QStringLiteral("\\bvalue\\b"),
         QStringLiteral("\\bscope\\b"),         QStringLiteral("\\bcall\\b"),
     };
-    for (const QString& pattern : keywordPatterns) {
+    for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
         rule.format = keywordFormat;
         highlightingRules_.append(rule);
@@ -138,7 +138,7 @@ void TextHighlighter::SetupMindIRLang() {
                                     QStringLiteral("\\bfalse\\b"),
                                     QStringLiteral("\\btrue\\b"),
                                     QStringLiteral("\\bunknown\\b")};
-    for (const QString& pattern : typePatterns) {
+    for (const QString &pattern : typePatterns) {
         rule.pattern = QRegularExpression(pattern);
         rule.format = typeFormat;
         highlightingRules_.append(rule);
@@ -197,7 +197,7 @@ void TextHighlighter::SetupCLang() {
         QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"),   QStringLiteral("\\btypename\\b"),
         QStringLiteral("\\bunion\\b"),    QStringLiteral("\\bunsigned\\b"),  QStringLiteral("\\bvirtual\\b"),
         QStringLiteral("\\bvoid\\b"),     QStringLiteral("\\bvolatile\\b"),  QStringLiteral("\\bbool\\b")};
-    for (const QString& pattern : keywordPatterns) {
+    for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
         rule.format = keywordFormat;
         highlightingRules_.append(rule);
@@ -243,7 +243,7 @@ void TextHighlighter::SetupCLang() {
     clangcommentEndExpression_ = QRegularExpression(QStringLiteral("\\*/"));
 }
 
-void TextHighlighter::highlightBlock(const QString& text) {
+void TextHighlighter::highlightBlock(const QString &text) {
     // Handle multiple lines regular firstly.
     if (!clangCommentStartExpression_.pattern().isEmpty() && !clangcommentEndExpression_.pattern().isEmpty()) {
         setCurrentBlockState(0);
@@ -266,7 +266,7 @@ void TextHighlighter::highlightBlock(const QString& text) {
         }
     }
 
-    for (const HighlightingRule& rule : qAsConst(highlightingRules_)) {
+    for (const HighlightingRule &rule : qAsConst(highlightingRules_)) {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         if (!matchIterator.isValid()) {
             qDebug() << "isValid: " << matchIterator.isValid() << ", text: " << text
@@ -279,4 +279,4 @@ void TextHighlighter::highlightBlock(const QString& text) {
         }
     }
 }
-} // namespace QEditor
+}  // namespace QEditor

@@ -70,9 +70,9 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
     SIZE_T cbData;
 };
 
-using fnAllowDarkModeForWindow = BOOL(WINAPI*)(HWND hWnd, BOOL allow);
-using fnSetPreferredAppMode = PreferredAppMode(WINAPI*)(PreferredAppMode appMode);
-using fnSetWindowCompositionAttribute = BOOL(WINAPI*)(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA*);
+using fnAllowDarkModeForWindow = BOOL(WINAPI *)(HWND hWnd, BOOL allow);
+using fnSetPreferredAppMode = PreferredAppMode(WINAPI *)(PreferredAppMode appMode);
+using fnSetWindowCompositionAttribute = BOOL(WINAPI *)(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *);
 
 bool IsDarkTheme() {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
@@ -124,7 +124,7 @@ void SetDarkTitleBar(HWND hwnd) {
     WINDOWCOMPOSITIONATTRIBDATA data = {WCA_USEDARKMODECOLORS, &dark, sizeof(dark)};
     SetWindowCompositionAttribute(hwnd, &data);
 }
-} // namespace WinTheme
+}  // namespace WinTheme
 #endif
 
-#endif // WINTHEME_H
+#endif  // WINTHEME_H

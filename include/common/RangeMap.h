@@ -22,34 +22,38 @@
 #include <map>
 
 namespace QEditor {
-template <typename T> class Range {
-public:
-    Range(const T& center) : min_(center), max_(center) {}
-    Range(const T& min, const T& max) : min_(min), max_(max) {}
+template <typename T>
+class Range {
+   public:
+    Range(const T &center) : min_(center), max_(center) {}
+    Range(const T &min, const T &max) : min_(min), max_(max) {}
 
     T min() const { return min_; }
     T max() const { return max_; }
 
-    friend std::ostream& operator<<(std::ostream& os, const Range& range) {
+    friend std::ostream &operator<<(std::ostream &os, const Range &range) {
         os << std::string("{") << range.min() << "~" << range.max << "}";
         return os;
     }
 
-private:
+   private:
     T min_;
     T max_;
 };
 
-template <typename T> struct LeftOfRange : public std::binary_function<Range<T>, Range<T>, bool> {
-    bool operator()(const Range<T>& lhs, const Range<T>& rhs) const {
+template <typename T>
+struct LeftOfRange : public std::binary_function<Range<T>, Range<T>, bool> {
+    bool operator()(const Range<T> &lhs, const Range<T> &rhs) const {
         auto res = lhs.min() < rhs.min() && lhs.max() <= rhs.min();
         return res;
     }
 };
 
-template <typename T, typename S> using RangeMap = std::map<Range<T>, S, LeftOfRange<T>>;
+template <typename T, typename S>
+using RangeMap = std::map<Range<T>, S, LeftOfRange<T>>;
 
-template <typename T, typename S> using RangeMapValue = typename std::map<Range<T>, S, LeftOfRange<T>>::value_type;
+template <typename T, typename S>
+using RangeMapValue = typename std::map<Range<T>, S, LeftOfRange<T>>::value_type;
 
 #if 0
 void test() {
@@ -78,6 +82,6 @@ void test() {
     qDebug() << "number: " << posToLine.at(499);
 }
 #endif
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // RANGEMAP_H
+#endif  // RANGEMAP_H

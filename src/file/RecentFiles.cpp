@@ -31,7 +31,7 @@ void RecentFiles::Clear() {
     StoreFiles();
 }
 
-void RecentFiles::UpdateFiles(const QString& filePath) {
+void RecentFiles::UpdateFiles(const QString &filePath) {
     auto size = files_.size();
     auto exist = files_.removeOne(filePath);
     if (!exist && size >= kMaxRecentFilesNum_) {
@@ -73,4 +73,4 @@ void RecentFiles::LoadFiles() {
     QDataStream filesInfoStream(&filesInfoFile);
     filesInfoStream >> files_;
 }
-} // namespace QEditor
+}  // namespace QEditor

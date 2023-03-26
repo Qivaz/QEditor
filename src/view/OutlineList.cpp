@@ -20,9 +20,10 @@
 #include <QScrollBar>
 
 namespace QEditor {
-OutlineList::OutlineList(IParser* parser) : parser_(parser) {
-    verticalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-                                       "QScrollBar::add-line:vertical { \
+OutlineList::OutlineList(IParser *parser) : parser_(parser) {
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
+        "QScrollBar::add-line:vertical { \
                                             border: none; \
                                             background: none; \
                                         } \
@@ -30,8 +31,9 @@ OutlineList::OutlineList(IParser* parser) : parser_(parser) {
                                             border: none; \
                                             background: none; \
                                         }");
-    horizontalScrollBar()->setStyleSheet("QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
-                                         "QScrollBar::add-line:horizontal { \
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar {border: none; background-color: rgb(28, 28, 28)}"
+        "QScrollBar::add-line:horizontal { \
                                               border: none; \
                                               background: none; \
                                           } \
@@ -43,7 +45,7 @@ OutlineList::OutlineList(IParser* parser) : parser_(parser) {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     int num = 0;
-    for (const auto& info : parser->funcGraphInfos()) {
+    for (const auto &info : parser->funcGraphInfos()) {
         auto top = new OverviewItem(num);
         ++num;
         auto resizeFont = font();
@@ -59,8 +61,9 @@ OutlineList::OutlineList(IParser* parser) : parser_(parser) {
 
     setIndentation(15);
 
-    setStyleSheet("QTreeWidget{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
-                  "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}");
+    setStyleSheet(
+        "QTreeWidget{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
+        "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}");
 
     connect(this, &QTreeWidget::itemClicked, this, &OutlineList::HandleItemClicked);
 
@@ -69,14 +72,14 @@ OutlineList::OutlineList(IParser* parser) : parser_(parser) {
     setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void OutlineList::HandleItemClicked(QTreeWidgetItem* item, int column) {
+void OutlineList::HandleItemClicked(QTreeWidgetItem *item, int column) {
     qDebug() << item << column;
     auto editView = MainWindow::Instance().editView();
     if (editView == nullptr) {
         return;
     }
     auto cursor = editView->textCursor();
-    auto itemInfo = parser_->funcGraphInfos()[((OverviewItem*)item)->num()];
+    auto itemInfo = parser_->funcGraphInfos()[((OverviewItem *)item)->num()];
     cursor.setPosition(itemInfo.pos_, QTextCursor::MoveAnchor);
     editView->GotoCursor(cursor);
 }
@@ -87,4 +90,4 @@ int OutlineList::GetIndexByCursorPos(int cursorPos) {
     }
     return parser_->GetIndexByCursorPosition(cursorPos);
 }
-} // namespace QEditor
+}  // namespace QEditor

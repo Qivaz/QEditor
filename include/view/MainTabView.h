@@ -29,8 +29,8 @@
 namespace QEditor {
 class TabView : public QTabWidget {
     Q_OBJECT
-public:
-    TabView(QWidget* parent = nullptr);
+   public:
+    TabView(QWidget *parent = nullptr);
 
     void HandleCurrentIndexChanged(int index);
     void HandleTabBarClicked(int index);
@@ -38,29 +38,29 @@ public:
     void HandleTabCloseRequested(int index);
 
     void UpdateWindowTitle(int index = -1);
-    void ChangeTabCloseButtonToolTip(int index, const QString& tip);
+    void ChangeTabCloseButtonToolTip(int index, const QString &tip);
 
     bool ActionSave();
     bool ActionSaveAs();
     bool TabCloseMaybeSave();
-    bool TabCloseMaybeSaveInner(EditView* editView);
+    bool TabCloseMaybeSaveInner(EditView *editView);
     bool TabForceClose();
 
     void AutoStore();
     bool AutoLoad();
 
     void DeleteWidget(int index);
-    void DeleteWidget(QWidget* widget);
+    void DeleteWidget(QWidget *widget);
 
-    EditView* CurrentEditView() {
+    EditView *CurrentEditView() {
         // The tab widget is definitely a EditView.
-        auto editView = qobject_cast<EditView*>(currentWidget());
+        auto editView = qobject_cast<EditView *>(currentWidget());
         if (editView == nullptr) {
             return nullptr;
         }
 #if defined(USE_DIFF_TEXT_VIEW)
         // DiffView is sub class of EditView. Ignore.
-        auto diffView = qobject_cast<DiffView*>(currentWidget());
+        auto diffView = qobject_cast<DiffView *>(currentWidget());
         if (diffView != nullptr) {
             return nullptr;
         }
@@ -68,15 +68,15 @@ public:
         return editView;
     }
 
-    EditView* GetEditView(int index) {
+    EditView *GetEditView(int index) {
         // The tab widget is definitely a EditView.
-        auto editView = qobject_cast<EditView*>(widget(index));
+        auto editView = qobject_cast<EditView *>(widget(index));
         if (editView == nullptr) {
             return nullptr;
         }
 #if defined(USE_DIFF_TEXT_VIEW)
         // DiffView is sub class of EditView. Ignore.
-        auto diffView = qobject_cast<DiffView*>(widget(index));
+        auto diffView = qobject_cast<DiffView *>(widget(index));
         if (diffView != nullptr) {
             return nullptr;
         }
@@ -84,15 +84,15 @@ public:
         return editView;
     }
 
-    DiffView* GetDiffView(int index) {
-        auto diffView = qobject_cast<DiffView*>(widget(index));
+    DiffView *GetDiffView(int index) {
+        auto diffView = qobject_cast<DiffView *>(widget(index));
         if (diffView == nullptr) {
             return nullptr;
         }
         return diffView;
     }
 
-    int FindEditViewIndex(const QString& filePath) {
+    int FindEditViewIndex(const QString &filePath) {
         for (int i = 0; i < count(); ++i) {
             auto editView = GetEditView(i);
             if (editView == nullptr) {
@@ -105,32 +105,32 @@ public:
         return -1;
     }
 
-    void ViewDiff(const QString& former, const QString& latter);
-    void ViewDiff(const EditView* former, const EditView* latter);
+    void ViewDiff(const QString &former, const QString &latter);
+    void ViewDiff(const EditView *former, const EditView *latter);
     void SwapDiff(int index);
     void NewFile();
     void OpenFile();
-    void OpenFile(const QString& filePath);
-    bool LoadFile(EditView* editView, const QString& filePath);
-    bool LoadFile(EditView* editView, const QString& filePath, FileEncoding&& fileEncoding,
+    void OpenFile(const QString &filePath);
+    bool LoadFile(EditView *editView, const QString &filePath);
+    bool LoadFile(EditView *editView, const QString &filePath, FileEncoding &&fileEncoding,
                   bool forceUseFileEncoding = false);
-    void OpenSsh(const QString& ip, int port, const QString& user, const QString& pwd);
+    void OpenSsh(const QString &ip, int port, const QString &user, const QString &pwd);
 
-    void ChangeTabDescription(const QFileInfo& fileInfo, int index = -1);
+    void ChangeTabDescription(const QFileInfo &fileInfo, int index = -1);
     void ApplyWrapTextState(int index);
     void ApplySpecialCharsVisible(int index);
 
-    QSet<QString>& openFiles() { return openFiles_; }
+    QSet<QString> &openFiles() { return openFiles_; }
 
     bool stepRunning() { return stepRunning_; }
     void setStepRunning(bool stepRunning) { stepRunning_ = stepRunning; }
-    QList<QPair<EditView*, int>>& backwardSteps() { return backwardSteps_; }
-    QList<QPair<EditView*, int>>& forwardSteps() { return forwardSteps_; }
-    void RecordStep(EditView* editView, int pos) {
+    QList<QPair<EditView *, int>> &backwardSteps() { return backwardSteps_; }
+    QList<QPair<EditView *, int>> &forwardSteps() { return forwardSteps_; }
+    void RecordStep(EditView *editView, int pos) {
         if (!stepRunning()) {
             // Not to add the same position.
             if (!backwardSteps().isEmpty()) {
-                const auto& lastStep = backwardSteps().last();
+                const auto &lastStep = backwardSteps().last();
                 if (lastStep.first == editView && lastStep.second == pos) {
                     return;
                 }
@@ -141,27 +141,27 @@ public:
         }
     }
 
-    const QString& formerDiffStr() const { return formerDiffStr_; }
-    void setFormerDiffStr(const QString& formerDiffStr) { formerDiffStr_ = formerDiffStr; }
+    const QString &formerDiffStr() const { return formerDiffStr_; }
+    void setFormerDiffStr(const QString &formerDiffStr) { formerDiffStr_ = formerDiffStr; }
 
-protected:
-    void mouseDoubleClickEvent(QMouseEvent* e) override;
+   protected:
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
     void tabInserted(int index) override;
     void tabRemoved(int index) override;
 
-private:
-    QMenu* menu_;
+   private:
+    QMenu *menu_;
     QSet<QString> openFiles_;
 
     bool stepRunning_{false};
-    QList<QPair<EditView*, int>> backwardSteps_;
-    QList<QPair<EditView*, int>> forwardSteps_;
+    QList<QPair<EditView *, int>> backwardSteps_;
+    QList<QPair<EditView *, int>> forwardSteps_;
 
-    EditView* diffFormerEditView_{nullptr};
+    EditView *diffFormerEditView_{nullptr};
     Diff diff_;
 
     QString formerDiffStr_{""};
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // TABVIEW_H
+#endif  // TABVIEW_H

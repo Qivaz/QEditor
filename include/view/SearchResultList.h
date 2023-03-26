@@ -26,19 +26,19 @@
 namespace QEditor {
 // https://stackoverflow.com/questions/1956542/how-to-make-item-view-render-rich-html-text-in-qt
 class HtmlDelegate : public QStyledItemDelegate {
-public:
+   public:
     HtmlDelegate() = default;
     ~HtmlDelegate() = default;
 
-protected:
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+   protected:
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 class SearchResultList : public QTreeWidget {
     Q_OBJECT
-public:
-    SearchResultList(TabView* tabView);
+   public:
+    SearchResultList(TabView *tabView);
     ~SearchResultList() {
         if (topItem_ != nullptr) {
             delete topItem_;
@@ -46,34 +46,34 @@ public:
         }
     }
 
-    QTreeWidgetItem* StartSearchSession(EditView* editView);
-    void AddSearchResult(QTreeWidgetItem* sessionItem, const int lineNum, const QString& htmlText,
-                         const QString& plainText, const QTextCursor& cursor);
-    void FinishSearchSession(QTreeWidgetItem* sessionItem, const QString& target, int matchCount);
+    QTreeWidgetItem *StartSearchSession(EditView *editView);
+    void AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &htmlText,
+                         const QString &plainText, const QTextCursor &cursor);
+    void FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount);
 
-    void HandleItemDoubleClicked(QTreeWidgetItem* item, int column);
-    void HandleItemClicked(QTreeWidgetItem* item, int column);
+    void HandleItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void HandleItemClicked(QTreeWidgetItem *item, int column);
 
-    QTreeWidgetItem* topItem();
+    QTreeWidgetItem *topItem();
 
-    void setTopItem(QTreeWidgetItem* topItem);
+    void setTopItem(QTreeWidgetItem *topItem);
 
-protected:
-    bool event(QEvent* event) override;
-    void contextMenuEvent(QContextMenuEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
+   protected:
+    bool event(QEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
-private:
+   private:
     void SetQss();
 
     // Used for current edit view temporarily.
-    EditView* editView_{nullptr};
+    EditView *editView_{nullptr};
 
-    TabView* tabView_{nullptr};
-    QTreeWidgetItem* topItem_{nullptr};
+    TabView *tabView_{nullptr};
+    QTreeWidgetItem *topItem_{nullptr};
 
-    QMenu* menu_;
+    QMenu *menu_;
 };
-} // namespace QEditor
+}  // namespace QEditor
 
-#endif // SEARCHRESULTLIST_H
+#endif  // SEARCHRESULTLIST_H

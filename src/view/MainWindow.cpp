@@ -45,7 +45,8 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     setAcceptDrops(true);
     setWindowOpacity(opa);
 
-    setStyleSheet("background: rgb(68, 68, 68); selection-background-color: rgb(9, 71, 113); border: 5px, solid, "
+    setStyleSheet("background: rgb(68, 68, 68); selection-color: lightGray; selection-background-color: rgb(9, 71, "
+                  "113); border: 5px, solid, "
                   "rgb(255, 0, 0);");
     setCentralWidget(tabView_);
 

@@ -40,6 +40,10 @@ public:
     int currentTabIndex();
     void setCurrentTabIndex(int index);
 
+protected:
+    void closeEvent(QCloseEvent*) override;
+    void hideEvent(QHideEvent* event) override;
+
 private slots:
     void on_pushButtonFindFindNext_clicked();
 
@@ -72,6 +76,11 @@ private:
     Ui::UISearchDialog* ui_;
     SearchResultList* searchResultList_{nullptr};
     Searcher* searcher_{nullptr};
+
+    QMenu* historyMenu_;
+
+    int historyIndex_{-1};
+    QString searchInput_;
 };
 
 class Searcher : public QObject {
@@ -128,6 +137,46 @@ private:
     bool radioButtonFindRe_;
 
     QString info_;
+};
+
+// template<typename ...ARGS>
+class LambdaEventFilter : public QObject {
+    Q_OBJECT
+public:
+    bool eventFilter(QObject* watched, QEvent* event) override { return lambdaContainer->CallLambda(watched, event); }
+
+    template <typename LAMBDA> LambdaEventFilter(QObject* parent, LAMBDA lambda /*, ARGS... args*/) : QObject(parent) {
+        lambdaContainer = new LambdaContainer<LAMBDA>(lambda /*, args...*/);
+    }
+
+    ~LambdaEventFilter() override {
+        if (lambdaContainer != nullptr) {
+            delete lambdaContainer;
+            lambdaContainer = nullptr;
+        }
+    }
+
+private:
+    class AbstractLambdaContainer : public QObject {
+    public:
+        virtual bool CallLambda(QObject* watched, QEvent* event) = 0;
+    };
+
+    template <typename LAMBDA> class LambdaContainer : public AbstractLambdaContainer {
+    public:
+        LambdaContainer(LAMBDA lambda /*, ARGS... args*/) : lambda_(lambda) /*, args_(std::make_tuple(args...))*/ {}
+
+        bool CallLambda(QObject* watched, QEvent* event) {
+            auto args = std::tuple_cat(std::make_tuple(watched, event) /*, args_*/);
+            return std::apply(lambda_, args);
+        }
+
+    private:
+        LAMBDA lambda_;
+        //        std::tuple<ARGS...> args_;
+    };
+
+    AbstractLambdaContainer* lambdaContainer;
 };
 } // namespace QEditor
 

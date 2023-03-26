@@ -17,6 +17,7 @@
 #include "SearchDialog.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include "SearchTargets.h"
 #include "Settings.h"
 #include "ui_SearchDialog.h"
 #include <QScrollBar>
@@ -31,7 +32,8 @@ extern void SetDarkTitleBar(HWND hwnd);
 #endif
 
 namespace QEditor {
-SearchDialog::SearchDialog(QWidget* parent, int index) : QDialog(parent), ui_(new Ui::UISearchDialog()) {
+SearchDialog::SearchDialog(QWidget* parent, int index)
+    : QDialog(parent), ui_(new Ui::UISearchDialog()), historyMenu_(new QMenu(this)) {
     ui_->setupUi(this);
     setAttribute(Qt::WA_TranslucentBackground);
     //    setAttribute(Qt::WA_DeleteOnClose);
@@ -39,11 +41,114 @@ SearchDialog::SearchDialog(QWidget* parent, int index) : QDialog(parent), ui_(ne
     qreal opa = Settings().Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
+    historyMenu_->setStyleSheet("\
+                       QMenu {\
+                           color: lightGray;\
+                           background-color: rgb(40, 40, 40);\
+                           margin: 2px 2px;\
+                           border: none;\
+                       }\
+                       QMenu::item {\
+                           color: rgb(225, 225, 225);\
+                           background-color: rgb(40, 40, 40);\
+                           padding: 5px 5px;\
+                       }\
+                       QMenu::item:selected {\
+                           background-color: rgb(9, 71, 113);\
+                       }\
+                       QMenu::item:pressed {\
+                           border: 1px solid rgb(60, 60, 60); \
+                           background-color: rgb(29, 91, 133); \
+                       }\
+                       QMenu::separator {height: 1px; background-color: rgb(80, 80, 80); }\
+                      ");
+
     ui_->tabWidget->setCurrentIndex(index);
+    auto historyLambda = [this](QObject* watched, QEvent* event) -> bool {
+        if (event->type() == QEvent::MouseButtonDblClick) {
+            auto watchedLineEdit = qobject_cast<QLineEdit*>(watched);
+            if (!watchedLineEdit->hasFocus()) {
+                watchedLineEdit->setFocus();
+                return true;
+            }
+            historyMenu_->clear();
+            SearchTargets::LoadTargets();
+            const auto& targets = SearchTargets::targets();
+            if (targets.isEmpty()) {
+                if (!watchedLineEdit->hasSelectedText()) {
+                    watchedLineEdit->setSelection(0, watchedLineEdit->text().size());
+                    return true;
+                }
+                return false;
+            }
+            for (const auto& target : targets) {
+                QAction* historyAction = new QAction(target, this);
+                historyMenu_->addAction(historyAction);
+
+                connect(historyAction, &QAction::triggered, watched, [watchedLineEdit, target]() {
+                    if (watchedLineEdit != nullptr) {
+                        watchedLineEdit->setText(target);
+                    }
+                });
+            }
+            qDebug() << watchedLineEdit->pos() << watchedLineEdit->x() << watchedLineEdit->y()
+                     << watchedLineEdit->size() << watchedLineEdit->width() << watchedLineEdit->height();
+            auto size = watchedLineEdit->size();
+            auto centerPos = watchedLineEdit->mapToGlobal(watchedLineEdit->pos());
+            constexpr auto padding = 5;
+            historyMenu_->popup(QPoint(centerPos.x() - size.width() / 2 + padding, centerPos.y() + size.height() / 2));
+        } else if (event->type() == QEvent::KeyPress) {
+            historyMenu_->hide();
+            auto watchedLineEdit = qobject_cast<QLineEdit*>(watched);
+            watchedLineEdit->setFocus();
+
+            SearchTargets::LoadTargets();
+            const auto& targets = SearchTargets::targets();
+            auto keyEvent = static_cast<QKeyEvent*>(event);
+            if (keyEvent->key() == Qt::Key_Down) {
+                // Save current inputting text.
+                if (historyIndex_ == -1) {
+                    searchInput_ = watchedLineEdit->text();
+                }
+
+                if (historyIndex_ < targets.size() - 1) {
+                    ++historyIndex_;
+                }
+                if (historyIndex_ >= 0 && historyIndex_ < targets.size()) {
+                    watchedLineEdit->setText(targets[historyIndex_]);
+                    watchedLineEdit->setSelection(0, watchedLineEdit->text().size());
+                }
+            } else if (keyEvent->key() == Qt::Key_Up) {
+                if (historyIndex_ == -1) {
+                    watchedLineEdit->setSelection(0, watchedLineEdit->text().size());
+                    return false;
+                }
+
+                if (historyIndex_ >= 0) {
+                    --historyIndex_;
+                }
+                if (historyIndex_ == -1) {
+                    watchedLineEdit->setText(searchInput_);
+                    watchedLineEdit->setSelection(0, watchedLineEdit->text().size());
+                } else if (historyIndex_ >= 0 && historyIndex_ < targets.size()) {
+                    watchedLineEdit->setText(targets[historyIndex_]);
+                    watchedLineEdit->setSelection(0, watchedLineEdit->text().size());
+                }
+            } else {
+                historyIndex_ = -1;
+                searchInput_.clear();
+            }
+        }
+        return false; // Must return false.
+    };
     if (index == 0) { // Find
         ui_->lineEditFindFindWhat->setFocus();
+        // QCoreApplication::postEvent(this, event);
+        ui_->lineEditFindFindWhat->installEventFilter(new LambdaEventFilter(ui_->lineEditFindFindWhat, historyLambda));
     } else { // Replace
         ui_->lineEditReplaceFindWhat->setFocus();
+        ui_->lineEditReplaceFindWhat->installEventFilter(
+            new LambdaEventFilter(ui_->lineEditFindFindWhat, historyLambda));
     }
     ui_->checkBoxFindWrapAround->setChecked(true);
 
@@ -93,6 +198,16 @@ void SearchDialog::InitSetting() {
 int SearchDialog::currentTabIndex() { return ui_->tabWidget->currentIndex(); }
 
 void SearchDialog::setCurrentTabIndex(int index) { ui_->tabWidget->setCurrentIndex(index); }
+
+void SearchDialog::closeEvent(QCloseEvent*) {
+    historyIndex_ = -1;
+    searchInput_.clear();
+}
+
+void SearchDialog::hideEvent(QHideEvent*) {
+    historyIndex_ = -1;
+    searchInput_.clear();
+}
 
 const QString SearchDialog::GetSelectedText() {
     if (editView() == nullptr) {
@@ -500,7 +615,10 @@ QTextCursor Searcher::_FindNext(const QString& text, const QTextCursor& startCur
     if (text.isEmpty()) {
         return QTextCursor();
     }
+    // Record search string history.
     MainWindow::Instance().setSearchingString(text);
+    SearchTargets::UpdateTargets(text);
+
     bool res;
     QTextCursor cursor;
     if (radioButtonFindRe_) {

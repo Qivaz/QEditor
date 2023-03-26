@@ -66,22 +66,12 @@ QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelInd
 
     QTextDocument doc;
     doc.setHtml(itemOption.text);
-    if (itemOption.rect.width() == 0) {
-        // const qreal monoSingleSpace = QFontMetricsF(font()).horizontalAdvance(QLatin1Char('9'))
-        doc.setTextWidth(doc.toPlainText().size());
-    } else {
-        doc.setTextWidth(itemOption.rect.width());
-    }
-    qCritical() << "itemOption.text: " << itemOption.text << ", doc.toPlainText: " << doc.toPlainText()
-                << ", index: " << index.row() << index.column() << index.data()
-                << ", doc width: " << doc.idealWidth() << doc.textWidth() << itemOption.rect.width();
-    qreal monoSingleSpace;
-    if (Constants::kMonoSingleSpace != -1) {
-        monoSingleSpace = Constants::kMonoSingleSpace;
-    } else {
-        monoSingleSpace = 5;
-    }
-    return QSize(doc.textWidth() * monoSingleSpace, doc.size().height());
+    const auto plainText = doc.toPlainText();
+    qDebug() << "itemOption.text: " << itemOption.text << ", doc.toPlainText: " << doc.toPlainText()
+             << ", index: " << index.row() << index.column() << index.data() << ", doc width: " << doc.idealWidth()
+             << doc.textWidth() << itemOption.rect.width();
+    const auto width = QFontMetricsF(option.widget->font()).horizontalAdvance(plainText, -1);
+    return QSize(width, doc.size().height());
 }
 
 SearchResultList::SearchResultList(TabView* tabView)

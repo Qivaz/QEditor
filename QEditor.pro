@@ -24,6 +24,7 @@ HEADERS       = \
     include/file/FileRecorder.h \
     include/file/FileType.h \
     include/file/RecentFiles.h \
+    include/file/SearchTargets.h \
     include/hierarchy/AnfNodeHierarchy.h \
     include/hierarchy/AnfNodeHierarchyScene.h \
     include/hierarchy/AnfNodeItem.h \
@@ -65,6 +66,7 @@ SOURCES       = \
     src/file/FileEncoding.cpp \
     src/file/FileRecorder.cpp \
     src/file/RecentFiles.cpp \
+    src/file/SearchTargets.cpp \
     src/hierarchy/AnfNodeHierarchy.cpp \
     src/hierarchy/AnfNodeHierarchyScene.cpp \
     src/hierarchy/AnfNodeItem.cpp \

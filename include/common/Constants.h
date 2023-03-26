@@ -30,6 +30,8 @@ namespace Constants {
     constexpr auto kAppInternalFilesInfoFileName = "files_info";
     constexpr auto kAppInternalRecentFilesDirName = ".recent_files";
     constexpr auto kAppInternalRecentFilesFileName = "recent_files";
+    constexpr auto kAppInternalSearchTargetsDirName = ".search_targets";
+    constexpr auto kAppInternalSearchTargetsFileName = "search_targets";
     constexpr auto kAppInternalSingleRunFile = ".single_lock";
     constexpr auto kConfigFile = ".config.ini";
 
@@ -43,6 +45,7 @@ namespace Constants {
     constexpr auto kMaxRecursiveDepthToPairBracket = 10;
 
     constexpr auto kMaxOpenRecentFilesNum = 100;
+    constexpr auto kMaxSearchTargetsNum = 20;
 
     // File format: new line char.
     constexpr auto kFormatNewLineUnix = "Unix";

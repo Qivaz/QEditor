@@ -30,9 +30,9 @@
 namespace QEditor {
 ExplorerTreeView::ExplorerTreeView(QWidget* parent, const QString& rootPath)
     : QTreeView(parent), rootPath_(rootPath), menu_(new QMenu(this)) {
-    setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
+    setStyleSheet("QTreeView{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
-                  //                  "QTreeView::branch:has-children:!has-siblings:closed, \
+//                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
 //                  QTreeView::branch:open:has-children:!has-siblings, \
 //                  QTreeView::branch:open:has-children:has-siblings{border-image: none; image: none)");

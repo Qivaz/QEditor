@@ -21,5 +21,6 @@ namespace QEditor {
 namespace Constants {
     QString kAppPath;         // Should initialize once when startup.
     QString kAppInternalPath; // Should initialize once when startup.
+    qreal kMonoSingleSpace = -1;
 } // namespace Constants
 } // namespace QEditor

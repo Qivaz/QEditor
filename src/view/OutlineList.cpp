@@ -59,7 +59,7 @@ OutlineList::OutlineList(IParser* parser) : parser_(parser) {
 
     setIndentation(15);
 
-    setStyleSheet("QTreeWidget{color: darkGray; background-color: rgb(28, 28, 28)}"
+    setStyleSheet("QTreeWidget{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}");
 
     connect(this, &QTreeWidget::itemClicked, this, &OutlineList::HandleItemClicked);

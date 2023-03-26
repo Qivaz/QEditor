@@ -66,22 +66,36 @@ QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelInd
 
     QTextDocument doc;
     doc.setHtml(itemOption.text);
-    doc.setTextWidth(itemOption.rect.width());
-    return QSize(doc.idealWidth(), doc.size().height());
+    if (itemOption.rect.width() == 0) {
+        // const qreal monoSingleSpace = QFontMetricsF(font()).horizontalAdvance(QLatin1Char('9'))
+        doc.setTextWidth(doc.toPlainText().size());
+    } else {
+        doc.setTextWidth(itemOption.rect.width());
+    }
+    qCritical() << "itemOption.text: " << itemOption.text << ", doc.toPlainText: " << doc.toPlainText()
+                << ", index: " << index.row() << index.column() << index.data()
+                << ", doc width: " << doc.idealWidth() << doc.textWidth() << itemOption.rect.width();
+    qreal monoSingleSpace;
+    if (Constants::kMonoSingleSpace != -1) {
+        monoSingleSpace = Constants::kMonoSingleSpace;
+    } else {
+        monoSingleSpace = 5;
+    }
+    return QSize(doc.textWidth() * monoSingleSpace, doc.size().height());
 }
 
 SearchResultList::SearchResultList(TabView* tabView)
     : QTreeWidget(&MainWindow::Instance()), tabView_(tabView), menu_(new QMenu(this)) {
-    //    setHeaderLabel("Result...");
-    //    setStyle(QStyleFactory::create("windows"));
+    // setHeaderLabel("Result...");
+    // setStyle(QStyleFactory::create("windows"));
     SetQss();
-    //    setRootIsDecorated(false);
+    // setRootIsDecorated(false);
     setHeaderHidden(true);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     QHeaderView* headerView = header();
-    //    headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
-    //    headerView->setStretchLastSection(false);
+    // headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
+    // headerView->setStretchLastSection(false);
     headerView->setSectionResizeMode(QHeaderView::Stretch);
 
     clear();
@@ -125,7 +139,7 @@ void SearchResultList::SetQss() {
     //    qss.append(QString("QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"));
     //    setStyleSheet(qss.join(""));
 
-    setStyleSheet("QTreeView{color: darkGray; background-color: rgb(28, 28, 28)}"
+    setStyleSheet("QTreeView{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
                   "QTreeView::branch:selected{background-color: rgb(9, 71, 113)}"
                   //                  "QTreeView::branch:has-children:!has-siblings:closed, \
 //                  QTreeView::branch:closed:has-children:has-siblings{border-image: none; image: none;} \
@@ -191,7 +205,7 @@ void SearchResultList::HandleItemDoubleClicked(QTreeWidgetItem* item, int column
 }
 
 void SearchResultList::HandleItemClicked(QTreeWidgetItem* item, int column) {
-    //    item->setBackgroundColor(0, QColor(255, 71, 255));
+    // item->setBackgroundColor(0, QColor(255, 71, 255));
 }
 
 bool SearchResultList::event(QEvent* event) {
@@ -333,5 +347,8 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem* sessionItem, const Q
     auto htmlText =
         QString("<div style=\"font-size:15px;font-family:Consolas;color:#C3AE8B\">") + info + QString("</div>");
     topItem()->setText(0, htmlText);
+
+    // header()->resizeSection(0, minimumWidth());
+    resizeColumnToContents(0);
 }
 } // namespace QEditor

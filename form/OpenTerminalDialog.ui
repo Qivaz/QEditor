@@ -58,7 +58,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border: 1px solid gray;</string>
+    <string notr="true">border: 1px solid gray; selection-color: lightGray;</string>
    </property>
    <property name="text">
     <string>22</string>
@@ -109,7 +109,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border: 1px solid gray;</string>
+    <string notr="true">border: 1px solid gray; selection-color: lightGray;</string>
    </property>
    <property name="text">
     <string/>
@@ -163,7 +163,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border: 1px solid gray;</string>
+    <string notr="true">border: 1px solid gray; selection-color: lightGray;</string>
    </property>
    <property name="text">
     <string/>
@@ -182,7 +182,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border: 1px solid gray;</string>
+    <string notr="true">border: 1px solid gray; selection-color: lightGray;</string>
    </property>
    <property name="text">
     <string/>

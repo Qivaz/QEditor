@@ -71,8 +71,10 @@ void SearchDialog::Start(int index) {
 
     if (index == 0) { // Find.
         ui_->lineEditFindFindWhat->setText(GetSelectedText());
+        ui_->lineEditFindFindWhat->setFocus();
     } else { // Replace.
         ui_->lineEditReplaceFindWhat->setText(GetSelectedText());
+        ui_->lineEditReplaceFindWhat->setFocus();
     }
     setCurrentTabIndex(index);
     show();

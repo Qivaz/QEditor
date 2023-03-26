@@ -79,6 +79,9 @@ public slots:
         MainWindow::Instance().show();
         // Step 2:
         for (QWindow* appWindow : QGuiApplication::allWindows()) {
+            if (appWindow != MainWindow::Instance().windowHandle()) {
+                continue;
+            }
             appWindow->show();  // Bring window to top on OSX
             appWindow->raise(); // Bring window from minimized state on OSX
 

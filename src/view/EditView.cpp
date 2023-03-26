@@ -66,7 +66,7 @@ EditView::EditView(QWidget* parent)
 void EditView::Init() {
     setBackgroundVisible(false);
     //    setCenterOnScroll(true);
-    setStyleSheet("color: darkGray;"
+    setStyleSheet("color: rgb(215, 215, 210);"
                   "background-color: rgb(28, 28, 28);"
                   "selection-color: lightGray;"
                   "selection-background-color: rgb(9, 71, 113);" // rgb(76, 76, 167)
@@ -334,11 +334,15 @@ int EditView::GetLineNumberAreaWidth() {
         ++digits;
     }
 
+    static qreal minSpace = -1;
     constexpr qreal padding = 15;
-    qreal monoSingleSpace = QFontMetricsF(font()).horizontalAdvance(QLatin1Char('9'));
-    qDebug() << "EditView::lineNumberAreaWidth, singleSpace: " << monoSingleSpace << ", font: " << font();
-    const static qreal minSpace = 10 + monoSingleSpace + padding;
-    qreal space = monoSingleSpace * digits + padding;
+    if (minSpace == -1) {
+        qreal monoSingleSpace = QFontMetricsF(font()).horizontalAdvance(QLatin1Char('9'));
+        Constants::kMonoSingleSpace = monoSingleSpace;
+        qDebug() << "EditView::lineNumberAreaWidth, singleSpace: " << Constants::kMonoSingleSpace << ", font: " << font();
+        minSpace = 10 + Constants::kMonoSingleSpace + padding;
+    }
+    qreal space = Constants::kMonoSingleSpace * digits + padding;
     if (space < minSpace) {
         space = minSpace;
     }

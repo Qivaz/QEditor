@@ -52,6 +52,8 @@ namespace Constants {
     extern QString kAppPath;         // Should initialize once when startup.
     extern QString kAppInternalPath; // Should initialize once when startup.
 
+    extern qreal kMonoSingleSpace;
+
     constexpr auto kMaxParseFileSize = 15000000; // ~15M
     constexpr auto kMaxParseLineNum = 50000;
     constexpr auto kMaxParseCharNum = 9000000;

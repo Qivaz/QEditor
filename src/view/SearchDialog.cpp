@@ -655,7 +655,6 @@ std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     int firstStart = -1;
     while (true) {
-        qDebug();
         cursor = FindNext(target, cursor);
         if (!cursor.isNull()) {
             if (cursor.selectionStart() == firstStart) {
@@ -671,6 +670,44 @@ std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
     }
     editView()->setTextCursor(savedCursor);
     return cursors;
+}
+
+std::vector<int> Searcher::FindAllLineNum(const QString &target) {
+    std::vector<int> lineNums;
+    if (editView() == nullptr) {
+        return lineNums;
+    }
+
+    // Force options.
+    setCheckBoxFindMatchCase(true);
+    setRadioButtonFindNormal(true);
+
+    QTextCursor savedCursor = editView()->textCursor();
+    QTextCursor cursor = editView()->textCursor();
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    int firstStart = -1;
+    while (true) {
+        cursor = FindNext(target, cursor);
+        if (!cursor.isNull()) {
+            if (cursor.selectionStart() == firstStart) {
+                break;
+            }
+            if (firstStart == -1) {
+                firstStart = cursor.selectionStart();
+            }
+            const auto lineNum = editView()->LineNumber(cursor);
+            const auto blockRect = editView()->document()->documentLayout()->blockBoundingRect(cursor.block());
+            qDebug() << "cursor: " << cursor.position() << cursor.blockNumber() << lineNum << blockRect.topLeft();
+            const auto width = QFontMetricsF(editView()->font()).horizontalAdvance(cursor.block().text(), -1);
+            qDebug() << width << "/" << editView()->size().width() << editView()->rect().width() << ":"
+                     << cursor.block().text();
+            lineNums.emplace_back(lineNum);
+        } else {
+            break;
+        }
+    }
+    editView()->setTextCursor(savedCursor);
+    return lineNums;
 }
 
 // Replace 'target' with 'text'.

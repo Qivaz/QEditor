@@ -194,11 +194,15 @@ class EditView : public QPlainTextEdit {
 
     int currentBlockNumber() const;
 
-    std::vector<std::pair<std::vector<QTextCursor>, QColor>> scrollbarPositions() const;
+    std::vector<std::pair<std::vector<int>, QColor>> scrollbarLineInfos() const;
 
     bool hightlightScrollbarInvalid() const;
 
     void setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid);
+
+    int LineNumber(const QTextCursor &cursor);
+
+    std::vector<int> lineOffset() const;
 
    protected:
     void showEvent(QShowEvent *) override;
@@ -225,6 +229,7 @@ class EditView : public QPlainTextEdit {
     void HandleCopyAvailable(bool avail);
     void HandleUndoAvailable(bool avail);
     void HandleRedoAvailable(bool avail);
+    void HandleLineOffset();
 
     // Context menu operations.
     bool Find();
@@ -291,8 +296,12 @@ class EditView : public QPlainTextEdit {
     int timerId_{0};
     QMenu *menu_;
 
-    std::vector<std::pair<std::vector<QTextCursor>, QColor>> scrollbarPositions_;
+    std::vector<std::pair<std::vector<int>, QColor>> scrollbarLineInfos_;
     bool hightlightScrollbarInvalid_{false};
+
+    bool documentSizeChanged_{false};
+    QSizeF documentSize_;
+    std::vector<int> lineOffset_;
 };
 
 class LineNumberArea : public QWidget {

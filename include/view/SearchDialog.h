@@ -105,6 +105,7 @@ class Searcher : public QObject {
     QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
 
     std::vector<QTextCursor> FindAll(const QString &target);
+    std::vector<int> FindAllLineNum(const QString &target);
 
     void Replace(const QString &target, const QString &text, bool backward);
     int ReplaceAll(const QString &target, const QString &text);

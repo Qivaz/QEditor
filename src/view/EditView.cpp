@@ -90,11 +90,11 @@ void EditView::Init() {
 
     lineNumberArea_ = new LineNumberArea(this);
 
-    connect(this, &EditView::blockCountChanged, this, &EditView::HandleBlockCountChanged);
-    connect(this, &EditView::updateRequest, this, &EditView::HandleUpdateRequest);
-    connect(this, &EditView::cursorPositionChanged, this, &EditView::HandleCursorPositionChanged);
-    connect(this, &EditView::selectionChanged, this, &EditView::HandleSelectionChanged);
-    connect(this, &EditView::textChanged, this, &EditView::HandleTextChanged);
+    connect(this, &QPlainTextEdit::blockCountChanged, this, &EditView::HandleBlockCountChanged);
+    connect(this, &QPlainTextEdit::updateRequest, this, &EditView::HandleUpdateRequest);
+    connect(this, &QPlainTextEdit::cursorPositionChanged, this, &EditView::HandleCursorPositionChanged);
+    connect(this, &QPlainTextEdit::selectionChanged, this, &EditView::HandleSelectionChanged);
+    connect(this, &QPlainTextEdit::textChanged, this, &EditView::HandleTextChanged);
     connect(this->document(), &QTextDocument::contentsChanged, this, &EditView::HandleContentsChanged);
     connect(this->document(), &QTextDocument::contentsChange, this, &EditView::HandleContentsChange);
 
@@ -103,7 +103,15 @@ void EditView::Init() {
     connect(this, &QPlainTextEdit::redoAvailable, this, &EditView::HandleRedoAvailable);
 
     connect(this->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
-            [](const QSizeF &newSize) {});
+            [this](QSizeF newSize) {
+                if (qAbs(documentSize_.width() - newSize.width()) < 100 &&
+                    qAbs(documentSize_.height() - newSize.height()) < 100) {
+                    return;
+                }
+                qDebug() << "documentSizeChanged..." << documentSize_ << "->" << newSize;
+                documentSize_ = newSize;
+                documentSizeChanged_ = true;
+            });
 
     // TODO: Cause transparent window...
     // ApplyWrapTextState();
@@ -308,7 +316,7 @@ QColor EditView::GetMarkTextBackground(int i) {
 
 void EditView::HighlightMarkTexts() {
     if (hightlightScrollbarInvalid_) {
-        scrollbarPositions_.clear();
+        scrollbarLineInfos_.clear();
     }
     for (int i = 0; i < markTexts_.size(); ++i) {
         const auto &text = markTexts_[i];
@@ -317,8 +325,8 @@ void EditView::HighlightMarkTexts() {
 
         // Search all positions for highlight scrollbar.
         if (hightlightScrollbarInvalid_) {
-            const auto &cursors = MainWindow::Instance().GetSearcher()->FindAll(text);
-            scrollbarPositions_.emplace_back(std::make_pair(cursors, color));
+            const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
+            scrollbarLineInfos_.emplace_back(std::make_pair(lineNums, color));
         }
     }
 }
@@ -644,6 +652,7 @@ void EditView::HandleContentsChanged() {
 }
 
 void EditView::HandleContentsChange(int from, int charsRemoved, int charsAdded) {
+    qDebug() << "@" << from << ", +" << charsAdded << ", -" << charsRemoved;
     if (charsAdded > 50 || charsRemoved > 50) {
         TrigerParser();
     }
@@ -839,15 +848,15 @@ bool EditView::HighlightChars(int startPos, int count, const QColor &foreground,
     return true;
 }
 
+std::vector<int> EditView::lineOffset() const { return lineOffset_; }
+
 void EditView::setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid) {
     hightlightScrollbarInvalid_ = hightlightScrollbarInvalid;
 }
 
 bool EditView::hightlightScrollbarInvalid() const { return hightlightScrollbarInvalid_; }
 
-std::vector<std::pair<std::vector<QTextCursor>, QColor>> EditView::scrollbarPositions() const {
-    return scrollbarPositions_;
-}
+std::vector<std::pair<std::vector<int>, QColor>> EditView::scrollbarLineInfos() const { return scrollbarLineInfos_; }
 
 int EditView::currentBlockNumber() const { return currentBlockNumber_; }
 
@@ -1117,11 +1126,14 @@ void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent *event) {
 }
 
 void EditView::paintEvent(QPaintEvent *event) {
+    qDebug() << event->type();
     QPlainTextEdit::paintEvent(event);
     if (highlighterInvalid()) {
         HighlightFocus();
         highlighterInvalid_ = false;
     }
+
+    //    HandleLineOffset();
 }
 
 void EditView::showEvent(QShowEvent *event) {
@@ -1316,6 +1328,65 @@ void EditView::contextMenuEvent(QContextMenuEvent *event) {
     menu_->exec(event->globalPos());
 }
 
+void EditView::HandleLineOffset() {
+    if (!documentSizeChanged_) {
+        return;
+    }
+
+    qDebug() << ">>>>>" << fileName();
+    lineOffset_.clear();
+
+    //    auto documentLayout = qobject_cast<QPlainTextDocumentLayout *>(document()->documentLayout());
+    //    if (documentLayout == nullptr) {
+    //        return;
+    //    }
+    //    for (auto block = document()->begin(); block != document()->end(); block = block.next()) {
+    //        documentLayout->ensureBlockLayout(block);
+    //    }
+
+    int offset = 0;
+    int blockHeight = 0;
+    for (auto block = document()->begin(); block != document()->end(); block = block.next()) {
+        if (block.layout() == nullptr) {
+            qDebug() << fileName() << "block layout is null";
+            continue;
+        }
+        offset += blockHeight;
+        lineOffset_.emplace_back(offset);
+
+        const auto width = QFontMetricsF(font()).horizontalAdvance(block.text(), -1);
+        blockHeight = width / this->rect().width() + 1;
+        qDebug() << fileName() << "offset: " << offset << ", blockHeight: " << width << "/" << this->size().width()
+                 << this->rect().width() << ":" << blockHeight << block.text();
+    }
+    documentSizeChanged_ = false;
+    qDebug() << "<<<<<" << fileName() << "lineOffset_ size: " << lineOffset_.size();
+}
+
+// Not BlockNumber, but LineNumber.
+// A block may contain multiple lines.
+int EditView::LineNumber(const QTextCursor &cursor) {
+    //    auto layout = qobject_cast<QPlainTextDocumentLayout *>(document()->documentLayout());
+    //    if (layout == nullptr) {
+    //        return 0;
+    //    }
+    //    layout->ensureBlockLayout(cursor.block());
+
+    QTextLayout *blockLayout = cursor.block().layout();
+    if (blockLayout != nullptr) {
+        const auto textLine = blockLayout->lineForTextPosition(cursor.positionInBlock());
+        const int lineNum = textLine.lineNumber();
+        //        if (cursor.block().firstLineNumber() >= (int)lineOffset().size()) {
+        //            return 0;
+        //        }
+        //        const int linePos = lineOffset()[cursor.block().firstLineNumber()] + lineNum;
+        const int linePos = cursor.block().firstLineNumber() + lineNum;
+        qDebug() << cursor.block().firstLineNumber() << linePos << textLine.position() << blockLayout->lineCount();
+        return linePos;
+    }
+    return 0;
+}
+
 QSize LineNumberArea::sizeHint() const { return QSize(editView_->GetLineNumberAreaWidth(), 0); }
 
 void LineNumberArea::paintEvent(QPaintEvent *event) { editView_->HandleLineNumberAreaPaintEvent(event); }
@@ -1346,21 +1417,6 @@ void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event) {
         auto lineCount = editView_->GotoBlock(blockNumber);
         editView_->SelectCurrentBlock(lineCount);
     }
-}
-
-std::vector<std::pair<int, QColor>> HighlightScrollBar::PreparePositions() {
-    std::vector<std::pair<int, QColor>> positions;
-    for (const auto &scrollbarPosition : editView_->scrollbarPositions()) {
-        for (const auto &cursor : scrollbarPosition.first) {
-            QTextLayout *layout = cursor.block().layout();
-            if (layout != nullptr) {
-                const int lineNum = layout->lineForTextPosition(cursor.positionInBlock()).lineNumber();
-                const int linePos = cursor.block().firstLineNumber() + lineNum;
-                positions.push_back({linePos, scrollbarPosition.second});
-            }
-        }
-    }
-    return positions;
 }
 
 void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleRect, const QRect &handleRect,
@@ -1433,12 +1489,15 @@ void HighlightScrollBar::paintEvent(QPaintEvent *event) {
     setMinimum(0);
     setMaximum(editView_->document()->documentLayout()->documentSize().height());
 
-    const auto positions = PreparePositions();
+    const auto lineInfos = editView_->scrollbarLineInfos();
     qDebug() << "value: " << value() << ", minimum: " << minimum() << ", maximum: " << maximum() << ", " << lineHeight
              << ", " << editView_->currentBlockNumber() << editView_->blockCount() << ", " << grooveRect << sliderRect
-             << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << positions.size();
-    for (const auto &pos : positions) {
-        PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, pos.second, pos.first);
+             << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << lineInfos.size();
+    for (const auto &lineInfo : lineInfos) {
+        const auto &lineNums = lineInfo.first;
+        for (const auto &lineNum : lineNums) {
+            PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, lineInfo.second, lineNum);
+        }
     }
 }
 

@@ -200,7 +200,8 @@ class EditView : public QPlainTextEdit {
 
     void setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid);
 
-    int LineNumber(const QTextCursor &cursor);
+    int LineNumber(const QTextCursor &cursor) const;
+    int LineCount() const;
 
     std::vector<int> lineOffset() const;
 
@@ -343,7 +344,7 @@ class HighlightScrollBar : public QScrollBar {
    private:
     std::vector<std::pair<int, QColor>> PreparePositions();
     void PaintLines(QPainter &painter, const QRect &aboveHandleRect, const QRect &handleRect,
-                    const QRect &belowHandleRect, const QColor &color, int pos);
+                    const QRect &belowHandleRect, const QColor &color, int pos, bool inHandle);
 
     EditView *editView_{nullptr};
     int height_{0};

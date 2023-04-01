@@ -706,7 +706,8 @@ std::vector<int> Searcher::FindAllLineNum(const QString &target) {
                 firstStart = cursor.selectionStart();
             }
             const auto lineNum = editView()->LineNumber(cursor);
-            qCritical() << "cursor: " << cursor.position() << cursor.blockNumber() << lineNum << cursor.block().text();
+            qDebug() << "cursor: " << cursor.position() << cursor.blockNumber() << cursor.block().firstLineNumber()
+                     << lineNum << cursor.block().text();
             lineNums.emplace_back(lineNum);
         } else {
             break;

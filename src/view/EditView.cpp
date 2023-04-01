@@ -1345,6 +1345,9 @@ bool EditView::eventFilter(QObject *obj, QEvent *event) {
 
 void EditView::HandleLineOffset() {
     qCritical() << ">>>>>" << fileName();
+    if (!MainWindow::Instance().shouldWrapText()) {
+        return;
+    }
     lineOffset_.clear();
 
 #if 0
@@ -1360,14 +1363,20 @@ void EditView::HandleLineOffset() {
     int offset = 0;
     int blockHeight = 0;
     for (auto block = document()->begin(); block != document()->end(); block = block.next()) {
+#if 0
         if (block.layout() == nullptr) {
             qDebug() << fileName() << "block layout is null";
             continue;
         }
+#endif
         offset += blockHeight;
         lineOffset_.emplace_back(offset);
 
-#if 1
+#if 0
+        blockHeight = block.layout()->lineCount();
+        qCritical() << fileName() << "offset: " << offset << ", blockHeight: " << blockHeight << block.text()
+                    << block.layout()->position();
+#else
         // Calculate the line count of block by self.
         constexpr int margin = 10;
         const auto width = QFontMetricsF(font()).horizontalAdvance(block.text(), -1);
@@ -1375,21 +1384,22 @@ void EditView::HandleLineOffset() {
             rect().width() - verticalScrollBar()->rect().width() - lineNumberArea_->rect().width() - margin;
         const auto quot = width / widgetWidth;
         blockHeight = qMax(qCeil(quot), 1);
-        qCritical() << fileName() << "offset: " << offset << ", blockHeight: " << blockHeight << qCeil(quot) << quot
-                    << "=" << width << "/" << widgetWidth << "(" << rect().width()
-                    << verticalScrollBar()->rect().width() << lineNumberArea_->rect().width() << "), " << block.text();
-#else
-        blockHeight = block.layout()->lineCount();
-        qCritical() << fileName() << "offset: " << offset << ", blockHeight: " << blockHeight << block.text()
-                    << block.layout()->position();
+        qDebug() << fileName() << "[" << lineOffset_.size() << "]: offset: " << offset
+                 << ", blockHeight: " << blockHeight << qCeil(quot) << quot << "=" << width << "/" << widgetWidth << "("
+                 << rect().width() << verticalScrollBar()->rect().width() << lineNumberArea_->rect().width() << "), "
+                 << block.text();
 #endif
     }
-    qCritical() << "<<<<<" << fileName() << "lineOffset_ size: " << lineOffset_.size();
+    // lineOffset_ contains (line number + 1) elements.
+    offset += blockHeight;
+    lineOffset_.emplace_back(offset);
+    qCritical() << "<<<<<" << fileName() << "lineOffset_ size: " << lineOffset_.size()
+                << ", LineCount: " << LineCount();
 }
 
 // Not BlockNumber, but LineNumber.
 // A block may contain multiple lines.
-int EditView::LineNumber(const QTextCursor &cursor) {
+int EditView::LineNumber(const QTextCursor &cursor) const {
 #if 0
     auto layout = qobject_cast<QPlainTextDocumentLayout *>(document()->documentLayout());
     if (layout == nullptr) {
@@ -1403,19 +1413,34 @@ int EditView::LineNumber(const QTextCursor &cursor) {
         const auto textLine = blockLayout->lineForTextPosition(cursor.positionInBlock());
         const int lineNum = textLine.lineNumber();
         int linePos;
-        if (lineWrapMode() == QPlainTextEdit::LineWrapMode::NoWrap) {
-            linePos = cursor.block().firstLineNumber() + lineNum;
+        if (!MainWindow::Instance().shouldWrapText()) {
+            linePos = cursor.blockNumber() + lineNum;
         } else {
-            if (cursor.block().firstLineNumber() < (int)lineOffset().size()) {
-                linePos = lineOffset()[cursor.block().firstLineNumber()] + lineNum;
+            // Valid after HandleLineOffset().
+            if (cursor.blockNumber() <
+                (int)lineOffset().size() - 1) {  // lineOffset_ contains (line number + 1) elements.
+                linePos = lineOffset()[cursor.blockNumber()] + lineNum;
             } else {
-                linePos = cursor.block().firstLineNumber() + lineNum;
+                linePos = cursor.blockNumber() + lineNum;
             }
         }
-        qCritical() << cursor.block().firstLineNumber() << linePos << cursor.block().text();
+        qDebug() << cursor.blockNumber() << linePos << cursor.block().text();
         return linePos;
     }
     return 0;
+}
+
+int EditView::LineCount() const {
+    if (!MainWindow::Instance().shouldWrapText()) {
+        return blockCount();
+    } else {
+        // Valid after HandleLineOffset().
+        if (lineOffset().size() > 0) {
+            return lineOffset()[lineOffset().size() - 1];
+        } else {
+            return 0;
+        }
+    }
 }
 
 QSize LineNumberArea::sizeHint() const { return QSize(editView_->GetLineNumberAreaWidth(), 0); }
@@ -1451,44 +1476,31 @@ void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleRect, const QRect &handleRect,
-                                    const QRect &belowHandleRect, const QColor &color, int pos) {
+                                    const QRect &belowHandleRect, const QColor &color, int pos, bool inHandle) {
+    const int hightlightWidth = aboveHandleRect.width();
     constexpr int hightlightHeight = 1;
-    const qreal lineHeight = editView_->LineSpacing();
-    const auto viewRange = editView_->viewport()->rect().height() / lineHeight - 1;
 
-    const int above = value();
-    const int below = maximum() - value();
-    const double ratio = (double)(aboveHandleRect.height() + belowHandleRect.height()) / (above + below);
-    // const double overSrollRatio = maximum() / maximum() + viewRange;
-    // Paint above area: {0 ~ above}
-    if (above > 0 && pos < above) {
+    // Paint above area: {aboveStart(0) ~ (aboveStart + height)}
+    if (pos >= aboveHandleRect.y() && pos < aboveHandleRect.y() + aboveHandleRect.height()) {
         painter.save();
         painter.setClipRect(aboveHandleRect);
-        const auto distance = qRound(pos * ratio);
-        const QRect rect(aboveHandleRect.left(), aboveHandleRect.top() + distance, aboveHandleRect.width(),
-                         hightlightHeight);
+        const QRect rect(aboveHandleRect.left(), pos, hightlightWidth, hightlightHeight);
         painter.fillRect(rect, color);
         painter.restore();
     }
-    // Paint below area: {belowStart ~ (belowStart + below)}
-    const auto handleSize = qRound(viewRange);  // qRound(handleRect.height() / ratio)
-    const auto belowStart = above + handleSize;
-    if (below > 0 && pos > belowStart && pos < belowStart + below) {
+    // Paint below area: {belowStart ~ (belowStart + height)}
+    if (pos >= belowHandleRect.y() && pos < belowHandleRect.y() + belowHandleRect.height()) {
         painter.save();
         painter.setClipRect(belowHandleRect);
-        const auto distance = qRound((pos - belowStart) * ratio);
-        const QRect rect(belowHandleRect.left(), belowHandleRect.top() + distance, belowHandleRect.width(),
-                         hightlightHeight);
+        const QRect rect(belowHandleRect.left(), pos, hightlightWidth, hightlightHeight);
         painter.fillRect(rect, color);
         painter.restore();
     }
-    // Paint handle area: {above ~ (above + handleSize)}
-    if (pos > above && pos < above + handleSize) {
+    // Paint handle area: {handleStart ~ (handleStart + height)}
+    if (inHandle && pos >= handleRect.y() && pos < handleRect.y() + handleRect.height()) {
         painter.save();
         painter.setClipRect(handleRect);
-        const auto handleRatio = handleRect.height() / viewRange;
-        const auto distance = qRound((pos - above) * handleRatio);
-        const QRect rect(handleRect.left(), handleRect.top() + distance, handleRect.width(), hightlightHeight);
+        const QRect rect(handleRect.left(), pos, hightlightWidth, hightlightHeight);
         painter.fillRect(rect, color);
         painter.restore();
     }
@@ -1496,11 +1508,21 @@ void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleR
 
 void HighlightScrollBar::paintEvent(QPaintEvent *event) {
     QScrollBar::paintEvent(event);
+#if 0
+    if (editView_->LineCount() != 0) {
+        const qreal lineHeight = editView_->LineSpacing();
+        const auto viewRange = editView_->viewport()->rect().height() / lineHeight - 1;
+        const auto maximum = editView_->LineCount() - qCeil(viewRange / 2);
+        qCritical() << "maximum: " << maximum << "=" << editView_->LineCount() << "-" << qCeil(viewRange / 2);
+        setMaximum(maximum);
+    }
+#endif
 
     int height = editView_->document()->documentLayout()->documentSize().height();
     if (editView_->layoutRequested_ && editView_->resized_ && height != height_) {
         qCritical() << "Allow to call HandleLineOffset()";
         editView_->HandleLineOffset();
+
         height_ = height;
         editView_->layoutRequested_ = false;
         editView_->resized_ = false;
@@ -1528,10 +1550,7 @@ void HighlightScrollBar::paintEvent(QPaintEvent *event) {
 
 #if 0  // Not update maximum.
     setMinimum(0);
-    auto maxLineNum = 0;
-    if (editView_->lineOffset().size() > 0) {
-        maxLineNum = editView_->lineOffset()[editView_->lineOffset().size() - 1];
-    }
+    auto maxLineNum = editView_->LineCount();
     if (maxLineNum == 0) {
         setMaximum(height);
     } else {
@@ -1543,14 +1562,27 @@ void HighlightScrollBar::paintEvent(QPaintEvent *event) {
 #endif
 
     const qreal lineHeight = editView_->LineSpacing();
+    const auto viewRange = editView_->viewport()->rect().height() / lineHeight - 1;
+    const auto firstVisibleLineNum = editView_->LineNumber(QTextCursor(editView_->firstVisibleBlock()));
+    const auto lastVisibleLineNum = firstVisibleLineNum + viewRange + 1;
+
     const auto lineInfos = editView_->scrollbarLineInfos();
-    qDebug() << "value: " << value() << ", minimum: " << minimum() << ", maximum: " << height << ", " << lineHeight
-             << ", " << editView_->currentBlockNumber() << editView_->blockCount() << ", " << grooveRect << sliderRect
+    qDebug() << "value: " << value() << ", minimum: " << minimum() << ", maximum: " << maximum() << height
+             << ", viewRange: {" << firstVisibleLineNum << "," << lastVisibleLineNum
+             << "}, LineCount: " << editView_->LineCount() << ", lineHeight: " << lineHeight << grooveRect << sliderRect
              << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << lineInfos.size();
+
+    const auto ratio = (double)(grooveRect.height()) / editView_->LineCount();
     for (const auto &lineInfo : lineInfos) {
         const auto &lineNums = lineInfo.first;
         for (const auto &lineNum : lineNums) {
-            PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, lineInfo.second, lineNum);
+            // Get the Y positon from line number.
+            const auto pos = grooveRect.y() + qRound(lineNum * ratio);
+            const bool inHandle = (lineNum >= firstVisibleLineNum && lineNum <= lastVisibleLineNum);
+            qDebug() << "pos: " << pos << ", {" << grooveRect.y() << ", " << grooveRect.y() + grooveRect.height()
+                     << "}, lineNum: " << lineNum << ", ratio: " << ratio << grooveRect.height()
+                     << editView_->LineCount();
+            PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, lineInfo.second, pos, inHandle);
         }
     }
 }

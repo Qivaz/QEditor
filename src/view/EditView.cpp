@@ -22,13 +22,13 @@
 #include "MainTabView.h"
 #include "MainWindow.h"
 #include "OutlineList.h"
+#include "SearchDialog.h"
 #include "Toast.h"
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSaveFile>
-#include <QScrollBar>
 #include <QStatusBar>
 #include <QTextBlock>
 #include <QTextLayout>
@@ -66,6 +66,8 @@ EditView::EditView(QWidget *parent)
 void EditView::Init() {
     setBackgroundVisible(false);
     //    setCenterOnScroll(true);
+
+    setVerticalScrollBar(new HighlightScrollBar(this, this));
     setStyleSheet(
         "color:rgb(215,215,210); background-color:rgb(28,28,28); selection-color:lightGray; "
         "selection-background-color:rgb(9,71,113); border:none;");
@@ -99,6 +101,9 @@ void EditView::Init() {
     connect(this, &QPlainTextEdit::copyAvailable, this, &EditView::HandleCopyAvailable);
     connect(this, &QPlainTextEdit::undoAvailable, this, &EditView::HandleUndoAvailable);
     connect(this, &QPlainTextEdit::redoAvailable, this, &EditView::HandleRedoAvailable);
+
+    connect(this->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
+            [](const QSizeF &newSize) {});
 
     // TODO: Cause transparent window...
     // ApplyWrapTextState();
@@ -262,13 +267,25 @@ void EditView::AddMarkText(const QString &str) {
         markTexts_.push_back("\\\\");
     }
     markTexts_.push_back(str);
+    hightlightScrollbarInvalid_ = true;
 }
 
 bool EditView::RemoveMarkText(const QString &str) {
+    bool res;
     if (str == '\\') {
-        return markTexts_.removeOne("\\\\");
+        res = markTexts_.removeOne("\\\\");
+    } else {
+        res = markTexts_.removeOne(str);
     }
-    return markTexts_.removeOne(str);
+    if (res) {
+        hightlightScrollbarInvalid_ = true;
+    }
+    return res;
+}
+
+void EditView::ClearMarkTexts() {
+    markTexts_.clear();
+    hightlightScrollbarInvalid_ = true;
 }
 
 QColor EditView::GetMarkTextBackground(int i) {
@@ -290,9 +307,19 @@ QColor EditView::GetMarkTextBackground(int i) {
 }
 
 void EditView::HighlightMarkTexts() {
+    if (hightlightScrollbarInvalid_) {
+        scrollbarPositions_.clear();
+    }
     for (int i = 0; i < markTexts_.size(); ++i) {
         const auto &text = markTexts_[i];
-        HighlightVisibleChars(text, QColor(Qt::white), GetMarkTextBackground(i));
+        const auto &color = GetMarkTextBackground(i);
+        HighlightVisibleChars(text, QColor(Qt::white), color);
+
+        // Search all positions for highlight scrollbar.
+        if (hightlightScrollbarInvalid_) {
+            const auto &cursors = MainWindow::Instance().GetSearcher()->FindAll(text);
+            scrollbarPositions_.emplace_back(std::make_pair(cursors, color));
+        }
     }
 }
 
@@ -812,6 +839,18 @@ bool EditView::HighlightChars(int startPos, int count, const QColor &foreground,
     return true;
 }
 
+void EditView::setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid) {
+    hightlightScrollbarInvalid_ = hightlightScrollbarInvalid;
+}
+
+bool EditView::hightlightScrollbarInvalid() const { return hightlightScrollbarInvalid_; }
+
+std::vector<std::pair<std::vector<QTextCursor>, QColor>> EditView::scrollbarPositions() const {
+    return scrollbarPositions_;
+}
+
+int EditView::currentBlockNumber() const { return currentBlockNumber_; }
+
 void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCursor &rightCursor) {
     qDebug() << "left char: " << document()->characterAt(leftCursor.position());
     qDebug() << "right char: " << document()->characterAt(rightCursor.position());
@@ -1064,8 +1103,8 @@ void EditView::HandleLineNumberAreaPaintEvent(QPaintEvent *event) {
                 painter.setPen(QColor(43, 145, 175));
             }
             QRectF rect = QRectF(0, top, lineNumberArea_->width(), fontMetrics().height());
-            //            qDebug() << ", top: " << top << ", bottom: " << bottom << ", lineHeight: " << lineHeight << ",
-            //            number: " << number;
+            // qDebug() << ", top: " << top << ", bottom: " << bottom << ", lineHeight: " << lineHeight << ", number: "
+            // << number;
             painter.drawText(rect, Qt::AlignRight | Qt::AlignVCenter, number);
         }
 
@@ -1307,5 +1346,105 @@ void LineNumberArea::mouseDoubleClickEvent(QMouseEvent *event) {
         auto lineCount = editView_->GotoBlock(blockNumber);
         editView_->SelectCurrentBlock(lineCount);
     }
+}
+
+std::vector<std::pair<int, QColor>> HighlightScrollBar::PreparePositions() {
+    std::vector<std::pair<int, QColor>> positions;
+    for (const auto &scrollbarPosition : editView_->scrollbarPositions()) {
+        for (const auto &cursor : scrollbarPosition.first) {
+            QTextLayout *layout = cursor.block().layout();
+            if (layout != nullptr) {
+                const int lineNum = layout->lineForTextPosition(cursor.positionInBlock()).lineNumber();
+                const int linePos = cursor.block().firstLineNumber() + lineNum;
+                positions.push_back({linePos, scrollbarPosition.second});
+            }
+        }
+    }
+    return positions;
+}
+
+void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleRect, const QRect &handleRect,
+                                    const QRect &belowHandleRect, const QColor &color, int pos) {
+    const int above = value();
+    const int below = maximum() - value();
+
+    constexpr int hightlightHeight = 1;
+    const qreal lineHeight = editView_->LineSpacing();
+    const auto viewRange = editView_->viewport()->rect().height() / lineHeight - 1;
+    const double ratio = (double)(aboveHandleRect.height() + belowHandleRect.height()) / (above + below);
+    // Paint above area: {0 ~ above}
+    if (above > 0 && pos < above) {
+        painter.save();
+        painter.setClipRect(aboveHandleRect);
+        const auto distance = qRound(pos * ratio);
+        const QRect rect(aboveHandleRect.left(), aboveHandleRect.top() + distance, aboveHandleRect.width(),
+                         hightlightHeight);
+        painter.fillRect(rect, color);
+        painter.restore();
+    }
+    // Paint below area: {belowStart ~ (belowStart + below)}
+    const auto handleSize = qRound(viewRange);  // qRound(handleRect.height() / ratio)
+    const auto belowStart = above + handleSize;
+    if (below > 0 && pos > belowStart && pos < belowStart + below) {
+        painter.save();
+        painter.setClipRect(belowHandleRect);
+        const auto distance = qRound((pos - belowStart) * ratio);
+        const QRect rect(belowHandleRect.left(), belowHandleRect.top() + distance, belowHandleRect.width(),
+                         hightlightHeight);
+        painter.fillRect(rect, color);
+        painter.restore();
+    }
+    // Paint handle area: {above ~ (above + handleSize)}
+    if (pos > above && pos < above + handleSize) {
+        painter.save();
+        painter.setClipRect(handleRect);
+        const auto handleRatio = handleRect.height() / viewRange;
+        const auto distance = qRound((pos - above) * handleRatio);
+        const QRect rect(handleRect.left(), handleRect.top() + distance, handleRect.width(), hightlightHeight);
+        painter.fillRect(rect, color);
+        painter.restore();
+    }
+}
+
+void HighlightScrollBar::paintEvent(QPaintEvent *event) {
+    QScrollBar::paintEvent(event);
+
+    editView_->setHightlightScrollbarInvalid(false);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+
+    auto grooveRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarGroove, this);
+    auto sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+
+    constexpr int marginL = 3;
+    constexpr int marginR = -2 * marginL + 1;
+    const QRect aboveHandleRect =
+        QRect(grooveRect.x() + marginL, grooveRect.y(), grooveRect.width() + marginR, sliderRect.y() - grooveRect.y());
+    const QRect handleRect =
+        QRect(grooveRect.x() + marginL, sliderRect.y(), grooveRect.width() + marginR, sliderRect.height());
+    const QRect belowHandleRect =
+        QRect(grooveRect.x() + marginL, sliderRect.y() + sliderRect.height(), grooveRect.width() + marginR,
+              grooveRect.height() - sliderRect.height() + grooveRect.y() - sliderRect.y());
+
+    const qreal lineHeight = editView_->LineSpacing();
+    setMinimum(0);
+    setMaximum(editView_->document()->documentLayout()->documentSize().height());
+
+    const auto positions = PreparePositions();
+    qDebug() << "value: " << value() << ", minimum: " << minimum() << ", maximum: " << maximum() << ", " << lineHeight
+             << ", " << editView_->currentBlockNumber() << editView_->blockCount() << ", " << grooveRect << sliderRect
+             << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << positions.size();
+    for (const auto &pos : positions) {
+        PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, pos.second, pos.first);
+    }
+}
+
+void HighlightScrollBar::sliderChange(QAbstractSlider::SliderChange change) {
+    QScrollBar::sliderChange(change);
+    qDebug() << "change: " << change;
+    editView_->highlighterInvalid_ = true;
 }
 }  // namespace QEditor

@@ -26,6 +26,7 @@
 #include <QGraphicsView>
 #include <QPlainTextEdit>
 #include <QRandomGenerator>
+#include <QScrollBar>
 
 namespace QEditor {
 class TabView;
@@ -120,7 +121,7 @@ class EditView : public QPlainTextEdit {
     void setMarkTexts(const QVector<QString> strs) { markTexts_ = strs; }
     void AddMarkText(const QString &str);
     bool RemoveMarkText(const QString &str);
-    void ClearMarkTexts() { markTexts_.clear(); }
+    void ClearMarkTexts();
     QColor GetMarkTextBackground(int i);
     void HighlightMarkTexts();
 
@@ -183,6 +184,22 @@ class EditView : public QPlainTextEdit {
                 document()->characterCount() <= Constants::kMaxParseCharNum);
     }
 
+    qreal LineSpacing() {
+        QFont currentFont = font();
+        //        currentFont.setPointSize(fontSize_ * fontZoom_ / 100);
+        qreal spacing = QFontMetricsF(currentFont).lineSpacing();
+        //        if (lineSpacing_ != 100) spacing *= qreal(lineSpacing_) / 100;
+        return spacing;
+    }
+
+    int currentBlockNumber() const;
+
+    std::vector<std::pair<std::vector<QTextCursor>, QColor>> scrollbarPositions() const;
+
+    bool hightlightScrollbarInvalid() const;
+
+    void setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid);
+
    protected:
     void showEvent(QShowEvent *) override;
     void paintEvent(QPaintEvent *event) override;
@@ -216,6 +233,7 @@ class EditView : public QPlainTextEdit {
     bool UnmarkAll();
 
    private:
+    friend class HighlightScrollBar;
     void UpdateLineNumberArea(const QRect &rect, int dy);
 
     void HighlightFocusChars();
@@ -272,6 +290,9 @@ class EditView : public QPlainTextEdit {
 
     int timerId_{0};
     QMenu *menu_;
+
+    std::vector<std::pair<std::vector<QTextCursor>, QColor>> scrollbarPositions_;
+    bool hightlightScrollbarInvalid_{false};
 };
 
 class LineNumberArea : public QWidget {
@@ -292,6 +313,23 @@ class LineNumberArea : public QWidget {
     EditView *editView_{nullptr};
 
     int startBlockNumber_{-1};
+};
+
+class HighlightScrollBar : public QScrollBar {
+    Q_OBJECT
+   public:
+    HighlightScrollBar(EditView *editView, QWidget *parent = nullptr) : QScrollBar(parent), editView_(editView) {}
+
+   protected:
+    void paintEvent(QPaintEvent *) override;
+    void sliderChange(SliderChange change) override;
+
+   private:
+    std::vector<std::pair<int, QColor>> PreparePositions();
+    void PaintLines(QPainter &painter, const QRect &aboveHandleRect, const QRect &handleRect,
+                    const QRect &belowHandleRect, const QColor &color, int pos);
+
+    EditView *editView_{nullptr};
 };
 }  // namespace QEditor
 

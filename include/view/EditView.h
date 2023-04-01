@@ -194,7 +194,7 @@ class EditView : public QPlainTextEdit {
 
     int currentBlockNumber() const;
 
-    std::vector<std::pair<std::vector<int>, QColor>> scrollbarLineInfos() const;
+    std::vector<std::pair<std::vector<int>, QColor>> &scrollbarLineInfos();
 
     bool hightlightScrollbarInvalid() const;
 
@@ -203,6 +203,9 @@ class EditView : public QPlainTextEdit {
     int LineNumber(const QTextCursor &cursor);
 
     std::vector<int> lineOffset() const;
+
+    int lastPos() const;
+    void setLastPos(int lastPos);
 
    protected:
     void showEvent(QShowEvent *) override;
@@ -215,6 +218,7 @@ class EditView : public QPlainTextEdit {
     void mouseReleaseEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     virtual void UnderpaintCurrentBlock();
 
@@ -289,6 +293,8 @@ class EditView : public QPlainTextEdit {
     OutlineList *overviewList_{nullptr};
     FunctionHierarchy *hierarchy_{nullptr};
 
+    int lastPos_{-1};
+
     int hoverPos_;
     bool jumpAvailable_{false};
     FuncGraphInfo funcGraphInfo_;
@@ -299,9 +305,10 @@ class EditView : public QPlainTextEdit {
     std::vector<std::pair<std::vector<int>, QColor>> scrollbarLineInfos_;
     bool hightlightScrollbarInvalid_{false};
 
-    bool documentSizeChanged_{false};
-    QSizeF documentSize_;
+    // QSizeF documentSize_;
     std::vector<int> lineOffset_;
+    bool layoutRequested_{false};
+    bool resized_{false};
 };
 
 class LineNumberArea : public QWidget {
@@ -339,6 +346,7 @@ class HighlightScrollBar : public QScrollBar {
                     const QRect &belowHandleRect, const QColor &color, int pos);
 
     EditView *editView_{nullptr};
+    int height_{0};
 };
 }  // namespace QEditor
 

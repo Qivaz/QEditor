@@ -140,7 +140,17 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
 
     ui_->checkBoxFindWrapAround->setChecked(true);
 
+    connect(ui_->lineEditFindFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
+        const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
+        editView()->scrollbarLineInfos().emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
+        editView()->setHightlightScrollbarInvalid(true);
+    });
     ui_->lineEditFindFindWhat->setText(GetSelectedText());
+    connect(ui_->lineEditReplaceFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
+        const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
+        editView()->scrollbarLineInfos().emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
+        editView()->setHightlightScrollbarInvalid(true);
+    });
     ui_->lineEditReplaceFindWhat->setText(GetSelectedText());
 }
 
@@ -696,11 +706,7 @@ std::vector<int> Searcher::FindAllLineNum(const QString &target) {
                 firstStart = cursor.selectionStart();
             }
             const auto lineNum = editView()->LineNumber(cursor);
-            const auto blockRect = editView()->document()->documentLayout()->blockBoundingRect(cursor.block());
-            qDebug() << "cursor: " << cursor.position() << cursor.blockNumber() << lineNum << blockRect.topLeft();
-            const auto width = QFontMetricsF(editView()->font()).horizontalAdvance(cursor.block().text(), -1);
-            qDebug() << width << "/" << editView()->size().width() << editView()->rect().width() << ":"
-                     << cursor.block().text();
+            qCritical() << "cursor: " << cursor.position() << cursor.blockNumber() << lineNum << cursor.block().text();
             lineNums.emplace_back(lineNum);
         } else {
             break;

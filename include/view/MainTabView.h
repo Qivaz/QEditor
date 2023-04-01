@@ -131,11 +131,14 @@ class TabView : public QTabWidget {
             // Not to add the same position.
             if (!backwardSteps().isEmpty()) {
                 const auto &lastStep = backwardSteps().last();
-                if (lastStep.first == editView && lastStep.second == pos) {
+                if (lastStep.first == editView &&
+                    (qAbs(lastStep.second - pos) < 5 || qAbs(editView->lastPos() - pos) < 5)) {
+                    editView->setLastPos(pos);
                     return;
                 }
             }
 
+            editView->setLastPos(pos);
             backwardSteps().push_back({editView, pos});
             forwardSteps().clear();
         }

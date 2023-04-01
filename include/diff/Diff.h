@@ -10,12 +10,12 @@ namespace QEditor {
 class FormattedText {
    public:
     FormattedText() = default;
-    FormattedText(const QString &txt, const QTextCharFormat &fmt = QTextCharFormat()) : text(txt), format(fmt) {}
+    FormattedText(const QString &txt, const QTextCharFormat &fmt = QTextCharFormat()) : text_(txt), format_(fmt) {}
 
-    QString text;
-    QTextCharFormat format;
+    QString text_;
+    QTextCharFormat format_;
 
-    bool operator==(const FormattedText &other) const { return text == other.text && format == other.format; }
+    bool operator==(const FormattedText &other) const { return text_ == other.text_ && format_ == other.format_; }
 };
 
 class Diff {

@@ -508,8 +508,8 @@ void TabView::ViewDiff(const QString &former, const QString &latter) {
 #if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
     foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
-        cursor.insertText(ft.text, ft.format);
+        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
+        cursor.insertText(ft.text_, ft.format_);
     }
 #else
     diffView->appendHtml(html);
@@ -541,8 +541,8 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter) {
 #if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
     foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
-        cursor.insertText(ft.text, ft.format);
+        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
+        cursor.insertText(ft.text_, ft.format_);
     }
 #else
     diffView->appendHtml(html);
@@ -584,8 +584,8 @@ void TabView::SwapDiff(int index) {
 #if defined(USE_DIFF_TEXT_VIEW)
     auto cursor = diffView->textCursor();
     foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text << ", format: " << ft.format.foreground() << ft.format.background();
-        cursor.insertText(ft.text, ft.format);
+        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
+        cursor.insertText(ft.text_, ft.format_);
     }
 #else
     diffView->appendHtml(html);

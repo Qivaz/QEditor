@@ -75,6 +75,10 @@ int OutlineList::GetIndexByCursorPos(int cursorPos) {
     if (parser_->funcGraphInfos().isEmpty()) {
         return 0;
     }
-    return parser_->GetIndexByCursorPosition(cursorPos);
+    const auto res = parser_->GetIndexByCursorPosition(cursorPos);
+    if (res != -1) {
+        return res;
+    }
+    return 0;
 }
 }  // namespace QEditor

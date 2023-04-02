@@ -17,6 +17,8 @@
 #include "IrParser.h"
 #include "Toast.h"
 
+#include <SearchDialog.h>
+
 namespace QEditor {
 IrParser::IrParser(EditView *editView, QObject *parent) : IParser(parent), editView_(editView) { ParseFuncGraph(); }
 
@@ -304,6 +306,47 @@ void IrParser::ParseFuncGraph() {
         funcGraphInfos_.push_back(info);
         funcGraphPos_.insert(RangeMapValue<int, int>(Range<int>(funcStart, funcEnd), funcGraphInfos_.size() - 1));
     }
+}
+
+FuncGraphInfo IrParser::GetFuncGraphInfo(const QString &funcName) const {
+    const auto &simpleFuncName = funcName.section('.', 0, 0);
+    return funcGraphNameInfoMap_.value(simpleFuncName);
+}
+
+int IrParser::FindNodePositon(const QString &nodeName, int pos) const {
+    if (editView_->document()->characterAt(pos - 1) != '%') {
+        return -1;
+    }
+
+    Searcher searcher;
+    searcher.setRadioButtonFindNormal(true);
+    searcher.setCheckBoxFindWholeWord(true);
+    searcher.setCheckBoxFindBackward(true);  // The definition is above.
+    auto cursor = editView_->textCursor();
+    cursor.setPosition(pos);
+    constexpr auto nodePrefix = "  %";
+    constexpr auto nodePrefixLen = 3;
+    auto res = searcher.FindNext(nodePrefix + nodeName, cursor);
+    if (!res.isNull()) {
+        // Check if in the same function.
+        qDebug() << res.position() << res.selectionStart() << res.selectionEnd();
+        const auto nodePos = res.selectionStart() + nodePrefixLen;
+        const auto index1 = GetIndexByCursorPosition(nodePos);
+        const auto index2 = GetIndexByCursorPosition(pos);
+        if (index1 != -1 && index2 != -1 && index1 == index2) {
+            return nodePos;
+        }
+    }
+    return -1;
+}
+
+int IrParser::GetIndexByCursorPosition(int cursorPos) const {
+    try {
+        return funcGraphPos_.at(cursorPos);
+    } catch (std::out_of_range e) {
+        qCritical() << "out_of_range: " << e.what();
+    }
+    return -1;
 }
 
 const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {

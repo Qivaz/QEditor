@@ -263,6 +263,7 @@ class EditView : public QPlainTextEdit {
     int hoverPos_;
     bool jumpAvailable_{false};
     FuncGraphInfo funcGraphInfo_;
+    int variablePos_;
 
     int timerId_{0};
     QMenu *menu_;

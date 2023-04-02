@@ -31,10 +31,11 @@ class DummyParser : public IParser {
     void ParseFuncGraph() override {}
     const QString &GetEntry() const override { return entryFunc_; };
     FuncGraphInfo GetFuncGraphInfo(const QString &) const override { return FuncGraphInfo(); }
+    int FindNodePositon(const QString &, int) const override { return -1; }
     const QVector<FuncGraphInfo> &funcGraphInfos() const override { return funcGraphInfos_; }
     int GetIndexByCursorPosition(int) const override { return 0; }
 
-    const QMap<QString, NodeInfo> &ParseNodes(const QString &) override { return QMap<QString, NodeInfo>(); }
+    const QMap<QString, NodeInfo> &ParseNodes(const QString &) override { return nodesMap_; }
 
    private:
     QVector<FuncGraphInfo> funcGraphInfos_;
@@ -50,12 +51,10 @@ class IrParser : public IParser {
 
     void ParseFuncGraph() override;
     const QString &GetEntry() const override { return entryFunc_; };
-    FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const override {
-        const auto &simpleFuncName = funcName.section('.', 0, 0);
-        return funcGraphNameInfoMap_.value(simpleFuncName);
-    }
+    FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const override;
+    int FindNodePositon(const QString &nodeName, int pos) const override;
     const QVector<FuncGraphInfo> &funcGraphInfos() const override { return funcGraphInfos_; }
-    int GetIndexByCursorPosition(int cursorPos) const override { return funcGraphPos_.at(cursorPos); }
+    int GetIndexByCursorPosition(int cursorPos) const override;
 
     const QMap<QString, NodeInfo> &ParseNodes(const QString &funcName) override;
 

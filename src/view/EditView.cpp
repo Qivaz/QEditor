@@ -791,20 +791,33 @@ void EditView::JumpHint(QTextCursor &cursor) {
         cursor.select(QTextCursor::WordUnderCursor);
     }
     const auto &text = cursor.selectedText();
+    // Function.
     funcGraphInfo_ = parser_->GetFuncGraphInfo(text);
     if (funcGraphInfo_.pos_ != -1) {
+        HighlightChars(cursor.selectionStart(), cursor.selectionEnd() - cursor.selectionStart(), QColor(16, 126, 172),
+                       QColor(28, 28, 28), true);
+        return;
+    }
+    // Variable.
+    variablePos_ = parser_->FindNodePositon(text, cursor.selectionStart());
+    if (variablePos_ != -1) {
         HighlightChars(cursor.selectionStart(), cursor.selectionEnd() - cursor.selectionStart(), QColor(16, 126, 172),
                        QColor(28, 28, 28), true);
     }
 }
 
 void EditView::Jump() {
-    if (funcGraphInfo_.pos_ == -1) {
-        return;
+    if (funcGraphInfo_.pos_ != -1) {
+        auto cursor = textCursor();
+        cursor.setPosition(funcGraphInfo_.pos_);
+        setTextCursor(cursor);
+        funcGraphInfo_.pos_ = -1;
+    } else if (variablePos_ != -1) {
+        auto cursor = textCursor();
+        cursor.setPosition(variablePos_);
+        setTextCursor(cursor);
+        variablePos_ = -1;
     }
-    auto cursor = textCursor();
-    cursor.setPosition(funcGraphInfo_.pos_);
-    setTextCursor(cursor);
 }
 
 std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor cursor, QTextCursor::MoveOperation direct,

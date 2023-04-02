@@ -48,6 +48,7 @@ class IParser : public QObject {
     virtual void ParseFuncGraph() = 0;
     virtual const QString &GetEntry() const = 0;
     virtual FuncGraphInfo GetFuncGraphInfo(const QString &funcName) const = 0;
+    virtual int FindNodePositon(const QString &nodeName, int pos) const = 0;
     virtual const QVector<FuncGraphInfo> &funcGraphInfos() const = 0;
     virtual int GetIndexByCursorPosition(int cursorPos) const = 0;
 

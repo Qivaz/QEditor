@@ -35,7 +35,7 @@
 #include "Utils.h"
 // clang-format on
 
-#define OUTPUT_LOG
+//#define OUTPUT_LOG
 //#define OUTPUT_LOG_FILE
 
 #ifdef OUTPUT_LOG
@@ -185,17 +185,17 @@ static inline void OutputMessageOutput(QtMsgType type, const QMessageLogContext 
     }
 #endif
 }
-#else
+#else  // OUTPUT_LOG
 #undef qDebug
 #undef qInfo
 #undef qDebug
-//#undef qCritical
+#undef qCritical
 //#undef qFatal
 
 #define qDebug QT_NO_QDEBUG_MACRO
 #define qInfo QT_NO_QDEBUG_MACRO
 #define qDebug QT_NO_QDEBUG_MACRO
-//#define qCritical QT_NO_QDEBUG_MACRO
+#define qCritical QT_NO_QDEBUG_MACRO
 //#define qFatal QT_NO_QDEBUG_MACRO
-#endif
+#endif  // OUTPUT_LOG
 #endif  // LOGGER_H

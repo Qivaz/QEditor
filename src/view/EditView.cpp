@@ -278,7 +278,14 @@ void EditView::AddMarkText(const QString &str) {
         markTexts_.push_back("\\\\");
     }
     markTexts_.push_back(str);
-    setHightlightScrollbarInvalid(true);
+
+    // Search new added text's position for highlight scrollbar.
+    if (AllowHighlightScrollbar()) {
+        const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(str);
+        const auto &color = GetMarkTextBackground(markTexts_.size() - 1);
+        scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].emplace_back(std::make_pair(lineNums, color));
+        setHightlightScrollbarInvalid(true);
+    }
 }
 
 bool EditView::RemoveMarkText(const QString &str) {
@@ -288,7 +295,16 @@ bool EditView::RemoveMarkText(const QString &str) {
     } else {
         res = markTexts_.removeOne(str);
     }
-    if (res) {
+    if (res && AllowHighlightScrollbar()) {
+        scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].clear();
+        // Search all positions for highlight scrollbar.
+        for (int i = 0; i < markTexts_.size(); ++i) {
+            const auto &text = markTexts_[i];
+            const auto &color = GetMarkTextBackground(i);
+            const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
+            scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].emplace_back(
+                std::make_pair(lineNums, color));
+        }
         setHightlightScrollbarInvalid(true);
     }
     return res;
@@ -296,7 +312,10 @@ bool EditView::RemoveMarkText(const QString &str) {
 
 void EditView::ClearMarkTexts() {
     markTexts_.clear();
-    setHightlightScrollbarInvalid(true);
+    if (AllowHighlightScrollbar()) {
+        scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].clear();
+        setHightlightScrollbarInvalid(true);
+    }
 }
 
 QColor EditView::GetMarkTextBackground(int i) {
@@ -318,21 +337,10 @@ QColor EditView::GetMarkTextBackground(int i) {
 }
 
 void EditView::HighlightMarkTexts() {
-    if (AllowHighlightScrollbar()) {
-        scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].clear();
-    }
     for (int i = 0; i < markTexts_.size(); ++i) {
         const auto &text = markTexts_[i];
         const auto &color = GetMarkTextBackground(i);
         HighlightVisibleChars(text, QColor(Qt::white), color);
-
-        // Search all positions for highlight scrollbar.
-        if (AllowHighlightScrollbar()) {
-            const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
-            scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].emplace_back(
-                std::make_pair(lineNums, color));
-            setHightlightScrollbarInvalid(true);
-        }
     }
 }
 

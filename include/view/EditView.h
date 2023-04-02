@@ -138,6 +138,15 @@ class EditView : public QPlainTextEdit {
                 document()->characterCount() <= Constants::kMaxParseCharNum);
     }
 
+    bool AllowHighlightScrollbar() {
+        QFile file(filePath_);
+        if (file.size() > Constants::kMaxHighlightScrollbarFileSize) {
+            return false;
+        }
+        return (blockCount() <= Constants::kMaxHighlightScrollbarLineNum &&
+                document()->characterCount() <= Constants::kMaxHighlightScrollbarCharNum);
+    }
+
     qreal LineSpacing() {
         QFont currentFont = font();
         //        currentFont.setPointSize(fontSize_ * fontZoom_ / 100);

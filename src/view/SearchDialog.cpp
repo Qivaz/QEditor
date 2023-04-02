@@ -141,7 +141,7 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
     ui_->checkBoxFindWrapAround->setChecked(true);
 
     connect(ui_->lineEditFindFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
-        if (!editView()->AllowRichParsing()) {
+        if (!editView()->AllowHighlightScrollbar()) {
             return;
         }
         const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
@@ -152,7 +152,7 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
     });
     ui_->lineEditFindFindWhat->setText(GetSelectedText());
     connect(ui_->lineEditReplaceFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
-        if (!editView()->AllowRichParsing()) {
+        if (!editView()->AllowHighlightScrollbar()) {
             return;
         }
         const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
@@ -228,7 +228,7 @@ void SearchDialog::setCurrentTabIndex(int index) { ui_->tabWidget->setCurrentInd
 void SearchDialog::closeEvent(QCloseEvent *) {
     historyIndex_ = -1;
     searchInput_.clear();
-    if (editView()->AllowRichParsing()) {
+    if (editView()->AllowHighlightScrollbar()) {
         auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
         scrollbarInfos.clear();
         editView()->setHightlightScrollbarInvalid(true);
@@ -238,7 +238,7 @@ void SearchDialog::closeEvent(QCloseEvent *) {
 void SearchDialog::hideEvent(QHideEvent *) {
     historyIndex_ = -1;
     searchInput_.clear();
-    if (editView()->AllowRichParsing()) {
+    if (editView()->AllowHighlightScrollbar()) {
         auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
         scrollbarInfos.clear();
         editView()->setHightlightScrollbarInvalid(true);

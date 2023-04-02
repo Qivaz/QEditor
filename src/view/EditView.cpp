@@ -318,7 +318,7 @@ QColor EditView::GetMarkTextBackground(int i) {
 }
 
 void EditView::HighlightMarkTexts() {
-    if (AllowRichParsing()) {
+    if (AllowHighlightScrollbar()) {
         scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].clear();
     }
     for (int i = 0; i < markTexts_.size(); ++i) {
@@ -327,7 +327,7 @@ void EditView::HighlightMarkTexts() {
         HighlightVisibleChars(text, QColor(Qt::white), color);
 
         // Search all positions for highlight scrollbar.
-        if (AllowRichParsing()) {
+        if (AllowHighlightScrollbar()) {
             const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
             scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].emplace_back(
                 std::make_pair(lineNums, color));
@@ -513,7 +513,7 @@ void EditView::HandleSelectionChanged() {
     if (text != selectedText_) {
         selectedText_ = std::move(text);
 
-        if (AllowRichParsing()) {
+        if (AllowHighlightScrollbar()) {
             auto &scrollbarInfos = scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryFocus];
             bool needInvalidate = !scrollbarInfos.empty();
             scrollbarInfos.clear();
@@ -1540,7 +1540,7 @@ void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleR
 
 void HighlightScrollBar::paintEvent(QPaintEvent *event) {
     QScrollBar::paintEvent(event);
-    if (!editView_->AllowRichParsing()) {
+    if (!editView_->AllowHighlightScrollbar()) {
         return;
     }
 

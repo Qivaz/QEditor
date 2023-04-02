@@ -493,20 +493,20 @@ void TabView::ViewDiff(DiffView *diffView, const QList<FormattedText> &formatted
     auto cursor = diffView->textCursor();
 
     auto &scrollbarInfos = diffView->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryDiff];
-    if (diffView->AllowRichParsing()) {
+    if (diffView->AllowHighlightScrollbar()) {
         scrollbarInfos.clear();
     }
 
     std::vector<int> diffPosList;
     foreach(auto &ft, formattedTexts) {
         qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
-        if (diffView->AllowRichParsing() && ft.format_.background() == Diff::kNewBgColor) {
+        if (diffView->AllowHighlightScrollbar() && ft.format_.background() == Diff::kNewBgColor) {
             diffPosList.emplace_back(diffView->textCursor().position());
         }
         cursor.insertText(ft.text_, ft.format_);
     }
 
-    if (diffView->AllowRichParsing()) {
+    if (diffView->AllowHighlightScrollbar()) {
         diffView->HandleLineOffset();
         //        cursor = diffView->textCursor();
         int lastLine = -1;
@@ -520,7 +520,7 @@ void TabView::ViewDiff(DiffView *diffView, const QList<FormattedText> &formatted
             lastLine = line;
             lines.emplace_back(line);
         }
-        scrollbarInfos.emplace_back(std::make_pair(lines, QColor(0xffcc0000)));
+        scrollbarInfos.emplace_back(std::make_pair(lines, Qt::red));
         diffView->setHightlightScrollbarInvalid(true);
     }
 

@@ -33,47 +33,9 @@ class TabView;
 class IParser;
 class OutlineList;
 class FunctionHierarchy;
+class NewFileNum;
 
-class NewFileNum : public QObject {
-    Q_OBJECT
-   public:
-    // Starts from 1.
-    static int GetNumber() {
-        for (int i = 0; i < numbers_use_status_.size(); ++i) {
-            if (!numbers_use_status_[i]) {
-                numbers_use_status_[i] = true;
-                qDebug() << "Reuse number: " << i + 1;
-                return i + 1;
-            }
-        }
-        numbers_use_status_.push_back(true);
-        qDebug() << "New number: " << numbers_use_status_.size();
-        return numbers_use_status_.size();
-    }
-    // The 'number' must exceed 0.
-    static void SetNumber(int number, bool use) {
-        if (number <= 0) {
-            qCritical() << "Wrong number: " << number;
-            return;
-        }
-        int pos = number - 1;
-        if (pos < numbers_use_status_.size()) {
-            numbers_use_status_[pos] = use;
-            qDebug() << "Reset number: " << number;
-            return;
-        }
-
-        // Extend to the 'pos', then set as use.
-        for (int i = 0; i <= pos; ++i) {
-            numbers_use_status_.push_back(false);
-        }
-        numbers_use_status_[pos] = use;
-        qDebug() << "Expand to number: " << numbers_use_status_.size();
-    }
-
-   private:
-    static QVector<bool> numbers_use_status_;
-};
+enum ScrollBarHighlightCategory : int { kCategoryFocus, kCategorySearch, kCategoryMark, kCategoryDiff };
 
 class EditView : public QPlainTextEdit {
     Q_OBJECT
@@ -82,6 +44,8 @@ class EditView : public QPlainTextEdit {
     EditView(const QString &fileName, QWidget *parent = nullptr);
     EditView(const QFileInfo &fileInfo, QWidget *parent = nullptr);
     ~EditView() = default;
+
+    using ScrollBarInfo = QHash<int, std::vector<std::pair<std::vector<int>, QColor>>>;
 
     void Init();
 
@@ -100,17 +64,7 @@ class EditView : public QPlainTextEdit {
     QString fileName() const { return fileName_; }
     void setFileName(const QString &fileName) { fileName_ = fileName; }
     QString filePath() const { return filePath_; }
-    void setFilePath(const QString &filePath) {
-        filePath_ = filePath;
-        if (!fileType_.IsUnknown()) {
-            qCritical() << "Not allowed to change file type, current type is: " << fileType_.fileType();
-            return;
-        }
-        fileType_.SetPath(filePath_);
-        if (newFileNum() != 0) {
-            NewFileNum::SetNumber(newFileNum(), false);
-        }
-    }
+    void setFilePath(const QString &filePath);
 
     void GotoCursor(const QTextCursor &cursor);
     int GotoBlock(int blockNumber);
@@ -175,7 +129,7 @@ class EditView : public QPlainTextEdit {
     void JumpHint(QTextCursor &cursor);
     void Jump();
 
-    bool CanParse() {
+    bool AllowRichParsing() {
         QFile file(filePath_);
         if (file.size() > Constants::kMaxParseFileSize) {
             return false;
@@ -194,7 +148,7 @@ class EditView : public QPlainTextEdit {
 
     int currentBlockNumber() const;
 
-    std::vector<std::pair<std::vector<int>, QColor>> &scrollbarLineInfos();
+    ScrollBarInfo &scrollbarLineInfos();
 
     bool hightlightScrollbarInvalid() const;
 
@@ -207,6 +161,8 @@ class EditView : public QPlainTextEdit {
 
     int lastPos() const;
     void setLastPos(int lastPos);
+
+    void HandleLineOffset();
 
    protected:
     void showEvent(QShowEvent *) override;
@@ -234,7 +190,6 @@ class EditView : public QPlainTextEdit {
     void HandleCopyAvailable(bool avail);
     void HandleUndoAvailable(bool avail);
     void HandleRedoAvailable(bool avail);
-    void HandleLineOffset();
 
     // Context menu operations.
     bool Find();
@@ -303,13 +258,54 @@ class EditView : public QPlainTextEdit {
     int timerId_{0};
     QMenu *menu_;
 
-    std::vector<std::pair<std::vector<int>, QColor>> scrollbarLineInfos_;
+    ScrollBarInfo scrollbarLineInfos_;
     bool hightlightScrollbarInvalid_{false};
 
     // QSizeF documentSize_;
     std::vector<int> lineOffset_;
     bool layoutRequested_{false};
     bool resized_{false};
+};
+
+class NewFileNum : public QObject {
+    Q_OBJECT
+   public:
+    // Starts from 1.
+    static int GetNumber() {
+        for (int i = 0; i < numbers_use_status_.size(); ++i) {
+            if (!numbers_use_status_[i]) {
+                numbers_use_status_[i] = true;
+                qDebug() << "Reuse number: " << i + 1;
+                return i + 1;
+            }
+        }
+        numbers_use_status_.push_back(true);
+        qDebug() << "New number: " << numbers_use_status_.size();
+        return numbers_use_status_.size();
+    }
+    // The 'number' must exceed 0.
+    static void SetNumber(int number, bool use) {
+        if (number <= 0) {
+            qCritical() << "Wrong number: " << number;
+            return;
+        }
+        int pos = number - 1;
+        if (pos < numbers_use_status_.size()) {
+            numbers_use_status_[pos] = use;
+            qDebug() << "Reset number: " << number;
+            return;
+        }
+
+        // Extend to the 'pos', then set as use.
+        for (int i = 0; i <= pos; ++i) {
+            numbers_use_status_.push_back(false);
+        }
+        numbers_use_status_[pos] = use;
+        qDebug() << "Expand to number: " << numbers_use_status_.size();
+    }
+
+   private:
+    static QVector<bool> numbers_use_status_;
 };
 
 class LineNumberArea : public QWidget {

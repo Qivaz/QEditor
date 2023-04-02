@@ -488,6 +488,52 @@ void TabView::NewFile() {
     editView->setFocus();
 }
 
+#if defined(USE_DIFF_TEXT_VIEW)
+void TabView::ViewDiff(DiffView *diffView, const QList<FormattedText> &formattedTexts) {
+    auto cursor = diffView->textCursor();
+
+    auto &scrollbarInfos = diffView->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryDiff];
+    if (diffView->AllowRichParsing()) {
+        scrollbarInfos.clear();
+    }
+
+    std::vector<int> diffPosList;
+    foreach(auto &ft, formattedTexts) {
+        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
+        if (diffView->AllowRichParsing() && ft.format_.background() == Diff::kNewBgColor) {
+            diffPosList.emplace_back(diffView->textCursor().position());
+        }
+        cursor.insertText(ft.text_, ft.format_);
+    }
+
+    if (diffView->AllowRichParsing()) {
+        diffView->HandleLineOffset();
+        //        cursor = diffView->textCursor();
+        int lastLine = -1;
+        std::vector<int> lines;
+        for (const auto &pos : diffPosList) {
+            cursor.setPosition(pos);
+            const auto line = diffView->LineNumber(cursor);
+            if (line == lastLine) {
+                continue;
+            }
+            lastLine = line;
+            lines.emplace_back(line);
+        }
+        scrollbarInfos.emplace_back(std::make_pair(lines, QColor(0xffcc0000)));
+        diffView->setHightlightScrollbarInvalid(true);
+    }
+
+    cursor.movePosition(QTextCursor::Start);
+    diffView->setTextCursor(cursor);
+}
+#else
+void TabView::ViewDiff(DiffView *diffView, const QString &html) {
+    diffView->appendHtml(html);
+    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+}
+#endif
+
 void TabView::ViewDiff(const QString &former, const QString &latter) {
     diff_.Impose(former, latter);
 #if defined(USE_DIFF_TEXT_VIEW)
@@ -505,15 +551,11 @@ void TabView::ViewDiff(const QString &former, const QString &latter) {
     setTabToolTip(count() - 1, diffTip);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
+
 #if defined(USE_DIFF_TEXT_VIEW)
-    auto cursor = diffView->textCursor();
-    foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
-        cursor.insertText(ft.text_, ft.format_);
-    }
+    ViewDiff(diffView, formattedTexts);
 #else
-    diffView->appendHtml(html);
-    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+    ViewDiff(diffView, html);
 #endif
 }
 
@@ -538,15 +580,11 @@ void TabView::ViewDiff(const EditView *former, const EditView *latter) {
     setTabToolTip(count() - 1, diffTip);
     diffView->setFocus();
     diffView->setFont(QFont("Consolas", 16));
+
 #if defined(USE_DIFF_TEXT_VIEW)
-    auto cursor = diffView->textCursor();
-    foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
-        cursor.insertText(ft.text_, ft.format_);
-    }
+    ViewDiff(diffView, formattedTexts);
 #else
-    diffView->appendHtml(html);
-    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+    ViewDiff(diffView, html);
 #endif
 }
 
@@ -581,15 +619,11 @@ void TabView::SwapDiff(int index) {
     auto afterName = latter->filePath().isEmpty() ? latter->fileName() : latter->filePath();
     QString diffTip = QString(tr("Diff: ")) + beforeName + QString(" → ") + afterName;
     setTabToolTip(index, diffTip);
+
 #if defined(USE_DIFF_TEXT_VIEW)
-    auto cursor = diffView->textCursor();
-    foreach(auto &ft, formattedTexts) {
-        qDebug() << "text: " << ft.text_ << ", format: " << ft.format_.foreground() << ft.format_.background();
-        cursor.insertText(ft.text_, ft.format_);
-    }
+    ViewDiff(diffView, formattedTexts);
 #else
-    diffView->appendHtml(html);
-    qDebug() << "html: " << html << ", text: " << diffView->toPlainText();
+    ViewDiff(diffView, html);
 #endif
 }
 

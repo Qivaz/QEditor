@@ -44,7 +44,7 @@ EditView::EditView(const QFileInfo &fileInfo, QWidget *parent)
       filePath_(fileInfo.canonicalFilePath()),
       fileType_(filePath_),
       menu_(new QMenu(parent)) {
-    if (!fileType_.IsUnknown() && CanParse()) {
+    if (!fileType_.IsUnknown() && AllowRichParsing()) {
         highlighter_ = new TextHighlighter(fileType_, document(), "");
     }
 
@@ -278,7 +278,7 @@ void EditView::AddMarkText(const QString &str) {
         markTexts_.push_back("\\\\");
     }
     markTexts_.push_back(str);
-    hightlightScrollbarInvalid_ = true;
+    setHightlightScrollbarInvalid(true);
 }
 
 bool EditView::RemoveMarkText(const QString &str) {
@@ -289,14 +289,14 @@ bool EditView::RemoveMarkText(const QString &str) {
         res = markTexts_.removeOne(str);
     }
     if (res) {
-        hightlightScrollbarInvalid_ = true;
+        setHightlightScrollbarInvalid(true);
     }
     return res;
 }
 
 void EditView::ClearMarkTexts() {
     markTexts_.clear();
-    hightlightScrollbarInvalid_ = true;
+    setHightlightScrollbarInvalid(true);
 }
 
 QColor EditView::GetMarkTextBackground(int i) {
@@ -318,8 +318,8 @@ QColor EditView::GetMarkTextBackground(int i) {
 }
 
 void EditView::HighlightMarkTexts() {
-    if (hightlightScrollbarInvalid_) {
-        scrollbarLineInfos_.clear();
+    if (AllowRichParsing()) {
+        scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].clear();
     }
     for (int i = 0; i < markTexts_.size(); ++i) {
         const auto &text = markTexts_[i];
@@ -327,9 +327,11 @@ void EditView::HighlightMarkTexts() {
         HighlightVisibleChars(text, QColor(Qt::white), color);
 
         // Search all positions for highlight scrollbar.
-        if (hightlightScrollbarInvalid_) {
+        if (AllowRichParsing()) {
             const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
-            scrollbarLineInfos_.emplace_back(std::make_pair(lineNums, color));
+            scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryMark].emplace_back(
+                std::make_pair(lineNums, color));
+            setHightlightScrollbarInvalid(true);
         }
     }
 }
@@ -356,6 +358,18 @@ int EditView::GetLineNumberAreaWidth() {
         space = minSpace;
     }
     return space;
+}
+
+void EditView::setFilePath(const QString &filePath) {
+    filePath_ = filePath;
+    if (!fileType_.IsUnknown()) {
+        qCritical() << "Not allowed to change file type, current type is: " << fileType_.fileType();
+        return;
+    }
+    fileType_.SetPath(filePath_);
+    if (newFileNum() != 0) {
+        NewFileNum::SetNumber(newFileNum(), false);
+    }
 }
 
 void EditView::HandleBlockCountChanged(int newBlockCount) {
@@ -498,6 +512,21 @@ void EditView::HandleSelectionChanged() {
     auto text = textCursor().selectedText();
     if (text != selectedText_) {
         selectedText_ = std::move(text);
+
+        if (AllowRichParsing()) {
+            auto &scrollbarInfos = scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryFocus];
+            bool needInvalidate = !scrollbarInfos.empty();
+            scrollbarInfos.clear();
+            if (!selectedText_.isEmpty()) {
+                const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(selectedText_);
+                scrollbarInfos.emplace_back(std::make_pair(lineNums, QColor(0xff00c0c0)));
+                needInvalidate = true;
+            }
+            if (needInvalidate) {
+                setHightlightScrollbarInvalid(true);
+            }
+        }
+
         highlighterInvalid_ = true;
     }
     qDebug() << ", selectedText_: " << selectedText_ << ", highlighterInvalid_: " << highlighterInvalid_;
@@ -689,7 +718,7 @@ void EditView::HandleRedoAvailable(bool avail) {
 
 void EditView::TrigerParser() {
     // TODO: Add more lang.
-    if (!fileType_.IsIr() || !CanParse()) {
+    if (!fileType_.IsIr() || !AllowRichParsing()) {
         if (parser_ == nullptr) {
             parser_ = new DummyParser(this);
             overviewList_ = new OutlineList(parser_);
@@ -859,11 +888,14 @@ std::vector<int> EditView::lineOffset() const { return lineOffset_; }
 
 void EditView::setHightlightScrollbarInvalid(bool hightlightScrollbarInvalid) {
     hightlightScrollbarInvalid_ = hightlightScrollbarInvalid;
+    if (hightlightScrollbarInvalid_) {
+        verticalScrollBar()->update();
+    }
 }
 
 bool EditView::hightlightScrollbarInvalid() const { return hightlightScrollbarInvalid_; }
 
-std::vector<std::pair<std::vector<int>, QColor>> &EditView::scrollbarLineInfos() { return scrollbarLineInfos_; }
+EditView::ScrollBarInfo &EditView::scrollbarLineInfos() { return scrollbarLineInfos_; }
 
 int EditView::currentBlockNumber() const { return currentBlockNumber_; }
 
@@ -1508,6 +1540,10 @@ void HighlightScrollBar::PaintLines(QPainter &painter, const QRect &aboveHandleR
 
 void HighlightScrollBar::paintEvent(QPaintEvent *event) {
     QScrollBar::paintEvent(event);
+    if (!editView_->AllowRichParsing()) {
+        return;
+    }
+
 #if 0
     if (editView_->LineCount() != 0) {
         const qreal lineHeight = editView_->LineSpacing();
@@ -1566,23 +1602,26 @@ void HighlightScrollBar::paintEvent(QPaintEvent *event) {
     const auto firstVisibleLineNum = editView_->LineNumber(QTextCursor(editView_->firstVisibleBlock()));
     const auto lastVisibleLineNum = firstVisibleLineNum + viewRange + 1;
 
-    const auto lineInfos = editView_->scrollbarLineInfos();
+    const auto &scrollbarLineInfos = editView_->scrollbarLineInfos();
     qDebug() << "value: " << value() << ", minimum: " << minimum() << ", maximum: " << maximum() << height
              << ", viewRange: {" << firstVisibleLineNum << "," << lastVisibleLineNum
              << "}, LineCount: " << editView_->LineCount() << ", lineHeight: " << lineHeight << grooveRect << sliderRect
-             << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << lineInfos.size();
+             << ", " << aboveHandleRect << handleRect << belowHandleRect << ", " << scrollbarLineInfos.size();
 
     const auto ratio = (double)(grooveRect.height()) / editView_->LineCount();
-    for (const auto &lineInfo : lineInfos) {
-        const auto &lineNums = lineInfo.first;
-        for (const auto &lineNum : lineNums) {
-            // Get the Y positon from line number.
-            const auto pos = grooveRect.y() + qRound(lineNum * ratio);
-            const bool inHandle = (lineNum >= firstVisibleLineNum && lineNum <= lastVisibleLineNum);
-            qDebug() << "pos: " << pos << ", {" << grooveRect.y() << ", " << grooveRect.y() + grooveRect.height()
-                     << "}, lineNum: " << lineNum << ", ratio: " << ratio << grooveRect.height()
-                     << editView_->LineCount();
-            PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, lineInfo.second, pos, inHandle);
+    for (const auto &info : scrollbarLineInfos) {
+        const auto &lineInfos = info;
+        for (const auto &lineInfo : lineInfos) {
+            const auto &lineNums = lineInfo.first;
+            for (const auto &lineNum : lineNums) {
+                // Get the Y positon from line number.
+                const auto pos = grooveRect.y() + qRound(lineNum * ratio);
+                const bool inHandle = (lineNum >= firstVisibleLineNum && lineNum <= lastVisibleLineNum);
+                qDebug() << "pos: " << pos << ", {" << grooveRect.y() << ", " << grooveRect.y() + grooveRect.height()
+                         << "}, lineNum: " << lineNum << ", ratio: " << ratio << grooveRect.height()
+                         << editView_->LineCount();
+                PaintLines(painter, aboveHandleRect, handleRect, belowHandleRect, lineInfo.second, pos, inHandle);
+            }
         }
     }
 }

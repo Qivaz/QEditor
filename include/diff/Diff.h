@@ -28,6 +28,13 @@ class Diff {
     QString ToLineHtml();
     QList<FormattedText> ToFormattedText();
 
+    inline static const QColor kOldFgColor = QColor(Qt::red);
+    inline static const QColor kNewFgColor = QColor(Qt::green);
+    inline static const QColor kCommonFgColor = QColor(Qt::darkGray);
+
+    inline static const QColor kOldBgColor = QColor("#ffe6e6");
+    inline static const QColor kNewBgColor = QColor("#e6ffe6");
+
    private:
     diff_match_patch diffMatchPatch_;
     QList<_Diff> diffs_;

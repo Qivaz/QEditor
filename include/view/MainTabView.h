@@ -105,6 +105,11 @@ class TabView : public QTabWidget {
         return -1;
     }
 
+#if defined(USE_DIFF_TEXT_VIEW)
+    void ViewDiff(DiffView *diffView, const QList<FormattedText> &formattedTexts);
+#else
+    void ViewDiff(DiffView *diffView, const QString &html);
+#endif
     void ViewDiff(const QString &former, const QString &latter);
     void ViewDiff(const EditView *former, const EditView *latter);
     void SwapDiff(int index);

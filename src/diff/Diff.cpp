@@ -21,14 +21,14 @@ QList<FormattedText> Diff::ToFormattedText() {
             case DELETE: {
                 FormattedText oldFt;
                 oldFt.text_ = text;
-                oldFt.format_.setForeground(Qt::red);
+                oldFt.format_.setForeground(kOldFgColor);
                 oldFts << oldFt;
                 break;
             }
             case INSERT: {
                 FormattedText newFt;
                 newFt.text_ = text;
-                newFt.format_.setForeground(Qt::green);
+                newFt.format_.setForeground(kNewFgColor);
                 newFts << newFt;
                 break;
             }
@@ -44,23 +44,23 @@ QList<FormattedText> Diff::ToFormattedText() {
                             for (const auto &oldFt : oldFts) {
                                 auto ft = QTextCharFormat();
                                 ft.setForeground(oldFt.format_.foreground());
-                                ft.setBackground(QColor("#ffe6e6"));
+                                ft.setBackground(kOldBgColor);
                                 fts << FormattedText(oldFt.text_, ft);
                             }
                             auto firstFt = FormattedText(first);
-                            firstFt.format_.setForeground(Qt::darkGray);
-                            firstFt.format_.setBackground(QColor("#ffe6e6"));
+                            firstFt.format_.setForeground(kCommonFgColor);
+                            firstFt.format_.setBackground(kOldBgColor);
                             fts << firstFt;
                             // New part.
                             for (const auto &newFt : newFts) {
                                 auto ft = QTextCharFormat();
                                 ft.setForeground(newFt.format_.foreground());
-                                ft.setBackground(QColor("#e6ffe6"));
+                                ft.setBackground(kNewBgColor);
                                 fts << FormattedText(newFt.text_, ft);
                             }
                             firstFt = FormattedText(first);
-                            firstFt.format_.setForeground(Qt::darkGray);
-                            firstFt.format_.setBackground(QColor("#e6ffe6"));
+                            firstFt.format_.setForeground(kCommonFgColor);
+                            firstFt.format_.setBackground(kNewBgColor);
                             fts << firstFt;
                         } else {  // Add to common line.
                             fts << FormattedText(first);
@@ -75,7 +75,7 @@ QList<FormattedText> Diff::ToFormattedText() {
                         } else if (pos == lastPos) {  // Only one \n at the start of text.
                             const auto &tmp = text.mid(pos + line_feed_len);
                             auto tmpFt = FormattedText(tmp);
-                            tmpFt.format_.setForeground(Qt::darkGray);
+                            tmpFt.format_.setForeground(kCommonFgColor);
                             oldFts << tmpFt;
                             newFts << tmpFt;
                         } else {  // More than one \n exist, append middle to common line, and append the last line to
@@ -83,7 +83,7 @@ QList<FormattedText> Diff::ToFormattedText() {
                             fts << FormattedText(text.mid(pos + line_feed_len, lastPos - pos));
                             const auto &tmp = text.mid(lastPos + line_feed_len);
                             auto tmpFt = FormattedText(tmp);
-                            tmpFt.format_.setForeground(Qt::darkGray);
+                            tmpFt.format_.setForeground(kCommonFgColor);
                             oldFts << tmpFt;
                             newFts << tmpFt;
                         }
@@ -97,14 +97,14 @@ QList<FormattedText> Diff::ToFormattedText() {
                             fts << FormattedText(text.mid(0, lastPos + line_feed_len));
                             const auto &tmp = text.mid(lastPos + line_feed_len);
                             auto tmpFt = FormattedText(tmp);
-                            tmpFt.format_.setForeground(Qt::darkGray);
+                            tmpFt.format_.setForeground(kCommonFgColor);
                             oldFts << tmpFt;
                             newFts << tmpFt;
                         }
                     }
                 } else {  // Gather old line text and new line text.
                     auto tmpFt = FormattedText(text);
-                    tmpFt.format_.setForeground(Qt::darkGray);
+                    tmpFt.format_.setForeground(kCommonFgColor);
                     oldFts << tmpFt;
                     newFts << tmpFt;
                 }
@@ -117,14 +117,14 @@ QList<FormattedText> Diff::ToFormattedText() {
         for (const auto &oldFt : oldFts) {
             auto ft = FormattedText(oldFt.text_);
             ft.format_.setForeground(oldFt.format_.foreground());
-            ft.format_.setBackground(QColor("#ffe6e6"));
+            ft.format_.setBackground(kOldBgColor);
             fts << ft;
         }
         fts << FormattedText(line_feed);
         for (const auto &newFt : newFts) {
             auto ft = FormattedText(newFt.text_);
             ft.format_.setForeground(newFt.format_.foreground());
-            ft.format_.setBackground(QColor("#e6ffe6"));
+            ft.format_.setBackground(kNewBgColor);
             fts << ft;
         }
     } else {  // Add to common line.

@@ -141,14 +141,24 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
     ui_->checkBoxFindWrapAround->setChecked(true);
 
     connect(ui_->lineEditFindFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
+        if (!editView()->AllowRichParsing()) {
+            return;
+        }
         const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
-        editView()->scrollbarLineInfos().emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
+        auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
+        scrollbarInfos.clear();
+        scrollbarInfos.emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
         editView()->setHightlightScrollbarInvalid(true);
     });
     ui_->lineEditFindFindWhat->setText(GetSelectedText());
     connect(ui_->lineEditReplaceFindWhat, &QLineEdit::textChanged, this, [this](const QString &text) {
+        if (!editView()->AllowRichParsing()) {
+            return;
+        }
         const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(text);
-        editView()->scrollbarLineInfos().emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
+        auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
+        scrollbarInfos.clear();
+        scrollbarInfos.emplace_back(std::make_pair(lineNums, QColor(0xff00c000)));
         editView()->setHightlightScrollbarInvalid(true);
     });
     ui_->lineEditReplaceFindWhat->setText(GetSelectedText());
@@ -218,11 +228,21 @@ void SearchDialog::setCurrentTabIndex(int index) { ui_->tabWidget->setCurrentInd
 void SearchDialog::closeEvent(QCloseEvent *) {
     historyIndex_ = -1;
     searchInput_.clear();
+    if (editView()->AllowRichParsing()) {
+        auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
+        scrollbarInfos.clear();
+        editView()->setHightlightScrollbarInvalid(true);
+    }
 }
 
 void SearchDialog::hideEvent(QHideEvent *) {
     historyIndex_ = -1;
     searchInput_.clear();
+    if (editView()->AllowRichParsing()) {
+        auto &scrollbarInfos = editView()->scrollbarLineInfos()[ScrollBarHighlightCategory::kCategorySearch];
+        scrollbarInfos.clear();
+        editView()->setHightlightScrollbarInvalid(true);
+    }
 }
 
 const QString SearchDialog::GetSelectedText() {

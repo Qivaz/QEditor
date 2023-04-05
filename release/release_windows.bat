@@ -2,6 +2,9 @@ copy ..\..\build-QEditor-Desktop_Qt_5_14_2_MinGW_64_bit-Release\release\QEditor.
 
 windeployqt .\QEditor.exe --dir .\QEditor_windows\
 
+copy ..\zh_CN.qm .\QEditor_windows\
+copy ..\third_party\qssh\lib\QSsh.dll .\QEditor_windows\
+
 copy .\QEditor.exe .\QEditor_windows\
 cd .\QEditor_windows\
 
@@ -24,3 +27,7 @@ del .\imageformats\qtga.dll
 del .\imageformats\qwbmp.dll
 rd /s/q styles
 rd /s/q translations
+
+cd ..
+
+echo Deploy QEditor finished.

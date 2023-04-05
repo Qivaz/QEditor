@@ -124,7 +124,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -lws2_32
 
 include($$PWD/third_party/qssh/QSsh.pri)
 
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 QMAKE_TARGET_PRODUCT = "QEditor"
 QMAKE_TARGET_COMPANY = "Q"
 QMAKE_TARGET_DESCRIPTION = "QEditor"

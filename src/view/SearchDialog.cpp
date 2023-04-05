@@ -264,6 +264,11 @@ void SearchDialog::on_pushButtonFindFindNext_clicked() {
     }
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     auto cursor = searcher_->FindNext(target, editView()->textCursor());
     if (!cursor.isNull()) {
         editView()->setTextCursor(cursor);
@@ -284,6 +289,11 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked() {
     std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     res = searcher_->FindAll(target);
     qDebug() << "Find all finish....";
     int matchCount = 0;
@@ -321,6 +331,11 @@ void SearchDialog::on_pushButtonFindCount_clicked() {
     std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     res = searcher_->FindAll(target);
     auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(res.size()) + tr(" matches in ") +
                 editView()->fileName() + "</font></b>";
@@ -337,6 +352,11 @@ void SearchDialog::on_pushButtonReplaceFindNext_clicked() {
     }
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     auto res = searcher_->FindNext(target, editView()->textCursor());
     if (!res.isNull()) {
         editView()->setTextCursor(res);
@@ -347,6 +367,11 @@ void SearchDialog::on_pushButtonReplaceReplace_clicked() {
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     auto const &text = ui_->lineEditReplaceReplaceWith->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     searcher_->setInfo("");
     searcher_->Replace(target, text, ui_->checkBoxFindBackward->isChecked());
     ui_->labelInfo->setText(searcher_->info());
@@ -360,6 +385,11 @@ void SearchDialog::on_pushButtonReplaceReplaceAll_clicked() {
     auto const &target = ui_->lineEditReplaceFindWhat->text();
     auto const &text = ui_->lineEditReplaceReplaceWith->text();
     InitSetting();
+
+    // Record search string history.
+    MainWindow::Instance().setSearchingString(target);
+    SearchTargets::UpdateTargets(target);
+
     count = searcher_->ReplaceAll(target, text);
     auto info = QString("<b><font color=#67A9FF size=4>") + QString::number(count) +
                 tr(" occurrences were replaced in ") + editView()->fileName() + "</font></b>";
@@ -644,9 +674,6 @@ QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCur
     if (text.isEmpty()) {
         return QTextCursor();
     }
-    // Record search string history.
-    MainWindow::Instance().setSearchingString(text);
-    SearchTargets::UpdateTargets(text);
 
     bool res;
     QTextCursor cursor;

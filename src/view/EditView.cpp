@@ -851,8 +851,8 @@ std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor curs
             return std::make_pair(cursor, false);
         }
 
-        auto doc = document();
-        auto charactor = doc->characterAt(cursor.position());  // Get the char on the right hand of position.
+        const auto &doc = document();
+        const auto charactor = doc->characterAt(cursor.position());  // Get the char on the right hand of position.
         qDebug() << "current char: " << charactor;
         if (charactor == startBracketChar) {
             qDebug() << "Match more start bracket char: " << startBracketChar;
@@ -1279,6 +1279,37 @@ void EditView::mouseReleaseEvent(QMouseEvent *event) {
         }
     }
     QPlainTextEdit::mouseReleaseEvent(event);
+}
+
+void EditView::mouseDoubleClickEvent(QMouseEvent *event) {
+    auto cursor = textCursor();
+    const auto &doc = document();
+    int pos = cursor.position();
+    const auto charactor = doc->characterAt(pos);
+
+    QPlainTextEdit::mouseDoubleClickEvent(event);
+
+    // Select all spaces if double click them.
+    if (charactor == ' ') {
+        // Find left spaces.
+        int leftPos = pos;
+        while (leftPos - 1 >= 0 && doc->characterAt(leftPos - 1) == ' ') {
+            --leftPos;
+        }
+
+        // Find right spaces.
+        int rightPos = pos;
+        while (rightPos + 1 < doc->characterCount() && doc->characterAt(rightPos + 1) == ' ') {
+            ++rightPos;
+        }
+
+        // Select all spaces.
+        cursor.setPosition(leftPos);
+        for (int i = leftPos; i <= rightPos; ++i) {
+            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        }
+        setTextCursor(cursor);
+    }
 }
 
 void EditView::timerEvent(QTimerEvent *event) {

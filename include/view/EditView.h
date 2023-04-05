@@ -182,6 +182,7 @@ class EditView : public QPlainTextEdit {
     void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;

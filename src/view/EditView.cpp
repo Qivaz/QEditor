@@ -828,6 +828,7 @@ void EditView::Jump() {
     }
 }
 
+// The 'cursor' must at outside of brackets, i.e. on the left of '{'/'['/'(' or on the right of '}'/']'/')'.
 std::pair<QTextCursor, bool> EditView::FindPairingBracketCursor(QTextCursor cursor, QTextCursor::MoveOperation direct,
                                                                 const QChar &startBracketChar,
                                                                 const QChar &endBracketChar) {

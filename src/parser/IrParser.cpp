@@ -36,11 +36,23 @@ void IrParser::ParseFuncGraph() {
     auto entryStartPos = entryBlockText.indexOf(entryStart);
     if (entryStartPos == -1) {
         qDebug() << "Invalid ir file.";
-        return;
+        // If no entry info, use the first found subgraph.
+        funcStartCursor = editView_->document()->find(kSubGraphDefStart, funcStartCursor);
+        if (funcStartCursor.isNull()) {
+            return;
+        }
+        const QRegExp subGraphDefName = QRegExp(kSubGraphDefNameRe);
+        auto subgraphDefNameCursor = editView_->document()->find(subGraphDefName, funcStartCursor);
+        auto entrySubgraphName = subgraphDefNameCursor.selectedText();
+        qDebug() << "entryFuncName: " << entrySubgraphName;
+        entryFunc_ = entrySubgraphName;
+
+        funcStartCursor.setPosition(0, QTextCursor::MoveAnchor);
+    } else {
+        auto entryFuncName = entryBlockText.mid(entryStartPos + 1);
+        qDebug() << "entryFuncName: " << entryFuncName;
+        entryFunc_ = entryFuncName;
     }
-    auto entryFuncName = entryBlockText.mid(entryStartPos + 1);
-    qDebug() << "entryFuncName: " << entryFuncName;
-    entryFunc_ = entryFuncName;
 
     while (true) {
         // Match subgraph start, usually 'subgraph attr'.
@@ -388,7 +400,17 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 continue;
             }
             auto opStart = assignOperationPos + assignOperationLen;
-            auto opEnd = startBlockText.indexOf("(", opStart);
+            auto callEnd = startBlockText.lastIndexOf(")");
+            auto callEndCursor = editView_->textCursor();
+            callEndCursor.setPosition(startBlock.position() + callEnd + 1, QTextCursor::MoveAnchor);
+            auto callEndPair = editView_->FindPairingBracketCursor(callEndCursor, QTextCursor::Left, ')', '(');
+            auto opEnd = -1;
+            if (callEndPair.second) {
+                const auto &opEndCursor = callEndPair.first;
+                opEnd = opEndCursor.position() - startBlock.position();
+            } else {
+                opEnd = startBlockText.lastIndexOf("(", opStart);
+            }
             if (opEnd == -1) {
                 startBlock = startBlock.next();
                 continue;

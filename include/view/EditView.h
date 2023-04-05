@@ -226,6 +226,9 @@ class EditView : public QPlainTextEdit {
         return highlighterInvalid_;
     }
 
+    // Select SPACE or TAB when double clicked.
+    void SelectAllSpaces(QTextCursor &cursor, const QChar &charactor, const QChar &space);
+
     TabView *tabView_;
     QWidget *lineNumberArea_;
     int currentBlockNumber_{0};

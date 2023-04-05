@@ -1258,6 +1258,38 @@ void EditView::keyPressEvent(QKeyEvent *event) {
         JumpHint(cursor);
         jumpAvailable_ = true;
     }
+
+    if (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab) {
+        auto cursor = textCursor();
+        if (cursor.hasSelection()) {
+            const auto &firstBlock = document()->findBlock(cursor.selectionStart());
+            auto lastBlock = document()->findBlock(cursor.selectionEnd());
+            bool needInsertPrefix = (firstBlock.blockNumber() != lastBlock.blockNumber());
+            if (needInsertPrefix) {
+                if (event->key() == Qt::Key_Tab) {
+                    // Insert 'tab' spaces before each line.
+                    cursor.beginEditBlock();
+                    for (; firstBlock.blockNumber() <= lastBlock.blockNumber(); lastBlock = lastBlock.previous()) {
+                        cursor.setPosition(lastBlock.position());
+                        cursor.insertText("\t");
+                    }
+                    cursor.endEditBlock();
+                } else {  // event->key() == Qt::Key_Backtab
+                    // Remove 'tab' spaces before each line.
+                    cursor.beginEditBlock();
+                    for (; firstBlock.blockNumber() <= lastBlock.blockNumber(); lastBlock = lastBlock.previous()) {
+                        if (document()->characterAt(lastBlock.position()) == '\t') {
+                            cursor.setPosition(lastBlock.position());
+                            cursor.deleteChar();
+                        }
+                    }
+                    cursor.endEditBlock();
+                }
+                return;
+            }
+        }
+    }
+
     QPlainTextEdit::keyPressEvent(event);
 }
 
@@ -1281,6 +1313,33 @@ void EditView::mouseReleaseEvent(QMouseEvent *event) {
     QPlainTextEdit::mouseReleaseEvent(event);
 }
 
+void EditView::SelectAllSpaces(QTextCursor &cursor, const QChar &charactor, const QChar &spaceChar) {
+    if (charactor != spaceChar) {
+        return;
+    }
+    const auto &doc = document();
+    int pos = cursor.position();
+
+    // Find left spaces.
+    int leftPos = pos;
+    while (leftPos - 1 >= 0 && doc->characterAt(leftPos - 1) == spaceChar) {
+        --leftPos;
+    }
+
+    // Find right spaces.
+    int rightPos = pos;
+    while (rightPos + 1 < doc->characterCount() && doc->characterAt(rightPos + 1) == spaceChar) {
+        ++rightPos;
+    }
+
+    // Select all spaces.
+    cursor.setPosition(leftPos);
+    for (int i = leftPos; i <= rightPos; ++i) {
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+    }
+    setTextCursor(cursor);
+}
+
 void EditView::mouseDoubleClickEvent(QMouseEvent *event) {
     auto cursor = textCursor();
     const auto &doc = document();
@@ -1290,26 +1349,8 @@ void EditView::mouseDoubleClickEvent(QMouseEvent *event) {
     QPlainTextEdit::mouseDoubleClickEvent(event);
 
     // Select all spaces if double click them.
-    if (charactor == ' ') {
-        // Find left spaces.
-        int leftPos = pos;
-        while (leftPos - 1 >= 0 && doc->characterAt(leftPos - 1) == ' ') {
-            --leftPos;
-        }
-
-        // Find right spaces.
-        int rightPos = pos;
-        while (rightPos + 1 < doc->characterCount() && doc->characterAt(rightPos + 1) == ' ') {
-            ++rightPos;
-        }
-
-        // Select all spaces.
-        cursor.setPosition(leftPos);
-        for (int i = leftPos; i <= rightPos; ++i) {
-            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-        }
-        setTextCursor(cursor);
-    }
+    SelectAllSpaces(cursor, charactor, ' ');
+    SelectAllSpaces(cursor, charactor, '\t');
 }
 
 void EditView::timerEvent(QTimerEvent *event) {

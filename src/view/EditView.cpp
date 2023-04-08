@@ -515,31 +515,6 @@ void EditView::SetModified(bool modified) {
     tabView()->UpdateWindowTitle();
 }
 
-void EditView::HandleSelectionChanged() {
-    qDebug();
-    auto text = textCursor().selectedText();
-    if (text != selectedText_) {
-        selectedText_ = std::move(text);
-
-        if (AllowHighlightScrollbar()) {
-            auto &scrollbarInfos = scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryFocus];
-            bool needInvalidate = !scrollbarInfos.empty();
-            scrollbarInfos.clear();
-            if (!selectedText_.isEmpty()) {
-                const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(selectedText_);
-                scrollbarInfos.emplace_back(std::make_pair(lineNums, QColor(0xff00c0c0)));
-                needInvalidate = true;
-            }
-            if (needInvalidate) {
-                setHightlightScrollbarInvalid(true);
-            }
-        }
-
-        highlighterInvalid_ = true;
-    }
-    qDebug() << ", selectedText_: " << selectedText_ << ", highlighterInvalid_: " << highlighterInvalid_;
-}
-
 void EditView::HighlightFocusChars() { HighlightVisibleChars(selectedText_); }
 
 // Hightlight the 'text' only in the visible region.
@@ -652,6 +627,10 @@ void EditView::UpdateStatusBarWithCursor() {
     QString posOrSel;
     if (cursor.hasSelection()) {
         posOrSel = tr("Sel: ") + QString::number(cursor.selectedText().length());
+        if (selectedTextMatchCount_ > 0) {
+            posOrSel += " | ";
+            posOrSel += QString::number(selectedTextMatchCount_);
+        }
     } else {
         posOrSel = tr("Pos: ") + QString::number(cursor.position() + 1);
     }
@@ -665,9 +644,31 @@ void EditView::UpdateStatusBarWithCursor() {
 }
 
 void EditView::HandleCursorPositionChanged() {
-    qDebug();
+    const auto text = textCursor().selectedText();
+    qDebug() << text << selectedText_;
+    if (text != selectedText_) {
+        selectedText_ = std::move(text);
+
+        selectedTextMatchCount_ = 0;
+        if (AllowHighlightScrollbar()) {
+            auto &scrollbarInfos = scrollbarLineInfos()[ScrollBarHighlightCategory::kCategoryFocus];
+            bool needInvalidate = !scrollbarInfos.empty();
+            scrollbarInfos.clear();
+            if (!selectedText_.isEmpty()) {
+                const auto &lineNums = MainWindow::Instance().GetSearcher()->FindAllLineNum(selectedText_);
+                scrollbarInfos.emplace_back(std::make_pair(lineNums, QColor(0xff00c0c0)));
+                selectedTextMatchCount_ = lineNums.size();
+                needInvalidate = true;
+            }
+            if (needInvalidate) {
+                setHightlightScrollbarInvalid(true);
+            }
+        }
+
+        highlighterInvalid_ = true;
+    }
+
     currentBlockNumber_ = textCursor().blockNumber();
-    highlighterInvalid_ = true;
 
     UpdateStatusBarWithCursor();
 
@@ -683,6 +684,8 @@ void EditView::HandleCursorPositionChanged() {
 
     tabView()->RecordStep(this, pos);
 }
+
+void EditView::HandleSelectionChanged() { qDebug() << textCursor().selectedText(); }
 
 void EditView::HandleTextChanged() { qDebug(); }
 

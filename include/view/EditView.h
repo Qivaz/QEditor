@@ -245,6 +245,7 @@ class EditView : public QPlainTextEdit {
     // We not use QSyntaxHighlighter for user interacting, to set false if want quick highlight to work.
     bool highlighterInvalid_{true};
     QString selectedText_;
+    int selectedTextMatchCount_{0};
     TextHighlighter *highlighter_{nullptr};
     QVector<QString> markTexts_;
     const QMap<QString, QString> leftBrackets_ = {{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"}};

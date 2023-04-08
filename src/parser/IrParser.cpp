@@ -41,7 +41,7 @@ void IrParser::ParseFuncGraph() {
         if (funcStartCursor.isNull()) {
             return;
         }
-        const QRegExp subGraphDefName = QRegExp(kSubGraphDefNameRe);
+        const QRegularExpression subGraphDefName = QRegularExpression(kSubGraphDefNameRe);
         auto subgraphDefNameCursor = editView_->document()->find(subGraphDefName, funcStartCursor);
         auto entrySubgraphName = subgraphDefNameCursor.selectedText();
         qDebug() << "entryFuncName: " << entrySubgraphName;
@@ -67,7 +67,7 @@ void IrParser::ParseFuncGraph() {
         if (funcStartCursor.isNull()) {
             break;
         }
-        const QRegExp subGraphDefName = QRegExp(kSubGraphDefNameRe);
+        const QRegularExpression subGraphDefName = QRegularExpression(kSubGraphDefNameRe);
         auto subgraphDefNameCursor = editView_->document()->find(subGraphDefName, funcStartCursor);
         auto subgraphName = subgraphDefNameCursor.selectedText();
         auto subgraphSimpleName = subgraphName.section('.', 0, 0);
@@ -106,7 +106,7 @@ void IrParser::ParseFuncGraph() {
         }
 
         // Find the end of subgraph.
-        const QRegExp subGraphDefEnd = QRegExp(kSubGraphDefEndRe);
+        const QRegularExpression subGraphDefEnd = QRegularExpression(kSubGraphDefEndRe);
         auto funcEndCursor = editView_->document()->find(subGraphDefEnd, returnValueStartCursor);
         if (funcEndCursor.isNull()) {
             Toast::Instance().Show(Toast::kError, QString(tr("Incomplete subgraph @%1")).arg(subgraphName));
@@ -241,7 +241,7 @@ void IrParser::ParseFuncGraph() {
         QString returnValue;
 #if 0
         // Get return value RE1, with 'sequence_nodes'.
-        const QRegExp subGraphReturnValue1 = QRegExp(kSubGraphReturnValueRe1);
+        const QRegularExpression subGraphReturnValue1 = QRegularExpression(kSubGraphReturnValueRe1);
         auto returnValueCursor = editView_->document()->find(subGraphReturnValue1, returnValueStartCursor);
         if (!returnValueCursor.isNull() && returnValueCursor.position() < funcEnd) {
             returnValue = returnValueCursor.selectedText();
@@ -257,7 +257,7 @@ void IrParser::ParseFuncGraph() {
             continue;
         }
         // Get return value RE2, without 'sequence_nodes'.
-        const QRegExp subGraphReturnValue2 = QRegExp(kSubGraphReturnValueRe2);
+        const QRegularExpression subGraphReturnValue2 = QRegularExpression(kSubGraphReturnValueRe2);
         returnValueCursor = editView_->document()->find(subGraphReturnValue2, returnValueStartCursor);
         if (!returnValueCursor.isNull() && returnValueCursor.position() < funcEnd) {
             returnValue = returnValueCursor.selectedText();

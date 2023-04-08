@@ -565,41 +565,43 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
         flag |= QTextDocument::FindFlag::FindWholeWords;
     }
 
-    // Multiple lines. Targets starts with '\n'.
-    if (std::is_same_v<T, QString> && target.isEmpty()) {
-        QTextCursor cursor = startCursor;
-        // Notice that, block.text().length() not includes '\n', but block.length() includes '\n'.
-        auto block = startCursor.block();
-        if (backward) {
-            block = block.previous();
-
-            // If cursor at the block end position, cursor.block() is its next block.
-            if (startCursor.hasSelection() &&
-                (startCursor.selectedText() == '\n' || startCursor.selectedText() == "\u2029")) {
+    if constexpr (std::is_same_v<T, QString>) {
+        // Multiple lines. Targets starts with '\n' if target is empty.
+        if (target.isEmpty()) {
+            QTextCursor cursor = startCursor;
+            // Notice that, block.text().length() not includes '\n', but block.length() includes '\n'.
+            auto block = startCursor.block();
+            if (backward) {
                 block = block.previous();
+
+                // If cursor at the block end position, cursor.block() is its next block.
+                if (startCursor.hasSelection() &&
+                    (startCursor.selectedText() == '\n' || startCursor.selectedText() == "\u2029")) {
+                    block = block.previous();
+                }
             }
-        }
-        if (block.isValid()) {
-            const auto &firstChar = editView()->document()->characterAt(block.position() + block.length() - 1);
-            const auto &lastChar = editView()->document()->characterAt(block.position() + block.length());
-            qDebug() << "firstChar: " << firstChar << ", lastChar: " << lastChar << "block text: " << block.text();
-            if (lastChar == '\0') {  // EOF
-                qDebug() << "Reach end of file.";
-            } else if (firstChar != '\n' && firstChar != "\u2029") {
-                qDebug() << "First Char: " << firstChar << ", Last Char: " << lastChar;
-            } else {
-                qDebug() << "Found \\n";  // Include '\n'
-                // When we get cursor.block(), the block is that where the cursor selectionEnd() stays at.
-                // if (backward) {
-                //     cursor.setPosition(block.position() + block.length(), QTextCursor::MoveAnchor);  // Set position
-                //     after '\n'. cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor); targetCursor =
-                //     cursor;
-                // } else {
-                cursor.setPosition(block.position() + block.length() - 1,
-                                   QTextCursor::MoveAnchor);  // Set position before '\n'.
-                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+            if (block.isValid()) {
+                const auto &firstChar = editView()->document()->characterAt(block.position() + block.length() - 1);
+                const auto &lastChar = editView()->document()->characterAt(block.position() + block.length());
+                qDebug() << "firstChar: " << firstChar << ", lastChar: " << lastChar << "block text: " << block.text();
+                if (lastChar == '\0') {  // EOF
+                    qDebug() << "Reach end of file.";
+                } else if (firstChar != '\n' && firstChar != "\u2029") {
+                    qDebug() << "First Char: " << firstChar << ", Last Char: " << lastChar;
+                } else {
+                    qDebug() << "Found \\n";  // Include '\n'
+                    // When we get cursor.block(), the block is that where the cursor selectionEnd() stays at.
+                    cursor.setPosition(block.position() + block.length() - 1,
+                                       QTextCursor::MoveAnchor);  // Set position before '\n'.
+                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                    targetCursor = cursor;
+                    return true;
+                }
+            }
+        } else {
+            auto cursor = editView()->document()->find(target, startCursor, QTextDocument::FindFlags(flag));
+            if (!cursor.isNull()) {
                 targetCursor = cursor;
-                // }
                 return true;
             }
         }
@@ -678,8 +680,8 @@ QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCur
     bool res;
     QTextCursor cursor;
     if (radioButtonFindRe_) {
-        const QRegExp reTarget = QRegExp(text);
-        res = _Find<QRegExp>(reTarget, startCursor, cursor, backward);
+        const QRegularExpression reTarget = QRegularExpression(text);
+        res = _Find<QRegularExpression>(reTarget, startCursor, cursor, backward);
     } else {
         if (radioButtonFindExtended_) {
             auto extendedText = text;

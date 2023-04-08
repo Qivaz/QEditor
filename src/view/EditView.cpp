@@ -669,9 +669,8 @@ void EditView::HandleCursorPositionChanged() {
                 setHightlightScrollbarInvalid(true);
             }
         }
-
-        highlighterInvalid_ = true;
     }
+    highlighterInvalid_ = true;
 
     currentBlockNumber_ = textCursor().blockNumber();
 
@@ -954,7 +953,7 @@ void EditView::HighlightBrackets(const QTextCursor &leftCursor, const QTextCurso
         }
     }
     QTextEdit::ExtraSelection selection;
-    QColor markColor = QColor(52, 58, 64);  // QColor(60, 60, 90);
+    QColor markColor = QColor(52, 58, 78);  // (52, 58, 64);  // QColor(60, 60, 90);
     selection.format.setBackground(markColor);
     // TODO: Why setFontItalic() not work, but setFontUnderline works ok?
     // selection.format.setFontItalic(true);

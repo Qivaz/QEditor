@@ -216,10 +216,10 @@ class EditView : public QPlainTextEdit {
     void HighlightBrackets(const QTextCursor &leftCursor, const QTextCursor &rightCursor);
 
     void HighlightVisibleChars(const QString &text, const QColor &foreground = QColor(Qt::lightGray),
-                               const QColor &background = QColor(52, 58, 64));  // QColor(54, 54, 100)
+                               const QColor &background = QColor(52, 58, 78));  // (52, 58, 64),  // QColor(54, 54, 100)
     // Return false if too many highlighting times.
     bool HighlightChars(int startPos, int count, const QColor &foreground = QColor(Qt::lightGray),
-                        const QColor &background = QColor(52, 58, 64),  // QColor(54, 54, 100)
+                        const QColor &background = QColor(52, 58, 78),  // (52, 58, 64),  // QColor(54, 54, 100)
                         bool underline = false);
     bool highlighterInvalid() {
         // If mark texts change, or selected text changes.

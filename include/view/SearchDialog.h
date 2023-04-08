@@ -91,6 +91,7 @@ class SearchDialog : public QDialog {
     Searcher *searcher_{nullptr};
 
     QMenu *historyMenu_;
+    QLineEdit *historyLineEdit_{nullptr};
 
     int historyIndex_{-1};
     QString searchInput_;

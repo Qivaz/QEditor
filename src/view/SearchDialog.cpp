@@ -48,9 +48,32 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
         "background-color:rgb(9,71,113);}"
         "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
         "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
+    historyMenu_->installEventFilter(
+        new LambdaEventFilter(historyMenu_, [this](QObject *watched, QEvent *event) -> bool {
+            if (event->type() == QEvent::KeyPress) {
+                auto keyEvent = static_cast<QKeyEvent *>(event);
+                if (keyEvent->key() != Qt::Key_Up && keyEvent->key() != Qt::Key_Down) {
+                    auto historyMenu = qobject_cast<QMenu *>(watched);
+                    historyMenu->clear();
+                    historyMenu->hide();
+                    if (historyLineEdit_ != nullptr) {
+                        qDebug() << historyLineEdit_ << event->type();
+                        historyLineEdit_->setFocus();
+
+                        // Simulate the key event once, after history menu discard.
+                        QKeyEvent *newKeyEvent =
+                            new QKeyEvent(keyEvent->type(), keyEvent->key(), keyEvent->modifiers(), keyEvent->text());
+                        QCoreApplication::postEvent(historyLineEdit_, newKeyEvent);
+                    }
+                    return true;
+                }
+            }
+            return false;  // Must return false.
+        }));
 
     ui_->tabWidget->setCurrentIndex(index);
     auto historyLambda = [this](QObject *watched, QEvent *event) -> bool {
+        qDebug() << watched << event->type();
         if (event->type() == QEvent::MouseButtonDblClick) {
             auto watchedLineEdit = qobject_cast<QLineEdit *>(watched);
             if (!watchedLineEdit->hasFocus()) {
@@ -83,6 +106,7 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
             auto centerPos = watchedLineEdit->mapToGlobal(watchedLineEdit->pos());
             constexpr auto padding = 5;
             historyMenu_->popup(QPoint(centerPos.x() - size.width() / 2 + padding, centerPos.y() + size.height() / 2));
+            historyLineEdit_ = watchedLineEdit;
         } else if (event->type() == QEvent::KeyPress) {
             historyMenu_->hide();
             auto watchedLineEdit = qobject_cast<QLineEdit *>(watched);
@@ -124,6 +148,9 @@ SearchDialog::SearchDialog(QWidget *parent, int index)
                 historyIndex_ = -1;
                 searchInput_.clear();
             }
+        } else if (event->type() == QEvent::InputMethod) {
+            historyMenu_->clear();
+            historyMenu_->hide();
         }
         return false;  // Must return false.
     };

@@ -299,10 +299,8 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
     }
     sessionItem->setToolTip(0, title);
     sessionItem->setText(0, html);
-    QCoreApplication::processEvents();
     expandItem(sessionItem);
     setCurrentItem(sessionItem);
-    QCoreApplication::processEvents();
 
     // Update header's total result count.
     auto info = QString::number(topItem()->childCount()) + tr(" results:");
@@ -312,6 +310,5 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
 
     // header()->resizeSection(0, minimumWidth());
     resizeColumnToContents(0);
-    QCoreApplication::processEvents();
 }
 }  // namespace QEditor

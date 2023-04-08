@@ -21,6 +21,7 @@
 #include "MainTabView.h"
 #include "SearchResultList.h"
 #include <QDialog>
+#include <QProgressDialog>
 
 namespace Ui {
 class UISearchDialog;
@@ -104,7 +105,8 @@ class Searcher : public QObject {
     QTextCursor FindNext(const QString &text, const QTextCursor &startCursor);
     QTextCursor FindPrevious(const QString &text, const QTextCursor &startCursor);
 
-    std::vector<QTextCursor> FindAll(const QString &target);
+    std::vector<QTextCursor> FindAll(const QString &target,
+                                     std::function<bool(int)> progressCallback = std::function<bool(int)>());
     std::vector<int> FindAllLineNum(const QString &target);
 
     void Replace(const QString &target, const QString &text, bool backward);

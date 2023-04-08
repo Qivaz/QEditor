@@ -49,7 +49,7 @@ class SearchResultList : public QTreeWidget {
     QTreeWidgetItem *StartSearchSession(EditView *editView);
     void AddSearchResult(QTreeWidgetItem *sessionItem, const int lineNum, const QString &htmlText,
                          const QString &plainText, const QTextCursor &cursor);
-    void FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount);
+    void FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount, bool finished = true);
 
     void HandleItemDoubleClicked(QTreeWidgetItem *item, int column);
     void HandleItemClicked(QTreeWidgetItem *item, int column);

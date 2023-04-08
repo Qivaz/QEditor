@@ -286,7 +286,6 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked() {
 
     auto sessionItem = searchResultList_->StartSearchSession(editView());
     qDebug() << "Find all start....";
-    std::vector<QTextCursor> res;
     auto const &target = ui_->lineEditFindFindWhat->text();
     InitSetting();
 
@@ -294,13 +293,35 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked() {
     MainWindow::Instance().setSearchingString(target);
     SearchTargets::UpdateTargets(target);
 
-    res = searcher_->FindAll(target);
+    QProgressDialog progressDialog(this);
+    progressDialog.setMinimumWidth(540);
+    progressDialog.setCancelButtonText(tr("&Cancel"));
+
+    constexpr auto findProgressValue = 60;
+    constexpr auto addListProgressValue = 35;
+    constexpr auto finishProgressValue = 5;
+    constexpr auto maxProgressValue = findProgressValue + addListProgressValue + finishProgressValue;
+    progressDialog.setWindowTitle(tr("Finding all positions..."));
+    progressDialog.setRange(0, maxProgressValue);
+    std::vector<QTextCursor> findResult = searcher_->FindAll(target, [&progressDialog](int progress) {
+        if (progressDialog.wasCanceled()) {
+            return false;
+        }
+        progressDialog.setValue(findProgressValue * progress / maxProgressValue);
+        QCoreApplication::processEvents();
+        return true;
+    });
     qDebug() << "Find all finish....";
-    int matchCount = 0;
 
     // TODO:
     // To support display dynamic visible list items, and do fetchMore for user scrolling.
-    for (const auto &item : res) {
+    progressDialog.setWindowTitle(tr("Preparing result list..."));
+    for (size_t i = 0; i < findResult.size(); ++i) {
+        if (progressDialog.wasCanceled()) {
+            searchResultList_->FinishSearchSession(sessionItem, target, i, false);
+            return;
+        }
+        const auto &item = findResult[i];
         qDebug() << "Display item start....";
         const auto currentBlock = item.block();
         int lineNum = item.blockNumber();
@@ -317,11 +338,15 @@ void SearchDialog::on_pushButtonFindFindAllInCurrent_clicked() {
                         QString("<span style=\"font-size:14px;font-family:Consolas;color:#2891AF\">") +
                         QString::number(lineNum + 1) + QString("</span>") + ":  " + escapedStr + QString("</div>");
         qDebug() << "Line " << lineNum << ": text: " << htmlText;
-        ++matchCount;
         searchResultList_->AddSearchResult(sessionItem, lineNum, htmlText, plainText, item);
+        progressDialog.setValue(findProgressValue + addListProgressValue * (i + 1) / findResult.size());
+        QCoreApplication::processEvents();
         qDebug() << "Display item end....";
     }
-    searchResultList_->FinishSearchSession(sessionItem, target, matchCount);
+    progressDialog.setWindowTitle(tr("Showing results in list..."));
+    searchResultList_->FinishSearchSession(sessionItem, target, findResult.size());
+    progressDialog.setValue(maxProgressValue);
+    QCoreApplication::processEvents();
 }
 
 void SearchDialog::on_pushButtonFindCount_clicked() {
@@ -696,31 +721,43 @@ QTextCursor Searcher::_FindNext(const QString &text, const QTextCursor &startCur
     }
 
     if (res) {
-        qDebug() << "SearchDialog::on_pushButtonFindFindNext_clicked, found " << text;
+        qDebug() << "Found: " << text << ", pos: " << cursor.position();
         return cursor;
     } else {
-        qDebug() << "SearchDialog::on_pushButtonFindFindNext_clicked, not found " << text;
+        qDebug() << "Not found: " << text;
         return QTextCursor();
     }
 }
 
-std::vector<QTextCursor> Searcher::FindAll(const QString &target) {
+std::vector<QTextCursor> Searcher::FindAll(const QString &target, std::function<bool(int)> progressCallback) {
     std::vector<QTextCursor> cursors;
     if (editView() == nullptr) {
         return cursors;
     }
+    setCheckBoxFindBackward(false);
+    setCheckBoxFindWrapAround(false);
     QTextCursor savedCursor = editView()->textCursor();
     QTextCursor cursor = editView()->textCursor();
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     int firstStart = -1;
     while (true) {
-        cursor = FindNext(target, cursor);
+        cursor = _FindNext(target, cursor, false);
         if (!cursor.isNull()) {
             if (cursor.selectionStart() == firstStart) {
                 break;
             }
             if (firstStart == -1) {
                 firstStart = cursor.selectionStart();
+            }
+            if (progressCallback) {
+                constexpr long long maxProgressValue = 100;
+                int progress = maxProgressValue * cursor.position() / editView()->document()->characterCount();
+                auto success = progressCallback(progress);
+                qDebug() << "progress: " << progress << ", pos: " << cursor.position()
+                         << ", count: " << editView()->document()->characterCount();
+                if (!success) {
+                    break;
+                }
             }
             cursors.emplace_back(cursor);
         } else {

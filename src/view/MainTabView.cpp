@@ -162,7 +162,7 @@ void TabView::HandleTabBarClicked(int index) {
             menu_->addAction(copyPathAction);
             connect(copyPathAction, &QAction::triggered, this, [filePath]() {
                 QClipboard *clipboard = QGuiApplication::clipboard();
-                clipboard->setText(filePath);
+                clipboard->setText(QDir::toNativeSeparators(filePath));
             });
             menu_->popup(QCursor::pos());
 

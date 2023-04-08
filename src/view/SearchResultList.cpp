@@ -161,7 +161,6 @@ bool SearchResultList::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
         auto item = itemAt(helpEvent->pos());
-        qDebug() << helpEvent->pos();
         if (item != nullptr) {
             qDebug() << item->toolTip(0);
             QToolTip::showText(helpEvent->globalPos(), item->toolTip(0));
@@ -218,6 +217,9 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event) {
     QAction *clearSelectedItemAction = new QAction(tr("Clear Selected"));
     connect(clearSelectedItemAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
+        if (item == nullptr) {
+            return;
+        }
         if (item->parent() != nullptr) {
             item->parent()->removeChild(item);
         }
@@ -226,6 +228,9 @@ void SearchResultList::contextMenuEvent(QContextMenuEvent *event) {
     QAction *clearSelectedResultAction = new QAction(tr("Clear Containing Result"));
     connect(clearSelectedResultAction, &QAction::triggered, this, [&event, this]() {
         auto item = itemAt(event->pos());
+        if (item == nullptr) {
+            return;
+        }
         qDebug() << "item: " << item->toolTip(0);
         while (item->parent() != topItem()) {
             item = item->parent();
@@ -262,7 +267,8 @@ QTreeWidgetItem *SearchResultList::StartSearchSession(EditView *editView) {
     editView_ = editView;
     const QString &title = editView->fileName();
     SearchResultItem *sessionItem = new SearchResultItem();
-    sessionItem->setText(0, title);
+    sessionItem->setText(0, QString("<div style=\"font-size:14px;font-family:Consolas;color:#E3CEAB\">") +
+                                tr("Searching ") + title + QString("</div>"));
     topItem()->insertChild(0, sessionItem);
     return sessionItem;
 }
@@ -278,17 +284,25 @@ void SearchResultList::AddSearchResult(QTreeWidgetItem *sessionItem, const int l
     sessionItem->addChild(searchItem);
 }
 
-void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount) {
+void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const QString &target, int matchCount,
+                                           bool finished) {
     // Update current session's search info.
-    const auto name = sessionItem->text(0);
+    const QString &fileName = editView_->fileName();
     const auto title =
-        name + " " + QString(tr("(Search ")) + "\"" + target + "\": " + QString::number(matchCount) + tr(" hits)");
-    const auto html =
+        fileName + " " + QString(tr("(Search ")) + "\"" + target + "\": " + QString::number(matchCount) + tr(" hits)");
+    auto html =
         QString("<div style=\"font-size:14px;font-family:Consolas;color:#E3CEAB\">") + title + QString("</div>");
+    if (!finished) {
+        html += QString("<div style=\"font-size:14px;font-family:Consolas;color:#FFA0A0\">");
+        html += tr("[Suspended]");
+        html += QString("</div>");
+    }
     sessionItem->setToolTip(0, title);
     sessionItem->setText(0, html);
+    QCoreApplication::processEvents();
     expandItem(sessionItem);
     setCurrentItem(sessionItem);
+    QCoreApplication::processEvents();
 
     // Update header's total result count.
     auto info = QString::number(topItem()->childCount()) + tr(" results:");
@@ -298,5 +312,6 @@ void SearchResultList::FinishSearchSession(QTreeWidgetItem *sessionItem, const Q
 
     // header()->resizeSection(0, minimumWidth());
     resizeColumnToContents(0);
+    QCoreApplication::processEvents();
 }
 }  // namespace QEditor

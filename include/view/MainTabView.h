@@ -45,6 +45,7 @@ class TabView : public QTabWidget {
     bool TabCloseMaybeSave();
     bool TabCloseMaybeSaveInner(EditView *editView);
     bool TabForceClose();
+    bool TabForceCloseInner(EditView *editView);
 
     void AutoStore();
     bool AutoLoad();

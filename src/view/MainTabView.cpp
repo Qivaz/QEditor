@@ -138,19 +138,59 @@ void TabView::HandleTabBarClicked(int index) {
         connect(closeAction, &QAction::triggered, this, &TabView::TabCloseMaybeSave);
         menu_->popup(QCursor::pos());
 
+        QAction *closeOtherAction = new QAction(tr("Close Other"));
+        menu_->addAction(closeOtherAction);
+        connect(closeOtherAction, &QAction::triggered, this, [this, index]() {
+            for (int i = count() - 1; i >= 0; --i) {
+                if (index == i) {
+                    continue;
+                }
+                auto textView = GetEditView(i);
+                if (textView == nullptr) {
+                    continue;
+                }
+                TabCloseMaybeSaveInner(textView);
+            }
+        });
+        menu_->popup(QCursor::pos());
+
+        QAction *closeAllAction = new QAction(tr("Close All"));
+        menu_->addAction(closeAllAction);
+        connect(closeAllAction, &QAction::triggered, this, [this]() {
+            for (int i = count() - 1; i >= 0; --i) {
+                auto textView = GetEditView(i);
+                if (textView == nullptr) {
+                    continue;
+                }
+                TabCloseMaybeSaveInner(textView);
+            }
+        });
+        menu_->popup(QCursor::pos());
+
         QAction *forceCloseAction = new QAction(tr("Force Close  (Double Click)"));
         menu_->addAction(forceCloseAction);
         connect(forceCloseAction, &QAction::triggered, this, &TabView::TabForceClose);
         menu_->popup(QCursor::pos());
 
-        QAction *closeAllAction = new QAction(tr("Force Close All"));
-        menu_->addAction(closeAllAction);
-        connect(closeAllAction, &QAction::triggered, this, [&]() { clear(); });
+        QAction *forceCloseOtherAction = new QAction(tr("Force Close Other"));
+        menu_->addAction(forceCloseOtherAction);
+        connect(forceCloseOtherAction, &QAction::triggered, this, [this, index]() {
+            for (int i = count() - 1; i >= 0; --i) {
+                if (index == i) {
+                    continue;
+                }
+                auto textView = GetEditView(i);
+                if (textView == nullptr) {
+                    continue;
+                }
+                TabForceCloseInner(textView);
+            }
+        });
         menu_->popup(QCursor::pos());
 
-        QAction *closeOtherAction = new QAction(tr("Force Close Other"));
-        menu_->addAction(closeOtherAction);
-        connect(closeOtherAction, &QAction::triggered, this, [&]() { clear(); });
+        QAction *forceCloseAllAction = new QAction(tr("Force Close All"));
+        menu_->addAction(forceCloseAllAction);
+        connect(forceCloseAllAction, &QAction::triggered, this, [&]() { clear(); });
         menu_->popup(QCursor::pos());
 
         auto editView = GetEditView(index);
@@ -320,10 +360,11 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView) {
             DeleteWidget(editView);
             return true;
         }
-        QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName),
-                               tr("The document has been modified.\n"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
+        QString text = tr("The document '%1' has been modified.\n"
+                          "Do you want to save your changes?")
+                           .arg(editView->fileName());
+        QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName), text,
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, editView);
         warningBox.setButtonText(QMessageBox::Save, tr("Save"));
         warningBox.setButtonText(QMessageBox::Discard, tr("Discard"));
         warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
@@ -348,15 +389,22 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView) {
 bool TabView::TabForceClose() {
     // Close without save.
     auto currentEditView = CurrentEditView();
-    if (currentEditView != nullptr) {
-        openFiles().remove(currentEditView->filePath());  // Just force remove.
-        if (currentEditView->newFileNum() != 0) {
-            NewFileNum::SetNumber(currentEditView->newFileNum(), false);
-        }
-        DeleteWidget(currentEditView);
-    } else {
+    if (!TabForceCloseInner(currentEditView)) {
         DeleteWidget(currentWidget());
     }
+    return true;
+}
+
+bool TabView::TabForceCloseInner(EditView *editView) {
+    // Close without save.
+    if (editView == nullptr) {
+        return false;
+    }
+    openFiles().remove(editView->filePath());  // Just force remove.
+    if (editView->newFileNum() != 0) {
+        NewFileNum::SetNumber(editView->newFileNum(), false);
+    }
+    DeleteWidget(editView);
     return true;
 }
 

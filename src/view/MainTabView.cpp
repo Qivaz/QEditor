@@ -148,6 +148,11 @@ void TabView::HandleTabBarClicked(int index) {
         connect(closeAllAction, &QAction::triggered, this, [&]() { clear(); });
         menu_->popup(QCursor::pos());
 
+        QAction *closeOtherAction = new QAction(tr("Force Close Other"));
+        menu_->addAction(closeOtherAction);
+        connect(closeOtherAction, &QAction::triggered, this, [&]() { clear(); });
+        menu_->popup(QCursor::pos());
+
         auto editView = GetEditView(index);
         if (editView != nullptr) {
             menu_->addSeparator();

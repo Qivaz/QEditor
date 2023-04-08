@@ -19,6 +19,15 @@
 
 namespace QEditor {
 QStringList FileEncoding::encodingNameList_ = {
+    "System",
+    "UTF-8",  // Move
+    "UTF-8 BOM",
+    "UTF-16BE",  // Move
+    "UTF-16LE",  // Move
+    "UTF-16",    // Move
+    "UTF-32",    // Move
+    "UTF-32BE",  // Move
+    "UTF-32LE",  // Move
     "US-ASCII",
     "ISO-8859-1",
     "ISO-8859-2",
@@ -33,7 +42,7 @@ QStringList FileEncoding::encodingNameList_ = {
     "ISO-2022-JP-1",
     "Shift_JIS",
     "EUC-JP",
-    //    "US-ASCII",
+    // "US-ASCII",
     "EUC-KR",
     "ISO-2022-KR",
     "EUC-KR",
@@ -46,23 +55,23 @@ QStringList FileEncoding::encodingNameList_ = {
     "ISO-8859-8",
     "ISO-2022-CN",
     "ISO-2022-CN-EXT",
-    "UTF-8",
+    // "UTF-8",
     "ISO-8859-13",
     "ISO-8859-14",
     "ISO-8859-15",
     "GBK",
     "GB18030",
-    "UTF-16",
-    "UTF-32",
+    "UCS-2",
+    "UCS-4",
     "SCSU",
     "UTF-7",
-    "UTF-16BE",
-    "UTF-16LE",
-    "UTF-16",
+    // "UTF-16BE",
+    // "UTF-16LE",
+    // "UTF-16",
     "CESU-8",
-    "UTF-32",
-    "UTF-32BE",
-    "UTF-32LE",
+    // "UTF-32",
+    // "UTF-32BE",
+    // "UTF-32LE",
     "BOCU-1",
     "hp-roman8",
     "Adobe-Standard-Encoding",
@@ -133,6 +142,15 @@ QStringList FileEncoding::encodingNameList_ = {
 
 // {name, MIB number}
 QMap<QString, int> FileEncoding::encodingNameToMib_ = {
+    {"System", 0},
+    {"UTF-8", 106},  // Move
+    {"UTF-8 BOM", 106},
+    {"UTF-16BE", 1013},  // Move
+    {"UTF-16LE", 1014},  // Move
+    {"UTF-16", 1015},    // Move
+    {"UTF-32", 1017},    // Move
+    {"UTF-32BE", 1018},  // Move
+    {"UTF-32LE", 1019},  // Move
     {"US-ASCII", 3},
     {"ISO-8859-1", 4},
     {"ISO-8859-2", 5},
@@ -147,7 +165,7 @@ QMap<QString, int> FileEncoding::encodingNameToMib_ = {
     {"ISO-2022-JP-1", 16},
     {"Shift_JIS", 17},
     {"EUC-JP", 18},
-    //    {"US-ASCII",	30},
+    // {"US-ASCII",	30},
     {"EUC-KR", 36},
     {"ISO-2022-KR", 37},
     {"EUC-KR", 38},
@@ -160,23 +178,23 @@ QMap<QString, int> FileEncoding::encodingNameToMib_ = {
     {"ISO-8859-8", 85},
     {"ISO-2022-CN", 104},
     {"ISO-2022-CN-EXT", 105},
-    {"UTF-8", 106},
+    // {"UTF-8", 106},
     {"ISO-8859-13", 109},
     {"ISO-8859-14", 110},
     {"ISO-8859-15", 111},
     {"GBK", 113},
     {"GB18030", 114},
-    {"UTF-16", 1000},
-    {"UTF-32", 1001},
+    {"UCS-2", 1000},
+    {"UCS-4", 1001},
     {"SCSU", 1011},
     {"UTF-7", 1012},
-    {"UTF-16BE", 1013},
-    {"UTF-16LE", 1014},
-    {"UTF-16", 1015},
+    // {"UTF-16BE", 1013},
+    // {"UTF-16LE", 1014},
+    // {"UTF-16", 1015},
     {"CESU-8", 1016},
-    {"UTF-32", 1017},
-    {"UTF-32BE", 1018},
-    {"UTF-32LE", 1019},
+    // {"UTF-32", 1017},
+    // {"UTF-32BE", 1018},
+    // {"UTF-32LE", 1019},
     {"BOCU-1", 1020},
     {"hp-roman8", 2004},
     {"Adobe-Standard-Encoding", 2005},

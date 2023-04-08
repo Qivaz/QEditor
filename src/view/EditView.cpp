@@ -421,6 +421,10 @@ bool EditView::SaveFile(const QString &filePath) {
     QSaveFile file(filePath);
     if (file.open(QFile::WriteOnly | QFile::Text)) {
         QTextStream out(&file);
+        if (fileEncoding().hasBom()) {
+            out.setGenerateByteOrderMark(true);
+        }
+        out.setCodec(fileEncoding().codec());
         out << toPlainText();
         if (!file.commit()) {
             errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(filePath), file.errorString());

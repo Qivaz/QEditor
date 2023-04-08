@@ -1313,8 +1313,8 @@ void MainWindow::HandleEncodingChanged(int index) {
         Toast::Instance().Show(Toast::kError, tr("Can't convert the encoding since the text is modified."));
         return;
     }
-    auto mib = FileEncoding::GetMibByName(encoding_->currentText());
-    auto fileEncoding = FileEncoding(mib);
+
+    auto fileEncoding = FileEncoding(encoding_->currentText());
     qDebug() << "currentText: " << encoding_->currentText() << ", itemText: " << encoding_->itemText(index)
              << ", new mib: " << fileEncoding.hasBom() << fileEncoding.mibEnum()
              << ", current mib: " << editView->fileEncoding().hasBom() << editView->fileEncoding().mibEnum();

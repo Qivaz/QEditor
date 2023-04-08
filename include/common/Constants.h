@@ -64,6 +64,8 @@ constexpr auto kMaxParseCharNum = 9000000;
 constexpr auto kMaxHighlightScrollbarFileSize = 5000000;  // ~15M
 constexpr auto kMaxHighlightScrollbarLineNum = 10000;
 constexpr auto kMaxHighlightScrollbarCharNum = 1000000;
+
+constexpr auto kCodecMibBom = "BOM";
 }  // namespace Constants
 }  // namespace QEditor
 

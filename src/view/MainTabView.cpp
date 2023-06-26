@@ -364,7 +364,7 @@ bool TabView::TabCloseMaybeSaveInner(EditView *editView) {
                           "Do you want to save your changes?")
                            .arg(editView->fileName());
         QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName), text,
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, editView);
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, nullptr);
         warningBox.setButtonText(QMessageBox::Save, tr("Save"));
         warningBox.setButtonText(QMessageBox::Discard, tr("Discard"));
         warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));

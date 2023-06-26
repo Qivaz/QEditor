@@ -483,7 +483,7 @@ bool EditView::MaybeSave() {
                       "Do you want to save your changes?")
                        .arg(fileName());
     QMessageBox warningBox(QMessageBox::Question, tr(Constants::kAppName), text,
-                           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
+                           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, nullptr);
     warningBox.setButtonText(QMessageBox::Save, tr("Save"));
     warningBox.setButtonText(QMessageBox::Discard, tr("Discard"));
     warningBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
@@ -693,10 +693,7 @@ void EditView::HandleSelectionChanged() { qDebug() << textCursor().selectedText(
 
 void EditView::HandleTextChanged() { qDebug(); }
 
-void EditView::HandleContentsChanged() {
-    qDebug();
-    ;
-}
+void EditView::HandleContentsChanged() { qDebug(); }
 
 void EditView::HandleContentsChange(int from, int charsRemoved, int charsAdded) {
     qDebug() << "@" << from << ", +" << charsAdded << ", -" << charsRemoved;

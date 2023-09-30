@@ -56,7 +56,6 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     ReadSettings();
 
 #ifndef QT_NO_SESSIONMANAGER
-    QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &MainWindow::HandleCommitData);
 #endif
 
@@ -291,7 +290,7 @@ void MainWindow::CreateActions() {
 
     const QIcon unmarkAllIcon = QIcon::fromTheme("select-unmark-all", QIcon(":/images/eraser.svg"));
     QAction *unmarkAllAct = new QAction(unmarkAllIcon, tr("&Unmark All"), this);
-    auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+    auto unmarkAllKeySeq = QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_F8);
     unmarkAllAct->setShortcut(unmarkAllKeySeq);
     unmarkAllAct->setStatusTip(tr("Mark"));
     connect(unmarkAllAct, &QAction::triggered, this, &MainWindow::UnmarkAll);
@@ -1059,7 +1058,7 @@ void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow) {
         textOption.setFlags(QTextOption::ShowTabsAndSpaces | QTextOption::ShowLineAndParagraphSeparators |
                             QTextOption::ShowDocumentTerminator);
     } else {
-        textOption.setFlags(0);
+        textOption.setFlags(QTextOption::Flag(0));
     }
     for (int i = 0; i < tabView()->count(); ++i) {
         auto textView = tabView()->GetEditView(i);

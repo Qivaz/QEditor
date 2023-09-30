@@ -24,6 +24,7 @@
 
 namespace QEditor {
 class FunctionHierarchy : public QGraphicsView {
+    Q_OBJECT
    public:
     FunctionHierarchy(IParser *parser = new DummyParser(), QWidget *parent = nullptr);
 

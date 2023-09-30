@@ -3,9 +3,9 @@
 namespace QEditor {
 Diff::Diff() {}
 
-void Diff::Impose(const QString &before, const QString &after) { diffs_ = diffMatchPatch_.diff_main(before, after); }
+void Diff::Impose(const QString &before, const QString &after) { diffs_ = diffMatchPatch_.diff_main(before.toStdString(), after.toStdString()); }
 
-QString Diff::ToHtml() { return diffMatchPatch_.diff_prettyHtml(diffs_); }
+QString Diff::ToHtml() { return QString::fromStdString(diffMatchPatch_.diff_prettyHtml(diffs_)); }
 
 QList<FormattedText> Diff::ToFormattedText() {
     QString text;
@@ -15,24 +15,24 @@ QList<FormattedText> Diff::ToFormattedText() {
     constexpr auto line_feed = "\n";
     const auto line_feed_len = strlen(line_feed);
     foreach(_Diff aDiff, diffs_) {
-        text = aDiff.text;
+        text = QString::fromStdString(aDiff.text);
         qDebug() << "diff text: " << text << ", op: " << aDiff.operation;
         switch (aDiff.operation) {
-            case DELETE: {
+            case diff_match_patch<QString>::DELETE: {
                 FormattedText oldFt;
                 oldFt.text_ = text;
                 oldFt.format_.setForeground(kOldFgColor);
                 oldFts << oldFt;
                 break;
             }
-            case INSERT: {
+            case diff_match_patch<QString>::INSERT: {
                 FormattedText newFt;
                 newFt.text_ = text;
                 newFt.format_.setForeground(kNewFgColor);
                 newFts << newFt;
                 break;
             }
-            case EQUAL: {
+            case diff_match_patch<QString>::EQUAL: {
                 // Find \n from start.
                 auto pos = text.indexOf(line_feed);
                 if (pos != -1) {
@@ -141,7 +141,7 @@ QString Diff::ToLineHtml() {
     constexpr auto html_line_feed = "&para;<br>";
     const auto html_line_feed_len = strlen(html_line_feed);
     foreach(_Diff aDiff, diffs_) {
-        text = aDiff.text;
+        text = QString::fromStdString(aDiff.text);
         qDebug() << "diff text: " << text << ", op: " << aDiff.operation;
         text.replace("&", "&amp;")
             .replace("<", "&lt;")
@@ -149,13 +149,13 @@ QString Diff::ToLineHtml() {
             .replace("\u0020", "&nbsp;")
             .replace("\n", html_line_feed);
         switch (aDiff.operation) {
-            case DELETE:
+            case diff_match_patch<QString>::DELETE:
                 oldHtml += QString("<font color=\"red\">") + text + QString("</font>");
                 break;
-            case INSERT:
+            case diff_match_patch<QString>::INSERT:
                 newHtml += QString("<font color=\"green\">") + text + QString("</font>");
                 break;
-            case EQUAL:
+            case diff_match_patch<QString>::EQUAL:
                 // Find \n from start.
                 auto pos = text.indexOf(html_line_feed);
                 if (pos != -1) {

@@ -26,6 +26,7 @@
 namespace QEditor {
 // https://stackoverflow.com/questions/1956542/how-to-make-item-view-render-rich-html-text-in-qt
 class HtmlDelegate : public QStyledItemDelegate {
+    Q_OBJECT
    public:
     HtmlDelegate() = default;
     ~HtmlDelegate() = default;

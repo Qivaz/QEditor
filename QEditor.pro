@@ -1,6 +1,8 @@
 QT += widgets network
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 CONFIG += c++17
 CONFIG += resources_big
+CONFIG += debug
 DEFINES += QT_MESSAGELOGCONTEXT
 requires(qtConfig(filedialog))
 
@@ -18,7 +20,8 @@ HEADERS       = \
     include/common/Settings.h \
     include/common/SingleApp.h \
     include/common/Utils.h \
-    include/diff/diff_match_patch/diff_match_patch.h \
+    include/diff/diff_match_patch_stl.h \
+#    include/diff/diff_match_patch/diff_match_patch.h \
     include/diff/Diff.h \
     include/file/FileEncoding.h \
     include/file/FileRecorder.h \
@@ -61,7 +64,7 @@ SOURCES       = \
     src/Entry.cpp \
     src/common/Constants.cpp \
     src/common/Settings.cpp \
-    src/diff/diff_match_patch/diff_match_patch.cpp \
+#    src/diff/diff_match_patch/diff_match_patch.cpp \
     src/diff/Diff.cpp \
     src/file/FileEncoding.cpp \
     src/file/FileRecorder.cpp \
@@ -121,10 +124,11 @@ INCLUDEPATH += \
 
 win32:CONFIG(release, debug|release): LIBS += -lws2_32
 else:win32:CONFIG(debug, debug|release): LIBS += -lws2_32
-
 include($$PWD/third_party/qssh/QSsh.pri)
 
-VERSION = "0.0.5"
+INCLUDEPATH += $$PWD/third_party/pybind11/pybind11-v2.10.4/include/pybind11
+
+VERSION = "0.0.6"
 QMAKE_TARGET_PRODUCT = "QEditor"
 QMAKE_TARGET_COMPANY = "Q"
 QMAKE_TARGET_DESCRIPTION = "QEditor"

@@ -23,7 +23,7 @@
 namespace QEditor {
 DockView::DockView(QWidget *parent) : QDockWidget(parent) {
     QPalette pal;
-    pal.setColor(QPalette::Background, QColor(28, 28, 28));
+    pal.setColor(QPalette::Window, QColor(28, 28, 28));
     setAutoFillBackground(true);
     setPalette(pal);
 

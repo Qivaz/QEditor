@@ -36,6 +36,7 @@ namespace QEditor {
 // };
 
 class RemoteExplorerTreeView : public QTreeView {
+    Q_OBJECT
    public:
     RemoteExplorerTreeView(QWidget *parent = nullptr, const QString &rootPath = QString());
     ~RemoteExplorerTreeView() = default;

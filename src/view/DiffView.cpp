@@ -43,7 +43,8 @@ void DiffHtmlView::wheelEvent(QWheelEvent *event) {
         return;
     }
 
-    if (event->delta() > 0) {
+    if ((!event->pixelDelta().isNull() && event->pixelDelta().y() > 0) ||
+        (!event->angleDelta().isNull() && event->angleDelta().y() > 0)) {
         ZoomIn();
     } else {
         ZoomOut();

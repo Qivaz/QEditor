@@ -501,13 +501,13 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
         qDebug() << "start: " << start << firstChar << ", end: " << end << lastChar
                  << ", selection: " << cursor.selectedText();
         if (target.length() > 1) {                             // Multiple lines, not one line.
-            if (firstChar == '\n' || firstChar == "\u2029") {  // Multiple lines target. Starts with '\n'.
+            if (firstChar == '\n' || firstChar == QChar(0x2029)) {  // Multiple lines target. Starts with '\n'.
                 ++count;                                       // Include '\n'
             } else {
                 // Check if ends with '\n'.
                 if (lastChar == '\0') {  // EOF
                     qDebug() << "Reach end of file.";
-                } else if (lastChar != '\n' && lastChar != "\u2029") {
+                } else if (lastChar != '\n' && lastChar != QChar(0x2029)) {
                     qDebug() << "lastChar: " << lastChar;
                     int newStart;
                     if (backward) {
@@ -528,7 +528,7 @@ bool Searcher::_Find(const QStringList &target, const QTextCursor &startCursor, 
         auto block = cursor.block();
         bool match = true;
         // If multiple lines target && starts with '\n', use current block firstly.
-        if (firstChar != '\n' && firstChar != "\u2029") {
+        if (firstChar != '\n' && firstChar != QChar(0x2029)) {
             block = block.next();
         }
         for (int i = 1; i < target.length() - 1; ++i) {
@@ -638,7 +638,7 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
                 qDebug() << "firstChar: " << firstChar << ", lastChar: " << lastChar << "block text: " << block.text();
                 if (lastChar == '\0') {  // EOF
                     qDebug() << "Reach end of file.";
-                } else if (firstChar != '\n' && firstChar != "\u2029") {
+                } else if (firstChar != '\n' && firstChar != QChar(0x2029)) {
                     qDebug() << "First Char: " << firstChar << ", Last Char: " << lastChar;
                 } else {
                     qDebug() << "Found \\n";  // Include '\n'

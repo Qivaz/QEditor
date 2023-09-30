@@ -31,6 +31,7 @@ class OverviewItem : public QTreeWidgetItem {
 };
 
 class OutlineList : public QTreeWidget {
+    Q_OBJECT
    public:
     OutlineList(IParser *parser);
 

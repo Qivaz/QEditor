@@ -1,10 +1,12 @@
 #ifndef DIFF_H
 #define DIFF_H
 
-#include "diff_match_patch.h"
+#include "diff_match_patch_stl.h"
 #include <QTextCharFormat>
 
-using _Diff = Diff;
+using _DiffMatchPatch = diff_match_patch<std::string>;
+using _Diff = diff_match_patch<std::string>::Diff;
+using _Diffs = std::list<_Diff>;
 
 namespace QEditor {
 class FormattedText {
@@ -36,8 +38,8 @@ class Diff {
     inline static const QColor kNewBgColor = QColor("#e6ffe6");
 
    private:
-    diff_match_patch diffMatchPatch_;
-    QList<_Diff> diffs_;
+    _DiffMatchPatch diffMatchPatch_;
+    _Diffs diffs_;
 };
 }  // namespace QEditor
 

@@ -31,7 +31,6 @@
 #include <QProcess>
 #include <QStatusBar>
 #include <QTabBar>
-#include <QTextCodec>
 #include <QToolButton>
 
 namespace QEditor {
@@ -741,9 +740,16 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
     // Check Byte Order Mark.
     if (forceUseFileEncoding || fileEncoding.hasBom()) {
         QTextStream in(&file);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         in.setCodec(fileEncoding.codec());
         const auto &text = in.readAll();
         qDebug() << "text: " << text << ", bytearry: " << text.toUtf8();
+#else
+        in.setEncoding(QStringConverter::Utf8);
+        const auto &bytes = in.readAll();
+        const auto &text = fileEncoding.codec()->toUnicode(bytes.toUtf8());
+        qCritical() << "text: " << text;
+#endif
         editView->setPlainText(text);
         editView->setFileEncoding(std::move(fileEncoding));
     } else {

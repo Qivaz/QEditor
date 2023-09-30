@@ -21,7 +21,11 @@
 #include <QFile>
 #include <QMap>
 #include <QObject>
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 #include <QTextCodec>
+#else
+#include <QtCore5Compat/QTextCodec>
+#endif
 #include <Toast.h>
 
 namespace QEditor {

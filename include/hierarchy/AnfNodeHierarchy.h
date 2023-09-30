@@ -24,6 +24,7 @@
 
 namespace QEditor {
 class AnfNodeHierarchy : public QGraphicsView {
+    Q_OBJECT
    public:
     AnfNodeHierarchy(const QString &funcName, IParser *parser = new DummyParser(), QWidget *parent = nullptr);
 

@@ -23,6 +23,7 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QLockFile>
+#include <QTranslator>
 
 // Q_IMPORT_PLUGIN(QIbusPlatformInputContextPlugin)
 // Q_IMPORT_PLUGIN(StaticQIbusPlatformInputContextPluginInstance)

@@ -144,7 +144,7 @@ void EditView::ApplySpecialCharsVisible() {
         textOption.setFlags(QTextOption::ShowTabsAndSpaces | QTextOption::ShowLineAndParagraphSeparators |
                             QTextOption::ShowDocumentTerminator);
     } else {
-        textOption.setFlags(0);
+        textOption.setFlags(QTextOption::Flag(0));
     }
     document()->setDefaultTextOption(textOption);
 }
@@ -424,7 +424,14 @@ bool EditView::SaveFile(const QString &filePath) {
         if (fileEncoding().hasBom()) {
             out.setGenerateByteOrderMark(true);
         }
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         out.setCodec(fileEncoding().codec());
+#else
+        out.setEncoding(QStringConverter::Utf8);
+        qCritical() << "Force to use UTF8!!!";
+#endif
+
         out << toPlainText();
         if (!file.commit()) {
             errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(filePath), file.errorString());
@@ -1247,7 +1254,8 @@ void EditView::wheelEvent(QWheelEvent *event) {
         qDebug() << "firstVisibleBlock.firstLineNumber: " << firstVisibleBlock().firstLineNumber();
         return;
     }
-    if (event->delta() > 0) {
+    if ((!event->pixelDelta().isNull() && event->pixelDelta().y() > 0) ||
+        (!event->angleDelta().isNull() && event->angleDelta().y() > 0)) {
         ZoomIn();
     } else {
         ZoomOut();
@@ -1386,12 +1394,12 @@ void EditView::contextMenuEvent(QContextMenuEvent *event) {
 
         menu_->addSeparator();
         QAction *markUnmarkAction = new QAction(tr("Mark or Unmark"), this);
-        auto markKeySeq = QKeySequence(Qt::SHIFT + Qt::Key_F8);
+        auto markKeySeq = QKeySequence(Qt::SHIFT, Qt::Key_F8);
         markUnmarkAction->setShortcut(markKeySeq);
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu_->addAction(markUnmarkAction);
         QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
-        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
         menu_->addAction(unmarkAllAction);
@@ -1416,7 +1424,7 @@ void EditView::contextMenuEvent(QContextMenuEvent *event) {
         connect(markUnmarkAction, &QAction::triggered, this, &EditView::MarkUnmarkCursorText);
         menu_->addAction(markUnmarkAction);
         QAction *unmarkAllAction = new QAction(tr("Unmark All"), this);
-        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F8);
+        auto unmarkAllKeySeq = QKeySequence(Qt::CTRL, Qt::SHIFT + Qt::Key_F8);
         unmarkAllAction->setShortcut(unmarkAllKeySeq);
         connect(unmarkAllAction, &QAction::triggered, this, &EditView::UnmarkAll);
         menu_->addAction(unmarkAllAction);

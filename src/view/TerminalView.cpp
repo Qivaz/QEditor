@@ -32,7 +32,7 @@ TerminalView::TerminalView(const QString &ip, int port, const QString &user, con
     CreateConnection();
 
     QTextOption textOption;
-    textOption.setFlags(0);
+    textOption.setFlags(QTextOption::Flag(0));
     document()->setDefaultTextOption(textOption);
 }
 

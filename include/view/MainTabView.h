@@ -21,7 +21,9 @@
 #include "DiffView.h"
 #include "EditView.h"
 #include "Logger.h"
+#ifdef OPEN_TERM
 #include "TerminalView.h"
+#endif
 #include <QAction>
 #include <QMenu>
 #include <QTabWidget>

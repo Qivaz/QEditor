@@ -774,12 +774,14 @@ bool TabView::LoadFile(EditView *editView, const QString &filePath, FileEncoding
 }
 
 void TabView::OpenSsh(const QString &ip, int port, const QString &user, const QString &pwd) {
+#ifdef OPEN_TERM
     auto terminalView = new TerminalView(ip, port, user, pwd, this);
     addTab(terminalView, terminalView->fileName());
     setCurrentIndex(count() - 1);
     setTabToolTip(count() - 1, terminalView->fileName());
     setTabIcon(count() - 1, QIcon::fromTheme("terminal-open", QIcon(":/images/terminal.svg")));
     terminalView->setFocus();
+#endif
 }
 
 void TabView::ChangeTabDescription(const QFileInfo &fileInfo, int index) {

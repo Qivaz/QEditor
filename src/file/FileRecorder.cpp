@@ -16,7 +16,9 @@
 
 #include "FileRecorder.h"
 #include "Logger.h"
+#ifdef OPEN_TERM
 #include "TerminalView.h"
+#endif
 #include "Utils.h"
 #include <QDir>
 #include <QFile>
@@ -39,8 +41,10 @@ void FileRecorder::StoreFiles() {
     fileList.pos_ = pos_;
     for (int i = 0; i < editViews_.size(); ++i) {
         auto const &editView = editViews_[i];
+#ifdef OPEN_TERM
         auto terminalView = qobject_cast<TerminalView *>(editView);
         if (terminalView == nullptr) {
+#endif
             int pos = i;
             // Open file edit, not change, or empty new file edit.
             if (!editView->ShouldSave()) {
@@ -48,10 +52,12 @@ void FileRecorder::StoreFiles() {
             }
             FileInfo fileInfo(pos, editView->newFileNum(), editView->filePath());
             fileList.fileInfos_.push_back(fileInfo);
+#ifdef OPEN_TERM
         } else {
             FileInfo fileInfo(terminalView->ip(), terminalView->port(), terminalView->user(), terminalView->pwd());
             fileList.fileInfos_.push_back(fileInfo);
         }
+#endif
     }
     filesInfoStream << fileList;
 

@@ -1,4 +1,5 @@
-QT += widgets network
+QT += core widgets network
+message($$QT_MAJOR_VERSION)
 greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 CONFIG += c++17
 CONFIG += resources_big
@@ -39,7 +40,6 @@ HEADERS       = \
     include/hierarchy/NodeItem.h \
     include/parser/IParser.h \
     include/parser/IrParser.h \
-    include/ssh/SshClient.h \
     include/view/ComboView.h \
     include/view/DiffView.h \
     include/view/DockView.h \
@@ -48,17 +48,21 @@ HEADERS       = \
     include/view/GotoLineDialog.h \
     include/view/MainTabView.h \
     include/view/MainWindow.h \
-    include/view/OpenTerminalDialog.h \
     include/view/OutlineList.h \
-    include/view/RemoteExplorerTreeView.h \
     include/view/SearchDialog.h \
     include/view/SearchResultItem.h \
     include/view/SearchResultList.h \
-    include/view/TerminalView.h \
     include/view/TextHighlighter.h \
     include/view/Toast.h \
     include/win/WinTheme.h \
     ansiescapecodehandler.h \
+
+#HEADERS += \
+#    include/ssh/SshClient.h \
+#    include/view/OpenTerminalDialog.h \
+#    include/view/RemoteExplorerTreeView.h \
+#    include/view/TerminalView.h \
+
 
 SOURCES       = \
     src/Entry.cpp \
@@ -80,7 +84,6 @@ SOURCES       = \
     src/hierarchy/HierarchyScene.cpp \
     src/hierarchy/NodeItem.cpp \
     src/parser/IrParser.cpp \
-    src/ssh/SshClient.cpp \
     src/view/ComboView.cpp \
     src/view/DiffView.cpp \
     src/view/DockView.cpp \
@@ -89,16 +92,20 @@ SOURCES       = \
     src/view/GotoLineDialog.cpp \
     src/view/MainTabView.cpp \
     src/view/MainWindow.cpp \
-    src/view/OpenTerminalDialog.cpp \
     src/view/OutlineList.cpp \
-    src/view/RemoteExplorerTreeView.cpp \
     src/view/SearchDialog.cpp \
     src/view/SearchResultItem.cpp \
     src/view/SearchResultList.cpp \
-    src/view/TerminalView.cpp \
     src/view/TextHighlighter.cpp \
     src/view/Toast.cpp \
     ansiescapecodehandler.cpp \
+
+#SOURCES += \
+#    src/ssh/SshClient.cpp \
+#    src/view/OpenTerminalDialog.cpp \
+#    src/view/RemoteExplorerTreeView.cpp \
+#    src/view/TerminalView.cpp \
+
 
 RESOURCES = QEditor.qrc
 
@@ -115,18 +122,18 @@ INCLUDEPATH += \
     ./include/ \
     ./include/common/ \
     ./include/diff/ \
-    ./include/diff/diff_match_patch/ \
+#    ./include/diff/diff_match_patch/ \
     ./include/file/ \
     ./include/hierarchy/ \
     ./include/parser/ \
-    ./include/ssh/ \
+#    ./include/ssh/ \
     ./include/view/ \
 
-win32:CONFIG(release, debug|release): LIBS += -lws2_32
-else:win32:CONFIG(debug, debug|release): LIBS += -lws2_32
-include($$PWD/third_party/qssh/QSsh.pri)
+#win32:CONFIG(release, debug|release): LIBS += -lws2_32
+#else:win32:CONFIG(debug, debug|release): LIBS += -lws2_32
+#include($$PWD/third_party/qssh/QSsh.pri)
 
-INCLUDEPATH += $$PWD/third_party/pybind11/pybind11-v2.10.4/include/pybind11
+#INCLUDEPATH += $$PWD/third_party/pybind11/pybind11-v2.10.4/include/pybind11
 
 VERSION = "0.0.6"
 QMAKE_TARGET_PRODUCT = "QEditor"

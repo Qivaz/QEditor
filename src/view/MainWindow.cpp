@@ -18,9 +18,11 @@
 #include "ComboView.h"
 #include "ExplorerTreeView.h"
 #include "Logger.h"
-#include "OpenTerminalDialog.h"
 #include "RecentFiles.h"
+#ifdef OPEN_TERM
+#include "OpenTerminalDialog.h"
 #include "RemoteExplorerTreeView.h"
+#endif
 #include "SearchDialog.h"
 #include "SearchResultList.h"
 #include "Settings.h"
@@ -391,6 +393,7 @@ void MainWindow::CreateActions() {
     viewMenu->addAction(showHierarchyAct);
     viewToolBar2->addAction(showHierarchyAct);
 
+#ifdef OPEN_TERM
     // Terminal menu.
     QMenu *terminalMenu = menuBar()->addMenu(tr("&Terminal"));
     QToolBar *terminalToolBar = addToolBar(tr("Terminal"));
@@ -410,6 +413,7 @@ void MainWindow::CreateActions() {
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
     aboutAct->setStatusTip(tr("Show the application's About box"));
+#endif
 
 #ifndef QT_NO_CLIPBOARD
     cutAct_->setEnabled(false);

@@ -201,7 +201,7 @@ class MainWindow : public QMainWindow {
     void WriteSettings();
     bool MaybeSave();
 
-    bool IsLeftOrRightSeparator(const QPoint &pos);
+    bool IsLeftOrRightSeparator(const QPointF &pos);
 
     bool init_{false};
     TabView *tabView_{nullptr};
@@ -222,6 +222,7 @@ class MainWindow : public QMainWindow {
     QAction *redoAct_{nullptr};
 
     // TODO: Save in settings.
+    bool toolBarVisible_{true};
     bool shouldWrapText_{true};
     bool specialCharsVisible_{true};
     bool explorerVisible_{true};

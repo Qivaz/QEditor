@@ -36,6 +36,7 @@
 namespace QEditor {
 MainWindow::MainWindow() : tabView_(new TabView(this)) {
     auto settings = Settings();
+    toolBarVisible_ = settings.Get("view", "toolbarvisible", true).toBool();
     shouldWrapText_ = settings.Get("view", "wraptext", true).toBool();
     specialCharsVisible_ = settings.Get("view", "allcharsvisible", false).toBool();
     explorerVisible_ = settings.Get("view", "explorervisible", true).toBool();
@@ -44,12 +45,16 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
 
     setAttribute(Qt::WA_InputMethodEnabled);
 
+    // Not show action icon in menu bar.
+    qApp->setAttribute(Qt::AA_DontShowIconsInMenus);
+
     setAcceptDrops(true);
     setWindowOpacity(opa);
 
-    setStyleSheet(
-        "background:rgb(68,68,68); selection-color:lightGray; selection-background-color:rgb(9,71,113); border:5px, "
-        "solid, rgb(255,0,0);");
+    // setStyleSheet(
+    //     "background:rgb(68,68,68); selection-color:lightGray; selection-background-color:rgb(9,71,113); border:1px,solid,rgb(255,0,0);");
+    setStyleSheet("QMainWindow::separator{background:rgb(54,54,54); width: 1px; height: 0px; margin: 0px; padding: 0px;}");
+
     setCentralWidget(tabView_);
 
     CreateActions();
@@ -80,6 +85,7 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     }
 #endif
 #endif
+    qApp->setStyleSheet("QToolTip{color:white; background-color:rgb(54,54,54); border:2px solid rgb(54,54,54); }");
 
     installEventFilter(this);
 
@@ -102,16 +108,18 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
 
 void MainWindow::CreateActions() {
     menuBar()->setStyleSheet(
-        "QMenuBar{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(28,28,28); "
-        "border:none;} QMenu{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(40,"
-        "40,40); border:none;} QMenu::separator {height:1px; background-color:rgb(80,80,80);}");
+        "QMenuBar{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(28,28,28); border:none;}"
+        "QMenu{color:lightGray; selection-background-color:rgb(9,71,113); background-color:rgb(40,40,40); border:none;}"
+        // "QMenu::item{height:45px; margin:0px;}"
+        "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
 
     auto toolBarStyle =
-        "QToolBar{color:lightGray; background-color:rgb(28,28,28);} QToolBar QToolButton {border:2px solid "
-        "transparent; background-color:rgb(28,28,28);} QToolBar QToolButton:hover{border:2px solid transparent; "
-        "background-color:rgb(54,54,54);} QToolBar QToolButton:enabled { border:1.5px solid rgb(40,40,40);}"
+        "QToolBar{color:lightGray; background-color:rgb(28,28,28); border-top: 0px; border-bottom: 0px;}"
+        "QToolBar QToolButton {border:2px solid transparent; background-color:rgb(28,28,28);}"
+        "QToolBar QToolButton:hover{border:2px solid transparent; background-color:rgb(54,54,54);}"
+        "QToolBar QToolButton:enabled{border:1.5px solid rgb(40,40,40);}"
         "QToolBar QToolButton:pressed{border:1.5px solid rgb(9,71,113); background-color:rgb(28,28,28);}"
-        "QToolBar QToolButton:checked{border:1.5px solid rgb(9,71,113); background-color:rgb(28,28,28);}";
+        "QToolBar QToolButton:checked{border:1.5px solid rgb(35,54,80); background-color:rgb(28,28,28);}";
 
     // File menu.
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -343,6 +351,32 @@ void MainWindow::CreateActions() {
 
     viewMenu->addSeparator();
 
+    QAction *showToolBar = new QAction(tr("Show Tool Bar"), this);
+    showToolBar->setToolTip(tr("Show/Hide Tool Bar"));
+    connect(showToolBar, &QAction::triggered, this, [this](){
+        toolBarVisible_ = !toolBarVisible_;
+        QList<QToolBar*> toolbars = findChildren<QToolBar*>();
+        for (const auto &toolbar : toolbars) {
+            if (toolbar == nullptr) {
+                continue;
+            }
+            if (toolBarVisible_) {
+                toolbar->show();
+            } else {
+                toolbar->hide();
+            }
+        }
+
+        Settings().Set("view", "toolbarvisible", toolBarVisible_);
+    });
+    showToolBar->setCheckable(true);
+    if (toolBarVisible_) {
+        showToolBar->setChecked(true);
+    }
+    viewMenu->addAction(showToolBar);
+
+    viewMenu->addSeparator();
+
     const QIcon wrapTextIcon = QIcon::fromTheme("view-wrap-text", QIcon(":/images/wrap-text.svg"));
     QAction *wrapTextAct = new QAction(wrapTextIcon, tr("Wrap Text"), this);
     wrapTextAct->setStatusTip(tr("WrapText"));
@@ -421,6 +455,19 @@ void MainWindow::CreateActions() {
     undoAct_->setEnabled(false);
     redoAct_->setEnabled(false);
 #endif  // !QT_NO_CLIPBOARD
+
+    // Show/Hide the whole tool bars.
+    QList<QToolBar*> toolbars = findChildren<QToolBar*>();
+    for (const auto &toolbar : toolbars) {
+        if (toolbar == nullptr) {
+            continue;
+        }
+        if (toolBarVisible_) {
+            toolbar->show();
+        } else {
+            toolbar->hide();
+        }
+    }
 }
 
 void MainWindow::HandleCurrentTabChanged(int index) { qDebug() << "MainWindow::tabIndexChanged, " << index; }
@@ -685,7 +732,7 @@ void MainWindow::showEvent(QShowEvent *event) {
 
 void MainWindow::closeEvent(QCloseEvent *event) { tabView_->AutoStore(); }
 
-bool MainWindow::IsLeftOrRightSeparator(const QPoint &pos) {
+bool MainWindow::IsLeftOrRightSeparator(const QPointF &pos) {
     constexpr auto distance_threhold = 3;
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
 }
@@ -717,7 +764,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     const auto editView = this->editView();
     if (event->type() == QEvent::HoverMove) {
         QHoverEvent *hoverEvent = static_cast<QHoverEvent *>(event);
-        if (IsLeftOrRightSeparator(hoverEvent->pos())) {
+        if (IsLeftOrRightSeparator(hoverEvent->position())) {
             setCursor(Qt::SplitHCursor);
         } else {
             unsetCursor();
@@ -729,7 +776,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         }
     } else if (event->type() == QEvent::MouseButtonPress) {
         auto mouseEvent = static_cast<QMouseEvent *>(event);
-        if (IsLeftOrRightSeparator(mouseEvent->pos())) {
+        if (IsLeftOrRightSeparator(mouseEvent->position())) {
             // Restore maxmum width to show the widget and separator.
             if (explorerDockView_ != nullptr) {
                 explorerDockView_->setMaximumWidth(explorerDockView_->savedMaxWidth());

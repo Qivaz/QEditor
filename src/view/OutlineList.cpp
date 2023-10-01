@@ -22,11 +22,15 @@
 namespace QEditor {
 OutlineList::OutlineList(IParser *parser) : parser_(parser) {
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none; background-color:rgb(28,28,28);} QScrollBar::add-line:vertical{border:none; "
-        "background:none;} QScrollBar::sub-line:vertical{border:none; background:none;}");
+        "QScrollBar{background:rgb(28,28,28); border:none; width:10px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:vertical{border:none; background:none;}"
+        "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none; background-color:rgb(28,28,28);} QScrollBar::add-line:horizontal{border:none; "
-        "background:none;} QScrollBar::sub-line:horizontal{border:none; background:none;}");
+        "QScrollBar{background:rgb(28,28,28); border:none; height:10px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:horizontal{border:none;background:none;}"
+        "QScrollBar::sub-line:horizontal{border:none;background:none;}");
 
     setHeaderHidden(true);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -49,8 +53,17 @@ OutlineList::OutlineList(IParser *parser) : parser_(parser) {
     setIndentation(15);
 
     setStyleSheet(
-        "QTreeWidget{color: rgb(215, 215, 210); background-color: rgb(28, 28, 28)}"
-        "QTreeView::branch:selected{background-color: rgb(54, 54, 54)}");
+        "QTreeView{color:darkGray; background-color:rgb(28,28,28);}"
+        "QTreeView::branch:selected{background-color:rgb(9,71,113);}"
+        "QTreeView::branch:hover{background:rgb(54,54,54);}"
+        "QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-siblings:adjoins-item{border-image:none0;}"
+        "QTreeView::branch:!has-children:!has-siblings:adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::item{background:rgb(28,28,28);}"
+        "QTreeView::item:selected{color: rgb(0, 215, 210); background:rgb(9,71,113);}"
+        "QTreeView::item:hover{background:rgb(54,54,54);}");
 
     connect(this, &QTreeWidget::itemClicked, this, &OutlineList::HandleItemClicked);
 

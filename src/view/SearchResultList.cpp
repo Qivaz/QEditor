@@ -43,11 +43,11 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     // Painting item without text
     itemOption.text = QString();
-    style->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter);
-
-    QAbstractTextDocumentLayout::PaintContext ctx;
+    // stackoverflow.com/questions/19635281/qlistview-stylesheet-not-working-with-delegate
+    style->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, itemOption.widget);
 
     // Highlighting text if item is selected
+    QAbstractTextDocumentLayout::PaintContext ctx;
     if (itemOption.state & QStyle::State_Selected) {
         ctx.palette.setColor(QPalette::Text, itemOption.palette.color(QPalette::Active, QPalette::HighlightedText));
     }
@@ -99,29 +99,37 @@ SearchResultList::SearchResultList(TabView *tabView)
     QEditor::HtmlDelegate *delegate = new HtmlDelegate();
     // Set delegate to the treeview object
     setItemDelegate(delegate);
+}
 
+void SearchResultList::SetQss() {
+    setStyleSheet(
+        "QTreeView{color:rgb(215,215,210); background-color:rgb(28,28,28);}"
+        "QTreeView::branch:selected{background-color:rgb(9,71,113);}"
+        "QTreeView::branch:hover{background:rgb(54,54,54);}"
+        "QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-siblings:adjoins-item{border-image:none0;}"
+        "QTreeView::branch:!has-children:!has-siblings:adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::item{background:rgb(28,28,28);}"
+        "QTreeView::item:selected{color:white; background:rgb(9,71,113);}"
+        "QTreeView::item:hover{background:rgb(54,54,54);}");
+    verticalScrollBar()->setStyleSheet(
+        "QScrollBar{background:rgb(28,28,28); border:none; width:15px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:vertical{border:none; background:none;}"
+        "QScrollBar::sub-line:vertical{border:none; background:none;}");
+    horizontalScrollBar()->setStyleSheet(
+        "QScrollBar{background:rgb(28,28,28); border:none; height:15px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:horizontal{border:none;background:none;}"
+        "QScrollBar::sub-line:horizontal{border:none;background:none;}");
     menu_->setStyleSheet(
         "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px;border:none;} "
         "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "
         "padding:5px 5px;} QMenu::item:selected{background-color:rgb(9,71,113);}"
         "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
         "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
-}
-
-void SearchResultList::SetQss() {
-    //    QStringList qss;
-    //    qss.append(QString("QTreeWidget{color: darkGray; background-color: rgb(28, 28, 28)}"));
-    //    qss.append(QString("QTreeView::branch:selected{background-color: rgb(54, 54, 54)}"));
-    //    setStyleSheet(qss.join(""));
-
-    setStyleSheet(
-        "QTreeView{color:rgb(215,215,210);background-color:rgb(28,28,28)}QTreeView::branch:selected{background-color:"
-        "rgb(9,71,113)}QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;}QTreeView::branch:has-siblings:"
-        "adjoins-item{border-image:none0;}QTreeView::branch:!has-children:!has-siblings:adjoins-item{border-image:"
-        "none0;}QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{"
-        "border-image:none;image:none;}QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-"
-        "children:has-siblings{border-image:none;image:none;}QTreeView::item{background:rgb(255,71,255);}QTreeView::"
-        "item:selected{background:rgb(9,71,113);}QTreeView::item:hover{background:rgb(9,255,113);}");
 }
 
 void SearchResultList::setTopItem(QTreeWidgetItem *topItem) { topItem_ = topItem; }

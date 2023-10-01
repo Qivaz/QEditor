@@ -31,22 +31,27 @@ namespace QEditor {
 ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath)
     : QTreeView(parent), menu_(new QMenu(this)), rootPath_(rootPath) {
     setStyleSheet(
-        "QTreeView{color:darkGray; background-color:rgb(28,28,28);} "
-        "QTreeView::branch:selected{background-color:rgb(9,71,113);} "
-        "QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;} "
-        "QTreeView::branch:has-siblings:adjoins-item{border-image:none0;} "
+        "QTreeView{color:darkGray; background-color:rgb(28,28,28);}"
+        "QTreeView::branch:selected{background-color:rgb(9,71,113);}"
+        "QTreeView::branch:hover{background:rgb(54,54,54);}"
+        "QTreeView::branch:has-siblings:!adjoins-item{border-image:none0;}"
+        "QTreeView::branch:has-siblings:adjoins-item{border-image:none0;}"
         "QTreeView::branch:!has-children:!has-siblings:adjoins-item{border-image:none0;}"
-        "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{ "
-        "border-image:none;image:none;} "
-        "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{ "
-        "border-image:none; image:none;} QTreeView::item:selected{background:rgb(9,71,113);}");
-
+        "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{border-image:none;image:none;}"
+        "QTreeView::item{background:rgb(28,28,28);}"
+        "QTreeView::item:selected{color:white; background:rgb(9,71,113);}"
+        "QTreeView::item:hover{background:rgb(54,54,54);}");
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none;} QScrollBar::add-line:vertical{border:none; background:none;} "
+        "QScrollBar{background:rgb(28,28,28); border:none; width:10px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:vertical{border:none; background:none;}"
         "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none;} QScrollBar::add-line:horizontal{border:none;background:none;} "
-        "QScrollBar::sub-line:horizontal{border:none; background:none;}");
+        "QScrollBar{background:rgb(28,28,28); border:none; height:10px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:horizontal{border:none;background:none;}"
+        "QScrollBar::sub-line:horizontal{border:none;background:none;}");
     menu_->setStyleSheet(
         "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px;border:none;} "
         "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "

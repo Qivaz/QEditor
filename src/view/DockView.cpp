@@ -22,18 +22,18 @@
 
 namespace QEditor {
 DockView::DockView(QWidget *parent) : QDockWidget(parent) {
-    QPalette pal;
-    pal.setColor(QPalette::Window, QColor(28, 28, 28));
-    setAutoFillBackground(true);
-    setPalette(pal);
+//    QPalette pal;
+//    pal.setColor(QPalette::Window, QColor(28, 28, 28));
+//    setAutoFillBackground(true);
+//    setPalette(pal);
 
-    SetDockQss(this, "9pt", "rgb(255, 255, 255)", "rgb(54, 54, 54)", "2px", "5px");
+    SetDockQss(this, "9pt", "lightGray", "rgb(35, 35, 35)", "2px", "5px");
 }
 
 void DockView::SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
                           const QString &backColor, const QString &leftPadding, const QString &topPadding) {
     QStringList qss;
-    qss.append(QString("QDockWidget{font-size:%1; color:%2;}").arg(fontSize).arg(textColor));
+    qss.append(QString("QDockWidget{border: 10px solid red; font-size:%1; color:%2;}").arg(fontSize).arg(textColor));
     qss.append(QString("QDockWidget::title{background:%1; padding-left:%2; padding-top:%3;}")
                    .arg(backColor)
                    .arg(leftPadding)

@@ -35,17 +35,19 @@ namespace QEditor {
 SearchDialog::SearchDialog(QWidget *parent, int index)
     : QDialog(parent), ui_(new Ui::UISearchDialog()), historyMenu_(new QMenu(this)) {
     ui_->setupUi(this);
-    setAttribute(Qt::WA_TranslucentBackground);
-    //    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(Qt::Dialog|Qt::WindowTitleHint|Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint);
+    // qCritical() << windowFlags();
+    // setAttribute(Qt::WA_TranslucentBackground);
+    // setAttribute(Qt::WA_DeleteOnClose);
 
     auto settings = Settings();
     qreal opa = settings.Get("dialog", "opacity", 0.9).toDouble();
     setWindowOpacity(opa * 0.8);
 
     historyMenu_->setStyleSheet(
-        "QMenu{color:gray; background-color:rgb(68,68,68); margin:2px 2px; border:none;} QMenu::item{color:gray; "
-        "background-color:rgb(68,68,68); padding:5px 5px;} QMenu::item:selected{color:lightGray; "
-        "background-color:rgb(9,71,113);}"
+        "QMenu{color:red; background-color:rgb(68,68,68); margin:2px 2px; border:none;} "
+        "QMenu::item{color:lightGray; background-color:rgb(68,68,68); padding:5px 5px;} "
+        "QMenu::item:selected{color:lightGray; background-color:rgb(9,71,113);} "
         "QMenu::item:pressed{border:1px solid rgb(60,60,60); background-color:rgb(29,91,133);} "
         "QMenu::separator{height:1px; background-color:rgb(80,80,80);}");
     historyMenu_->installEventFilter(

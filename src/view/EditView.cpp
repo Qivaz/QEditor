@@ -71,13 +71,16 @@ void EditView::Init() {
     setStyleSheet(
         "color:rgb(215,215,210); background-color:rgb(28,28,28); selection-color:lightGray; "
         "selection-background-color:rgb(9,71,113); border:none;");
-
     verticalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none;} QScrollBar::add-line:vertical{border:none; background:none;} "
+        "QScrollBar{background:rgb(28,28,28); border:none; width:15px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:vertical{border:none; background:none;}"
         "QScrollBar::sub-line:vertical{border:none; background:none;}");
     horizontalScrollBar()->setStyleSheet(
-        "QScrollBar{border:none;} QScrollBar::add-line:horizontal{border:none; background:none;} "
-        "QScrollBar::sub-line:horizontal{border:none; background:none;}");
+        "QScrollBar{background:rgb(28,28,28); border:none; height:15px;}"
+        "QScrollBar::handle{background:rgb(54,54,54); border:none;}"
+        "QScrollBar::add-line:horizontal{border:none;background:none;}"
+        "QScrollBar::sub-line:horizontal{border:none;background:none;}");
     menu_->setStyleSheet(
         "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px; border:none;} "
         "QMenu::item{color:rgb(225,225,225); background-color:rgb(40,40,40); "

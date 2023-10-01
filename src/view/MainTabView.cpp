@@ -39,16 +39,20 @@ TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
     setMovable(true);
     setTabsClosable(true);
     setStyleSheet(
-        "QTabWidget{color:darkGray; background-color:rgb(28,28,28); selection-color:red; "
-        "selection-background-color:green; border:none;}"
-        "QTabBar::tab{color:white; background-color:rgb(54,54,54); border:1px solid rgb(54,54,54); "
-        "border-left-style:solid; border-left-width:0.5px; border-left-color:gray; "
-        "border-right-style:solid; border-right-width:0.5px; border-right-color:gray;"
-        "padding:3px; border-top-left-radius:5px; border-top-right-radius:5px;}"
-        "QTabBar::tab:selected{background:QColor(0,0,0); border-bottom-color:#1769AA; border-bottom-width:3px}"
-        "QTabBar::tab:hover{background-color:QColor(0,0,0);}"
+        "QTabWidget{color:darkGray; background-color:rgb(28,28,28); selection-color:red; selection-background-color:green; border:none;}"
+        "QTabBar::tab{color:white; background-color:rgb(35,35,35); border:1px solid rgb(35,35,35); "
+            "border-left-style:solid; border-left-width:0.5px; border-left-color:rgb(28,28,28); "
+            "border-right-style:solid; border-right-width:0.5px; border-right-color:rgb(28,28,28); "
+            "padding:3px; border-top-left-radius:5px; border-top-right-radius:5px;}"
+        "QTabBar::tab:selected{background-color:rgb(35,35,48); border-bottom-color:#1769AA; border-bottom-width:3px}"
+        "QTabBar::tab:hover{background-color:rgb(35,35,54);}"
         "QTabBar::close-button{border-image:url(:/images/x-circle.svg);}"
         "QTabBar::close-button:hover{background:red; border-image:url(:/images/x.svg);}");
+        // "QToolButton#qt_toolbar_ext_button{background-color: red;}"
+    auto ext_button = this->findChild<QToolButton*>("qt_toolbar_ext_button");
+    if (ext_button != nullptr) {
+        ext_button->setIcon(QIcon(":/images/file-type-cpp2.svg"));
+    }
 
     menu_->setStyleSheet(
         "QMenu{color:lightGray; background-color:rgb(40,40,40); margin:2px 2px;border:none;} "
@@ -63,6 +67,7 @@ TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent))
     connect(this, &QTabWidget::tabCloseRequested, this, &TabView::HandleTabCloseRequested);
 
     setFont(QFont("Consolas", 10));
+    setContentsMargins(0, 0, 0, 0);
 }
 
 void TabView::ChangeTabCloseButtonToolTip(int index, const QString &tip) {

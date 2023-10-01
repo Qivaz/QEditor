@@ -47,192 +47,192 @@
 <context>
     <name>QEditor::EditView</name>
     <message>
-        <location filename="src/view/EditView.cpp" line="191"/>
+        <location filename="src/view/EditView.cpp" line="194"/>
         <source>Load file failed, can&apos;t change encoding.</source>
         <translation>加载文件失败，无法变更编码方式。</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="412"/>
+        <location filename="src/view/EditView.cpp" line="415"/>
         <source>untitled</source>
         <translation>未命名</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="430"/>
+        <location filename="src/view/EditView.cpp" line="440"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>无法保存文件%1: %2</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="434"/>
+        <location filename="src/view/EditView.cpp" line="444"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>无法保存文件%1: %2</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="452"/>
+        <location filename="src/view/EditView.cpp" line="462"/>
         <source>File saved</source>
         <translation>文件保存成功。</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="482"/>
+        <location filename="src/view/EditView.cpp" line="492"/>
         <source>The document &apos;%1&apos; has been modified.
 Do you want to save your changes?</source>
         <translation>文件&apos;%1&apos;已被修改，是否保存？</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="487"/>
+        <location filename="src/view/EditView.cpp" line="497"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="488"/>
+        <location filename="src/view/EditView.cpp" line="498"/>
         <source>Discard</source>
         <translation>丢弃</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="489"/>
+        <location filename="src/view/EditView.cpp" line="499"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="614"/>
+        <location filename="src/view/EditView.cpp" line="624"/>
         <source>Hightlight selected text failed. The texts count to mark exceed %1</source>
         <translation>高亮选中文字失败。文字数量超过%1限制。</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="634"/>
+        <location filename="src/view/EditView.cpp" line="644"/>
         <source>Sel: </source>
         <translation>选中: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="640"/>
+        <location filename="src/view/EditView.cpp" line="650"/>
         <source>Pos: </source>
         <translation>位置: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="642"/>
+        <location filename="src/view/EditView.cpp" line="652"/>
         <source>Ln: </source>
         <translation>行: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="643"/>
+        <location filename="src/view/EditView.cpp" line="653"/>
         <source>Col: </source>
         <translation>列: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="644"/>
+        <location filename="src/view/EditView.cpp" line="654"/>
         <source>Lines: </source>
         <translation>行数: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="645"/>
+        <location filename="src/view/EditView.cpp" line="655"/>
         <source>Length: </source>
         <translation>字符数: </translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="939"/>
+        <location filename="src/view/EditView.cpp" line="945"/>
         <source>Highlight brackets failed. The texts count to mark exceed %1</source>
         <translation>高亮文字失败。文字数量超过%1限制。</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1384"/>
+        <location filename="src/view/EditView.cpp" line="1391"/>
         <source>Find...</source>
         <translation>查找...</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1387"/>
+        <location filename="src/view/EditView.cpp" line="1394"/>
         <source>Replace...</source>
         <translation>替换...</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1392"/>
-        <location filename="src/view/EditView.cpp" line="1417"/>
+        <location filename="src/view/EditView.cpp" line="1399"/>
+        <location filename="src/view/EditView.cpp" line="1424"/>
         <source>Mark or Unmark</source>
         <translation>高亮 / 清除高亮</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1397"/>
-        <location filename="src/view/EditView.cpp" line="1422"/>
+        <location filename="src/view/EditView.cpp" line="1404"/>
+        <location filename="src/view/EditView.cpp" line="1429"/>
         <source>Unmark All</source>
         <translation>清除全部高亮</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1404"/>
+        <location filename="src/view/EditView.cpp" line="1411"/>
         <source>Select Text for View Diff</source>
         <translation>选中文字用于查看差异</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1409"/>
+        <location filename="src/view/EditView.cpp" line="1416"/>
         <source>View Diff with Previous Selection</source>
         <translation>查看与前一次选中文字的差异</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1430"/>
+        <location filename="src/view/EditView.cpp" line="1437"/>
         <source>&amp;Undo</source>
         <translation>撤销(&amp;U)</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1431"/>
+        <location filename="src/view/EditView.cpp" line="1438"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1436"/>
+        <location filename="src/view/EditView.cpp" line="1443"/>
         <source>&amp;Redo</source>
         <translation>恢复(&amp;R)</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1437"/>
+        <location filename="src/view/EditView.cpp" line="1444"/>
         <source>Redo</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1443"/>
+        <location filename="src/view/EditView.cpp" line="1450"/>
         <source>&amp;Copy</source>
         <translation>复制(&amp;C)</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1444"/>
+        <location filename="src/view/EditView.cpp" line="1451"/>
         <source>Copy the current selection&apos;s contents to the clipboard</source>
         <translation>复制选中内容到剪切板</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1448"/>
+        <location filename="src/view/EditView.cpp" line="1455"/>
         <source>Cu&amp;t</source>
         <translation>剪切(&amp;T)</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1449"/>
+        <location filename="src/view/EditView.cpp" line="1456"/>
         <source>Cut the current selection&apos;s contents to the clipboard</source>
         <translation>剪切选中内容到剪切板</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1453"/>
+        <location filename="src/view/EditView.cpp" line="1460"/>
         <source>&amp;Paste</source>
         <translation>粘贴(&amp;P)</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1454"/>
+        <location filename="src/view/EditView.cpp" line="1461"/>
         <source>Paste the clipboard&apos;s contents into the current selection</source>
         <translation>粘贴剪切板内容到选中位置</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1458"/>
+        <location filename="src/view/EditView.cpp" line="1465"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1459"/>
+        <location filename="src/view/EditView.cpp" line="1466"/>
         <source>Delete the current selection&apos;s contents</source>
         <translation>删除选中内容</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1464"/>
+        <location filename="src/view/EditView.cpp" line="1471"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="src/view/EditView.cpp" line="1465"/>
+        <location filename="src/view/EditView.cpp" line="1472"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
@@ -240,22 +240,22 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::ExplorerTreeView</name>
     <message>
-        <location filename="src/view/ExplorerTreeView.cpp" line="119"/>
+        <location filename="src/view/ExplorerTreeView.cpp" line="124"/>
         <source>Copy Full Path</source>
         <translation>复制路径</translation>
     </message>
     <message>
-        <location filename="src/view/ExplorerTreeView.cpp" line="128"/>
+        <location filename="src/view/ExplorerTreeView.cpp" line="133"/>
         <source>Copy File Name</source>
         <translation>复制文件名</translation>
     </message>
     <message>
-        <location filename="src/view/ExplorerTreeView.cpp" line="140"/>
+        <location filename="src/view/ExplorerTreeView.cpp" line="145"/>
         <source>Reveal in File Explorer</source>
         <translation>打开所在文件夹</translation>
     </message>
     <message>
-        <location filename="src/view/ExplorerTreeView.cpp" line="142"/>
+        <location filename="src/view/ExplorerTreeView.cpp" line="147"/>
         <source>Open Containing Folder</source>
         <translation>打开所在文件夹</translation>
     </message>
@@ -263,13 +263,13 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::FileEncoding</name>
     <message>
-        <location filename="include/file/FileEncoding.h" line="58"/>
-        <location filename="include/file/FileEncoding.h" line="66"/>
-        <location filename="include/file/FileEncoding.h" line="76"/>
-        <location filename="include/file/FileEncoding.h" line="85"/>
-        <location filename="include/file/FileEncoding.h" line="96"/>
-        <location filename="include/file/FileEncoding.h" line="105"/>
-        <location filename="include/file/FileEncoding.h" line="113"/>
+        <location filename="include/file/FileEncoding.h" line="62"/>
+        <location filename="include/file/FileEncoding.h" line="70"/>
+        <location filename="include/file/FileEncoding.h" line="80"/>
+        <location filename="include/file/FileEncoding.h" line="89"/>
+        <location filename="include/file/FileEncoding.h" line="100"/>
+        <location filename="include/file/FileEncoding.h" line="109"/>
+        <location filename="include/file/FileEncoding.h" line="117"/>
         <source>Use UTF-8 codec instead.</source>
         <translation>切换为UTF-8编码。</translation>
     </message>
@@ -306,450 +306,460 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::MainWindow</name>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="438"/>
+        <location filename="src/view/MainWindow.cpp" line="488"/>
         <source>Search result:</source>
         <translation>查找结果:</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="490"/>
+        <location filename="src/view/MainWindow.cpp" line="540"/>
         <source>EXPLORER</source>
         <translation>文件管理器</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="561"/>
+        <location filename="src/view/MainWindow.cpp" line="611"/>
         <source>OUTLINE</source>
         <translation>大纲</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="604"/>
+        <location filename="src/view/MainWindow.cpp" line="654"/>
         <source>FUNCTION HIERARCHY</source>
         <translation>函数调用链</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="621"/>
-        <location filename="src/view/MainWindow.cpp" line="650"/>
+        <location filename="src/view/MainWindow.cpp" line="671"/>
+        <location filename="src/view/MainWindow.cpp" line="700"/>
         <source>NODE HIERARCHY</source>
         <translation>节点调用链</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="932"/>
+        <location filename="src/view/MainWindow.cpp" line="982"/>
         <source>About </source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="933"/>
+        <location filename="src/view/MainWindow.cpp" line="983"/>
         <source>&lt;font color=&quot;lightgray&quot;&gt;&lt;b&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="933"/>
+        <location filename="src/view/MainWindow.cpp" line="983"/>
         <source>&lt;br/&gt;Version: </source>
         <translation>&lt;br/&gt;版本: </translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="934"/>
+        <location filename="src/view/MainWindow.cpp" line="984"/>
         <source>&lt;/b&gt;&lt;br/&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="934"/>
+        <location filename="src/view/MainWindow.cpp" line="984"/>
         <source>----------&lt;br/&gt;The &lt;b&gt;</source>
         <translation>----------&lt;br/&gt;&lt;b&gt;</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="936"/>
+        <location filename="src/view/MainWindow.cpp" line="986"/>
         <source>&lt;/b&gt; is a compact text editor with common functions, such as search, replace, mark, and simple syntax highlighting.&lt;br/&gt;&lt;br/&gt;&lt;b&gt;Author: &lt;a href=&quot;mailto:zhang-qh@hotmail.com&quot;&gt;Q&lt;/a&gt;&lt;/b&gt;&lt;/font&gt;</source>
         <translation>&lt;/b&gt; 是一个简洁的编辑器，提供搜索、替换、高亮、语法高亮、终端等常用功能。&lt;br/&gt;&lt;br/&gt;&lt;b&gt;联系: &lt;a href=&quot;mailto:zhang-qh@hotmail.com&quot;&gt;Q&lt;/a&gt;&lt;/b&gt;&lt;/font&gt;</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="1008"/>
+        <location filename="src/view/MainWindow.cpp" line="1058"/>
         <source>Clear Recently Opened</source>
         <translation>清除最近打开记录</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="116"/>
+        <location filename="src/view/MainWindow.cpp" line="125"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="117"/>
+        <location filename="src/view/MainWindow.cpp" line="126"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="123"/>
+        <location filename="src/view/MainWindow.cpp" line="132"/>
         <source>&amp;New</source>
         <translation>新建(&amp;N)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="125"/>
+        <location filename="src/view/MainWindow.cpp" line="134"/>
         <source>Create a new file</source>
         <translation>新建文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="131"/>
+        <location filename="src/view/MainWindow.cpp" line="140"/>
         <source>&amp;Open...</source>
         <translation>打开(&amp;O)...</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="133"/>
+        <location filename="src/view/MainWindow.cpp" line="142"/>
         <source>Open an existing file</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="138"/>
+        <location filename="src/view/MainWindow.cpp" line="147"/>
         <source>Open Recent</source>
         <translation>最近打开</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="143"/>
+        <location filename="src/view/MainWindow.cpp" line="152"/>
         <source>&amp;Save</source>
         <translation>保存(&amp;S)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="145"/>
+        <location filename="src/view/MainWindow.cpp" line="154"/>
         <source>Save the document to disk</source>
         <translation>保存文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="151"/>
+        <location filename="src/view/MainWindow.cpp" line="160"/>
         <source>Save all</source>
         <translation>保存全部</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="153"/>
+        <location filename="src/view/MainWindow.cpp" line="162"/>
         <source>Save all open documents</source>
         <translation>保存全部打开的文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="156"/>
+        <location filename="src/view/MainWindow.cpp" line="165"/>
         <source>Save &amp;As...</source>
         <translation>另存为(&amp;A)...</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="158"/>
+        <location filename="src/view/MainWindow.cpp" line="167"/>
         <source>Save the document under a new name</source>
         <translation>另存为新文件</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="163"/>
+        <location filename="src/view/MainWindow.cpp" line="172"/>
         <source>E&amp;xit</source>
         <translation>退出(&amp;X)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="165"/>
+        <location filename="src/view/MainWindow.cpp" line="174"/>
         <source>Exit the application</source>
         <translation>退出程序</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="168"/>
+        <location filename="src/view/MainWindow.cpp" line="177"/>
         <source>&amp;Edit</source>
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="169"/>
+        <location filename="src/view/MainWindow.cpp" line="178"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="173"/>
+        <location filename="src/view/MainWindow.cpp" line="182"/>
         <source>Cu&amp;t</source>
         <translation>剪切(&amp;T)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="176"/>
+        <location filename="src/view/MainWindow.cpp" line="185"/>
         <source>Cut the current selection&apos;s contents to the clipboard</source>
         <translation>剪切选中内容到剪切板</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="183"/>
+        <location filename="src/view/MainWindow.cpp" line="192"/>
         <source>&amp;Copy</source>
         <translation>复制(&amp;C)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="186"/>
+        <location filename="src/view/MainWindow.cpp" line="195"/>
         <source>Copy the current selection&apos;s contents to the clipboard</source>
         <translation>复制选中内容到剪切板</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="193"/>
+        <location filename="src/view/MainWindow.cpp" line="202"/>
         <source>&amp;Paste</source>
         <translation>粘贴(&amp;P)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="196"/>
+        <location filename="src/view/MainWindow.cpp" line="205"/>
         <source>Paste the clipboard&apos;s contents into the current selection</source>
         <translation>粘贴剪切板内容到选中位置</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="206"/>
+        <location filename="src/view/MainWindow.cpp" line="215"/>
         <source>Undo&amp;Redo</source>
         <translation>撤销 / 恢复</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="210"/>
+        <location filename="src/view/MainWindow.cpp" line="219"/>
         <source>&amp;Undo</source>
         <translation>撤销(&amp;U)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="212"/>
+        <location filename="src/view/MainWindow.cpp" line="221"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="218"/>
+        <location filename="src/view/MainWindow.cpp" line="227"/>
         <source>&amp;Redo</source>
         <translation>恢复(&amp;R)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="220"/>
+        <location filename="src/view/MainWindow.cpp" line="229"/>
         <source>Redo</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="226"/>
+        <location filename="src/view/MainWindow.cpp" line="235"/>
         <source>&amp;Select</source>
         <translation>选择(&amp;S)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="227"/>
+        <location filename="src/view/MainWindow.cpp" line="236"/>
         <source>Select</source>
         <translation>选择</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="231"/>
+        <location filename="src/view/MainWindow.cpp" line="240"/>
         <source>&amp;Find...</source>
         <translation>查找(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="233"/>
+        <location filename="src/view/MainWindow.cpp" line="242"/>
         <source>Find</source>
         <translation>查找</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="238"/>
+        <location filename="src/view/MainWindow.cpp" line="247"/>
         <source>&amp;Find Next</source>
         <translation>查找下一个(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="240"/>
+        <location filename="src/view/MainWindow.cpp" line="249"/>
         <source>Find next</source>
         <translation>查找下一个</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="244"/>
+        <location filename="src/view/MainWindow.cpp" line="253"/>
         <source>&amp;Find Previous</source>
         <translation>查找上一个(&amp;F)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="246"/>
+        <location filename="src/view/MainWindow.cpp" line="255"/>
         <source>Find previous</source>
         <translation>查找上一个</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="251"/>
+        <location filename="src/view/MainWindow.cpp" line="260"/>
         <source>&amp;Replace...</source>
         <translation>替换(&amp;R)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="254"/>
+        <location filename="src/view/MainWindow.cpp" line="263"/>
         <source>Replace</source>
         <translation>替换</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="262"/>
+        <location filename="src/view/MainWindow.cpp" line="271"/>
         <source>&amp;Go to Line...</source>
         <translation>转到行(&amp;G)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="265"/>
+        <location filename="src/view/MainWindow.cpp" line="274"/>
         <source>GotoLine</source>
         <translation>转到行</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="271"/>
+        <location filename="src/view/MainWindow.cpp" line="280"/>
         <source>&amp;Select All Lines</source>
         <translation>选中所有行(&amp;S)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="273"/>
+        <location filename="src/view/MainWindow.cpp" line="282"/>
         <source>SelectAll</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="280"/>
-        <location filename="src/view/MainWindow.cpp" line="296"/>
+        <location filename="src/view/MainWindow.cpp" line="289"/>
+        <location filename="src/view/MainWindow.cpp" line="305"/>
         <source>Mark</source>
         <translation>高亮</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="284"/>
+        <location filename="src/view/MainWindow.cpp" line="293"/>
         <source>&amp;Mark or Unmark</source>
         <translation>高亮 / 清除高亮(&amp;M)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="287"/>
+        <location filename="src/view/MainWindow.cpp" line="296"/>
         <source>Mark &amp; Unmack</source>
         <translation>高亮 / 清除高亮</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="293"/>
+        <location filename="src/view/MainWindow.cpp" line="302"/>
         <source>&amp;Unmark All</source>
         <translation>清除所有高亮(&amp;U)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="303"/>
+        <location filename="src/view/MainWindow.cpp" line="312"/>
         <source>Step</source>
         <translation>移动</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="307"/>
+        <location filename="src/view/MainWindow.cpp" line="316"/>
         <source>&amp;Step Back</source>
         <translation>移到上一步(&amp;S)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="310"/>
+        <location filename="src/view/MainWindow.cpp" line="319"/>
         <source>Step back</source>
         <translation>移到上一步</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="316"/>
+        <location filename="src/view/MainWindow.cpp" line="325"/>
         <source>&amp;Step Forward</source>
         <translation>移到下一步(&amp;S)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="319"/>
+        <location filename="src/view/MainWindow.cpp" line="328"/>
         <source>Step forward</source>
         <translation>移到下一步</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="325"/>
+        <location filename="src/view/MainWindow.cpp" line="334"/>
         <source>&amp;View</source>
         <translation>查看(&amp;V)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="326"/>
+        <location filename="src/view/MainWindow.cpp" line="335"/>
         <source>View</source>
         <translation>查看</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="330"/>
+        <location filename="src/view/MainWindow.cpp" line="339"/>
         <source>Zoom In</source>
         <translation>放大</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="331"/>
+        <location filename="src/view/MainWindow.cpp" line="340"/>
         <source>ZoomIn</source>
         <translation>放大</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="337"/>
+        <location filename="src/view/MainWindow.cpp" line="346"/>
         <source>Zoom Out</source>
         <translation>缩小</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="338"/>
+        <location filename="src/view/MainWindow.cpp" line="347"/>
         <source>ZoomOut</source>
         <translation>缩小</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="346"/>
+        <location filename="src/view/MainWindow.cpp" line="354"/>
+        <source>Show Tool Bar</source>
+        <translation>显示工具栏</translation>
+    </message>
+    <message>
+        <location filename="src/view/MainWindow.cpp" line="355"/>
+        <source>Show/Hide Tool Bar</source>
+        <translation>显示/隐藏工具栏</translation>
+    </message>
+    <message>
+        <location filename="src/view/MainWindow.cpp" line="381"/>
         <source>Wrap Text</source>
         <translation>自动换行</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="347"/>
+        <location filename="src/view/MainWindow.cpp" line="382"/>
         <source>WrapText</source>
         <translation>自动换行</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="355"/>
+        <location filename="src/view/MainWindow.cpp" line="390"/>
         <source>Show All Chars</source>
         <translation>显示所有符号</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="356"/>
+        <location filename="src/view/MainWindow.cpp" line="391"/>
         <source>ShowSpecialChars</source>
         <translation>显示所有符号</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="365"/>
+        <location filename="src/view/MainWindow.cpp" line="400"/>
         <source>View addin</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="369"/>
+        <location filename="src/view/MainWindow.cpp" line="404"/>
         <source>Show Explorer Window</source>
         <translation>文件管理器视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="370"/>
+        <location filename="src/view/MainWindow.cpp" line="405"/>
         <source>ShowExplorerWindow</source>
         <translation>文件管理器视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="378"/>
+        <location filename="src/view/MainWindow.cpp" line="413"/>
         <source>Show Outline Window</source>
         <translation>大纲视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="379"/>
+        <location filename="src/view/MainWindow.cpp" line="414"/>
         <source>ShowOutlineWindow</source>
         <translation>大纲视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="387"/>
+        <location filename="src/view/MainWindow.cpp" line="422"/>
         <source>Show Hierarchy Window</source>
         <translation>层级视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="388"/>
+        <location filename="src/view/MainWindow.cpp" line="423"/>
         <source>ShowHierarchyWindow</source>
         <translation>层级视图</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="396"/>
+        <location filename="src/view/MainWindow.cpp" line="432"/>
         <source>&amp;Terminal</source>
         <translation>终端(&amp;T)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="397"/>
+        <location filename="src/view/MainWindow.cpp" line="433"/>
         <source>Terminal</source>
         <translation>终端</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="401"/>
-        <location filename="src/view/MainWindow.cpp" line="402"/>
+        <location filename="src/view/MainWindow.cpp" line="437"/>
+        <location filename="src/view/MainWindow.cpp" line="438"/>
         <source>Open SSH</source>
         <translation>打开SSH</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="411"/>
+        <location filename="src/view/MainWindow.cpp" line="447"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="412"/>
+        <location filename="src/view/MainWindow.cpp" line="448"/>
         <source>&amp;About</source>
         <translation>关于(&amp;A)</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="413"/>
+        <location filename="src/view/MainWindow.cpp" line="449"/>
         <source>Show the application&apos;s About box</source>
         <translation>打开关于信息</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="1283"/>
+        <location filename="src/view/MainWindow.cpp" line="1333"/>
         <source>INS</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="1287"/>
+        <location filename="src/view/MainWindow.cpp" line="1337"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="src/view/MainWindow.cpp" line="1313"/>
+        <location filename="src/view/MainWindow.cpp" line="1363"/>
         <source>Can&apos;t convert the encoding since the text is modified.</source>
         <translation>内容已变更，无法切换文件编码方式。</translation>
     </message>
@@ -757,50 +767,48 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::OpenTerminalDialog</name>
     <message>
-        <location filename="src/view/OpenTerminalDialog.cpp" line="90"/>
         <source>The input IP is invalid: %1</source>
-        <translation>IP地址格式无效: %1</translation>
+        <translation type="vanished">IP地址格式无效: %1</translation>
     </message>
     <message>
-        <location filename="src/view/OpenTerminalDialog.cpp" line="99"/>
         <source>The input port is invalid: %1</source>
-        <translation>端口无效: %1</translation>
+        <translation type="vanished">端口无效: %1</translation>
     </message>
 </context>
 <context>
     <name>QEditor::SearchDialog</name>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="298"/>
+        <location filename="src/view/SearchDialog.cpp" line="327"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="304"/>
+        <location filename="src/view/SearchDialog.cpp" line="333"/>
         <source>Finding all positions...</source>
         <translation>正在查找所有匹配项...</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="318"/>
+        <location filename="src/view/SearchDialog.cpp" line="347"/>
         <source>Preparing result list...</source>
         <translation>正在汇总至结果列表...</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="337"/>
+        <location filename="src/view/SearchDialog.cpp" line="366"/>
         <source>Line </source>
         <translation>行</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="346"/>
+        <location filename="src/view/SearchDialog.cpp" line="375"/>
         <source>Showing results in list...</source>
         <translation>正在显示结果...</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="365"/>
+        <location filename="src/view/SearchDialog.cpp" line="394"/>
         <source> matches in </source>
         <translation>个结果匹配于 </translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="420"/>
+        <location filename="src/view/SearchDialog.cpp" line="449"/>
         <source> occurrences were replaced in </source>
         <translation>个匹配项被替换于 </translation>
     </message>
@@ -808,64 +816,64 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::SearchResultList</name>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="176"/>
+        <location filename="src/view/SearchResultList.cpp" line="184"/>
         <source>Collapse All</source>
         <translation>全部折叠</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="182"/>
+        <location filename="src/view/SearchResultList.cpp" line="190"/>
         <source>Expand All</source>
         <translation>全部展开</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="187"/>
+        <location filename="src/view/SearchResultList.cpp" line="195"/>
         <source>Copy Selected</source>
         <translation>复制选中</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="198"/>
+        <location filename="src/view/SearchResultList.cpp" line="206"/>
         <source>Copy All</source>
         <translation>复制全部</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="217"/>
+        <location filename="src/view/SearchResultList.cpp" line="225"/>
         <source>Clear Selected</source>
         <oldsource>Clear Selected Item</oldsource>
         <translation>清除选中项</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="228"/>
+        <location filename="src/view/SearchResultList.cpp" line="236"/>
         <source>Clear Containing Result</source>
         <oldsource>Clear Selected Result Belonging to</oldsource>
         <translation>清除选中项所在结果</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="242"/>
+        <location filename="src/view/SearchResultList.cpp" line="250"/>
         <source>Clear All</source>
         <translation>清除全部</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="271"/>
+        <location filename="src/view/SearchResultList.cpp" line="279"/>
         <source>Searching </source>
         <translation>正在查找</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="292"/>
+        <location filename="src/view/SearchResultList.cpp" line="300"/>
         <source>(Search </source>
         <translation>(查找</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="292"/>
+        <location filename="src/view/SearchResultList.cpp" line="300"/>
         <source> hits)</source>
         <translation>个结果)</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="297"/>
+        <location filename="src/view/SearchResultList.cpp" line="305"/>
         <source>[Suspended]</source>
         <translation>[中断]</translation>
     </message>
     <message>
-        <location filename="src/view/SearchResultList.cpp" line="308"/>
+        <location filename="src/view/SearchResultList.cpp" line="314"/>
         <source> results:</source>
         <translation>个结果:</translation>
     </message>
@@ -873,45 +881,45 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::Searcher</name>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="816"/>
-        <location filename="src/view/SearchDialog.cpp" line="820"/>
+        <location filename="src/view/SearchDialog.cpp" line="845"/>
+        <location filename="src/view/SearchDialog.cpp" line="849"/>
         <source>bottom</source>
         <translation>底部</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="817"/>
-        <location filename="src/view/SearchDialog.cpp" line="819"/>
+        <location filename="src/view/SearchDialog.cpp" line="846"/>
+        <location filename="src/view/SearchDialog.cpp" line="848"/>
         <source>top</source>
         <translation>顶部</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="851"/>
+        <location filename="src/view/SearchDialog.cpp" line="880"/>
         <source>1 occurrence were replaced, to continue replacing.</source>
         <translation>已替换1个匹配项，并找到下一个。</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="856"/>
+        <location filename="src/view/SearchDialog.cpp" line="885"/>
         <source>1 occurrence were replaced. No more occurrence to replace.</source>
         <translation>已替换1个匹配项，查找不到别的匹配项。</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="859"/>
+        <location filename="src/view/SearchDialog.cpp" line="888"/>
         <source>1 occurrence were replaced. </source>
         <translation>已替换1个匹配项。</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="860"/>
-        <location filename="src/view/SearchDialog.cpp" line="871"/>
+        <location filename="src/view/SearchDialog.cpp" line="889"/>
+        <location filename="src/view/SearchDialog.cpp" line="900"/>
         <source> has been reached.</source>
         <translation>已到达。</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="867"/>
+        <location filename="src/view/SearchDialog.cpp" line="896"/>
         <source>No more occurrence to replace.</source>
         <translation>没有找到可替换的匹配项。</translation>
     </message>
     <message>
-        <location filename="src/view/SearchDialog.cpp" line="870"/>
+        <location filename="src/view/SearchDialog.cpp" line="899"/>
         <source>No occurrence to replace, the </source>
         <translation>没有找到可替换的匹配项。</translation>
     </message>
@@ -926,128 +934,128 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::TabView</name>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="136"/>
+        <location filename="src/view/MainTabView.cpp" line="140"/>
         <source>Close  (Click Close Button)</source>
         <translation>关闭  (点击关闭按钮)</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="141"/>
+        <location filename="src/view/MainTabView.cpp" line="145"/>
         <source>Close Other</source>
         <translation>关闭其它</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="157"/>
+        <location filename="src/view/MainTabView.cpp" line="161"/>
         <source>Close All</source>
         <translation>全部关闭</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="170"/>
+        <location filename="src/view/MainTabView.cpp" line="174"/>
         <source>Force Close  (Double Click)</source>
         <translation>强制关闭  (双击标签)</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="191"/>
+        <location filename="src/view/MainTabView.cpp" line="195"/>
         <source>Force Close All</source>
         <translation>强制全部关闭</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="175"/>
+        <location filename="src/view/MainTabView.cpp" line="179"/>
         <source>Force Close Other</source>
         <translation>强制关闭其它</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="201"/>
+        <location filename="src/view/MainTabView.cpp" line="205"/>
         <source>Copy Full Path</source>
         <translation>复制路径</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="210"/>
+        <location filename="src/view/MainTabView.cpp" line="214"/>
         <source>Copy File Name</source>
         <translation>复制文件名</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="222"/>
+        <location filename="src/view/MainTabView.cpp" line="226"/>
         <source>Reveal in File Explorer</source>
         <translation>打开所在文件夹</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="224"/>
+        <location filename="src/view/MainTabView.cpp" line="228"/>
         <source>Open Containing Folder</source>
         <translation>打开所在文件夹</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="246"/>
+        <location filename="src/view/MainTabView.cpp" line="250"/>
         <source>View Diff between...</source>
         <translation>查看与...差异</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="254"/>
+        <location filename="src/view/MainTabView.cpp" line="258"/>
         <source>View Diff with</source>
         <translation>查看差异 → </translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="268"/>
+        <location filename="src/view/MainTabView.cpp" line="272"/>
         <source>Swap Diff</source>
         <translation>交换前后差异对象</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="363"/>
+        <location filename="src/view/MainTabView.cpp" line="367"/>
         <source>The document &apos;%1&apos; has been modified.
 Do you want to save your changes?</source>
         <translation>文件&apos;%1&apos;已被修改，是否保存？</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="368"/>
+        <location filename="src/view/MainTabView.cpp" line="372"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="369"/>
+        <location filename="src/view/MainTabView.cpp" line="373"/>
         <source>Discard</source>
         <translation>丢弃</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="370"/>
+        <location filename="src/view/MainTabView.cpp" line="374"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="460"/>
-        <location filename="src/view/MainTabView.cpp" line="725"/>
-        <location filename="src/view/MainTabView.cpp" line="737"/>
+        <location filename="src/view/MainTabView.cpp" line="464"/>
+        <location filename="src/view/MainTabView.cpp" line="729"/>
+        <location filename="src/view/MainTabView.cpp" line="741"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>无法保存文件%1: %2</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="465"/>
+        <location filename="src/view/MainTabView.cpp" line="469"/>
         <source> already opened.</source>
         <translation>已打开。</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="532"/>
+        <location filename="src/view/MainTabView.cpp" line="536"/>
         <source>new </source>
         <translation>新建 </translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="603"/>
-        <location filename="src/view/MainTabView.cpp" line="632"/>
-        <location filename="src/view/MainTabView.cpp" line="673"/>
+        <location filename="src/view/MainTabView.cpp" line="607"/>
+        <location filename="src/view/MainTabView.cpp" line="636"/>
+        <location filename="src/view/MainTabView.cpp" line="677"/>
         <source>Diff: </source>
         <translation>差异: </translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="697"/>
+        <location filename="src/view/MainTabView.cpp" line="701"/>
         <source> already opened, but not found!</source>
         <translation>已打开，但未查找到。</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="764"/>
+        <location filename="src/view/MainTabView.cpp" line="775"/>
         <source>File loaded</source>
         <translation>文件已加载</translation>
     </message>
     <message>
-        <location filename="src/view/MainTabView.cpp" line="809"/>
+        <location filename="src/view/MainTabView.cpp" line="822"/>
         <source>Double click to force close.</source>
         <translation>双击可强制关闭。</translation>
     </message>
@@ -1055,40 +1063,26 @@ Do you want to save your changes?</source>
 <context>
     <name>QEditor::TerminalView</name>
     <message>
-        <location filename="src/view/TerminalView.cpp" line="130"/>
-        <source><byte value="x10"/></source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="src/view/TerminalView.cpp" line="132"/>
-        <source><byte value="xe"/></source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="src/view/TerminalView.cpp" line="149"/>
         <source>Append &apos;%1&apos; in command line tail.</source>
-        <translation>添加%1到命令行末尾。</translation>
+        <translation type="vanished">添加%1到命令行末尾。</translation>
     </message>
     <message>
-        <location filename="src/view/TerminalView.cpp" line="204"/>
         <source>Try to connecting %1:%2.</source>
-        <translation>尝试连接到%1:%2。</translation>
+        <translation type="vanished">尝试连接到%1:%2。</translation>
     </message>
     <message>
-        <location filename="src/view/TerminalView.cpp" line="208"/>
         <source>%1:%2 is disconnected.</source>
-        <translation>%1:%2已断开。</translation>
+        <translation type="vanished">%1:%2已断开。</translation>
     </message>
     <message>
-        <location filename="src/view/TerminalView.cpp" line="214"/>
         <source>%1:%2 is connected.</source>
-        <translation>%1:%2已连接。</translation>
+        <translation type="vanished">%1:%2已连接。</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="src/Entry.cpp" line="76"/>
+        <location filename="src/Entry.cpp" line="77"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>无法保存文件%1: %2</translation>

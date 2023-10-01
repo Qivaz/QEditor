@@ -3,7 +3,7 @@ message($$QT_MAJOR_VERSION)
 greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 CONFIG += c++17
 CONFIG += resources_big
-CONFIG += debug
+#CONFIG += debug
 DEFINES += QT_MESSAGELOGCONTEXT
 requires(qtConfig(filedialog))
 

@@ -26,11 +26,17 @@ class Settings final {
     ~Settings() { delete settings_; }
 
     void Set(const QString &nodeName, const QString &keyName, const QVariant &var) {
-        settings_->setValue(QString("/%1/%2").arg(nodeName).arg(keyName), var);
+        const auto &key = QString("/%1/%2").arg(nodeName).arg(keyName);
+        settings_->setValue(key, var);
     }
 
     QVariant Get(const QString &nodeName, const QString &keyName, const QVariant &defaultValue) {
-        QVariant var = settings_->value(QString("/%1/%2").arg(nodeName).arg(keyName), defaultValue);
+        const auto &key = QString("/%1/%2").arg(nodeName).arg(keyName);
+        QVariant var = settings_->value(key, defaultValue);
+        // Store the value in settings.
+        if (!settings_->contains(key)) {
+            Set(nodeName, keyName, var);
+        }
         return var;
     }
 

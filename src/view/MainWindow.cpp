@@ -85,7 +85,10 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     }
 #endif
 #endif
-    qApp->setStyleSheet("QToolTip{color:white; background-color:rgb(54,54,54); border:2px solid rgb(54,54,54); }");
+    // Set global style sheet.
+    qApp->setStyleSheet(
+        "QToolTip{color:white; background-color:rgb(54,54,54); border:2px solid rgb(54,54,54);}"
+        "QMessageBox{color:lightGray; background-color:rgb(54,54,54);} QMessageBox QLabel{color:lightGray}");
 
     installEventFilter(this);
 
@@ -442,12 +445,12 @@ void MainWindow::CreateActions() {
     });
     terminalMenu->addAction(openSshAct);
     terminalToolBar->addAction(openSshAct);
+#endif
 
     // Help menu.
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::About);
     aboutAct->setStatusTip(tr("Show the application's About box"));
-#endif
 
 #ifndef QT_NO_CLIPBOARD
     cutAct_->setEnabled(false);
@@ -794,12 +797,15 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         moveSeparatorToHide_ = isSeparator(mouseEvent->pos());
     } else if (event->type() == QEvent::MouseButtonRelease) {
         auto mouseEvent = static_cast<QMouseEvent *>(event);
+        qDebug() << mouseEvent;
         if (moveSeparatorToHide_) {
+            constexpr auto threshold_distance = 3;
             // Set both minimum and maxmum width to 0 to hide the widget.
+            QPoint leftMovePoint = QPoint(mouseEvent->pos().x() + threshold_distance, mouseEvent->pos().y());
             if ((explorerDockView_ != nullptr &&
-                 explorerDockView_->rect().contains(explorerDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                 explorerDockView_->rect().contains(explorerDockView_->mapFrom(this, leftMovePoint), true)) ||
                 (outlineDockView_ != nullptr &&
-                 outlineDockView_->rect().contains(outlineDockView_->mapFrom(this, mouseEvent->pos())))) {
+                 outlineDockView_->rect().contains(outlineDockView_->mapFrom(this, leftMovePoint), true))) {
                 if (explorerDockView_ != nullptr) {
                     explorerDockView_->setMaximumWidth(0);
                 }
@@ -807,10 +813,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
                     outlineDockView_->setMaximumWidth(0);
                 }
             }
+            QPoint rightMovePoint = QPoint(mouseEvent->pos().x() - threshold_distance, mouseEvent->pos().y());
             if ((hierarchyDockView_ != nullptr &&
-                 hierarchyDockView_->rect().contains(hierarchyDockView_->mapFrom(this, mouseEvent->pos()))) ||
+                 hierarchyDockView_->rect().contains(hierarchyDockView_->mapFrom(this, rightMovePoint), true)) ||
                 (nodeHierarchyDockView_ != nullptr &&
-                 nodeHierarchyDockView_->rect().contains(nodeHierarchyDockView_->mapFrom(this, mouseEvent->pos())))) {
+                 nodeHierarchyDockView_->rect().contains(nodeHierarchyDockView_->mapFrom(this, rightMovePoint), true))) {
                 if (hierarchyDockView_ != nullptr) {
                     hierarchyDockView_->setMaximumWidth(0);
                 }

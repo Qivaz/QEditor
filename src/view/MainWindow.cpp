@@ -818,10 +818,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
             }
         }
         moveSeparatorToHide_ = isSeparator(mouseEvent->pos());
+        mouseButtonPressPos_ = mouseEvent->pos();
     } else if (event->type() == QEvent::MouseButtonRelease) {
         auto mouseEvent = static_cast<QMouseEvent *>(event);
         qDebug() << mouseEvent;
-        if (moveSeparatorToHide_) {
+        bool horizontalMove = (std::abs(mouseButtonPressPos_.x() - mouseEvent->pos().x()) >
+                               std::abs(mouseButtonPressPos_.y() - mouseEvent->pos().y()));
+        if (moveSeparatorToHide_ && horizontalMove) {
             constexpr auto threshold_distance = 3;
             // Set both minimum and maxmum width to 0 to hide the widget.
             QPoint leftMovePoint = QPoint(mouseEvent->pos().x() + threshold_distance, mouseEvent->pos().y());

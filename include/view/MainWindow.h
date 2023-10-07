@@ -221,6 +221,7 @@ class MainWindow : public QMainWindow {
     AnfNodeHierarchy *anfNodeHierarchy_{nullptr};
 
     bool moveSeparatorToHide_{false};
+    QPoint mouseButtonPressPos_;
 
     QAction *copyAct_{nullptr};
     QAction *cutAct_{nullptr};

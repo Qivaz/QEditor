@@ -741,37 +741,40 @@ void EditView::HandleRedoAvailable(bool avail) {
 void EditView::TrigerParser() {
     // TODO: Add more lang.
     if (!fileType_.IsIr() || !AllowRichParsing()) {
-        if (parser_ == nullptr) {
-            parser_ = new DummyParser(this);
-            overviewList_ = new OutlineList(parser_);
-        }
-        MainWindow::Instance().UpdateOutlineDockView(overviewList_);
-
+        // if (parser_ == nullptr) {
+        //     parser_ = new DummyParser(this);
+        //     outlineList_ = new OutlineList(parser_);
+        // }
+        MainWindow::Instance().HideOutlineDockView();
         MainWindow::Instance().HideHierarchyDockView();
         return;
     }
 
     // If change.
-    if (true) {
+    if (MainWindow::Instance().outlineVisible() || MainWindow::Instance().hierarchyVisible()) {
         if (parser_ != nullptr) {
             delete parser_;
         }
         parser_ = new IrParser(this, this);
 
-        if (overviewList_ != nullptr) {
-            delete overviewList_;
+        if (MainWindow::Instance().outlineVisible()) {
+            if (outlineList_ != nullptr) {
+                delete outlineList_;
+            }
+            outlineList_ = new OutlineList(parser_);
+            MainWindow::Instance().UpdateOutlineDockView(outlineList_);
         }
-        overviewList_ = new OutlineList(parser_);
-        MainWindow::Instance().UpdateOutlineDockView(overviewList_);
 
-        if (hierarchy_ != nullptr) {
-            delete hierarchy_;
+        if (MainWindow::Instance().hierarchyVisible()) {
+            if (hierarchy_ != nullptr) {
+                delete hierarchy_;
+            }
+            hierarchy_ = new FunctionHierarchy(parser_);
+            MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
         }
-        hierarchy_ = new FunctionHierarchy(parser_);
-        MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
     } else {
-        MainWindow::Instance().UpdateOutlineDockView(overviewList_);
-        MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
+        MainWindow::Instance().HideOutlineDockView();
+        MainWindow::Instance().HideHierarchyDockView();
     }
 }
 
@@ -809,6 +812,9 @@ QString EditView::GetCursorText(QTextCursor &textCursor) {
 }
 
 void EditView::JumpHint(QTextCursor &cursor) {
+    if (parser_ == nullptr) {
+        return;
+    }
     if (!cursor.hasSelection()) {
         cursor.select(QTextCursor::WordUnderCursor);
     }

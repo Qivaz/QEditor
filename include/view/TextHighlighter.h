@@ -22,6 +22,8 @@
 #include <QSyntaxHighlighter>
 
 namespace QEditor {
+#define Keyword(word) QStringLiteral("\\b" #word "\\b")
+
 class TextHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
    public:
@@ -34,6 +36,7 @@ class TextHighlighter : public QSyntaxHighlighter {
    private:
     void SetupSelectedText(const QString &text);
     void SetupMakeText(const QVector<QString> markUpText);
+    void SetupPythonLang();
     void SetupCLang();
     void SetupMindIRLang();
 
@@ -44,9 +47,9 @@ class TextHighlighter : public QSyntaxHighlighter {
 
     QVector<HighlightingRule> highlightingRules_;
 
-    QRegularExpression clangCommentStartExpression_;
-    QRegularExpression clangcommentEndExpression_;
-    QTextCharFormat clangMultiLineCommentFormat_;
+    QVector<QRegularExpression> commentStartExpressions_;
+    QVector<QRegularExpression> commentEndExpressions_;
+    QTextCharFormat commentMultiLineFormat_;
 
     const QVector<QColor> presetMarkColors_ = {
         QColor(250, 128, 114), QColor(255, 215, 0), QColor(192, 255, 62), QColor(127, 255, 212), QColor(255, 99, 71),

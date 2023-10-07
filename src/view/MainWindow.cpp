@@ -41,6 +41,7 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     specialCharsVisible_ = settings.Get("view", "allcharsvisible", false).toBool();
     explorerVisible_ = settings.Get("view", "explorervisible", true).toBool();
     outlineVisible_ = settings.Get("view", "outlinevisible", true).toBool();
+    hierarchyVisible_ = settings.Get("view", "hierarchyvisible", true).toBool();
     qreal opa = settings.Get("window", "opacity", 1).toDouble();
 
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -53,7 +54,7 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
 
     // setStyleSheet(
     //     "background:rgb(68,68,68); selection-color:lightGray; selection-background-color:rgb(9,71,113); border:1px,solid,rgb(255,0,0);");
-    setStyleSheet("QMainWindow::separator{background:rgb(54,54,54); width: 1px; height: 0px; margin: 0px; padding: 0px;}");
+    setStyleSheet("QMainWindow{background:rgb(68,68,68);} QMainWindow::separator{background:rgb(54,54,54); width: 1px; height: 0px; margin: 0px; padding: 0px;}");
 
     setCentralWidget(tabView_);
 
@@ -101,6 +102,11 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
         ShowOutlineDockView();
     } else {
         HideOutlineDockView();
+    }
+    if (hierarchyVisible_) {
+        ShowHierarchyDockView();
+    } else {
+        HideHierarchyDockView();
     }
 
     QPalette pal = QPalette();
@@ -425,7 +431,7 @@ void MainWindow::CreateActions() {
     QAction *showHierarchyAct = new QAction(showHierarchyIcon, tr("Show Hierarchy Window"), this);
     showHierarchyAct->setStatusTip(tr("ShowHierarchyWindow"));
     showHierarchyAct->setCheckable(true);
-    showHierarchyAct->setChecked(outlineVisible_);
+    showHierarchyAct->setChecked(hierarchyVisible_);
     connect(showHierarchyAct, &QAction::triggered, this, &MainWindow::SwitchHierarchyWindowVisible);
     viewMenu->addAction(showHierarchyAct);
     viewToolBar2->addAction(showHierarchyAct);
@@ -635,9 +641,10 @@ void MainWindow::UpdateHierarchyDockView(FunctionHierarchy *view) {
 }
 
 void MainWindow::ShowHierarchyDockView() {
-    if (hierarchyDockView_ != nullptr && !hierarchyDockView_->isVisible()) {
-        hierarchyDockView_->show();
+    if (hierarchyDockView_ == nullptr) {
+        CreateHierarchyDockView();
     }
+    hierarchyDockView_->show();
 }
 
 void MainWindow::HideHierarchyDockView() {
@@ -738,6 +745,21 @@ void MainWindow::closeEvent(QCloseEvent *event) { tabView_->AutoStore(); }
 bool MainWindow::IsLeftOrRightSeparator(const QPointF &pos) {
     constexpr auto distance_threhold = 3;
     return (pos.x() < distance_threhold || std::abs(pos.x() - rect().width()) < distance_threhold);
+}
+
+bool MainWindow::hierarchyVisible() const
+{
+    return hierarchyVisible_;
+}
+
+bool MainWindow::outlineVisible() const
+{
+    return outlineVisible_;
+}
+
+bool MainWindow::explorerVisible() const
+{
+    return explorerVisible_;
 }
 
 Searcher *MainWindow::GetSearcher() {
@@ -1136,57 +1158,48 @@ void MainWindow::SwitchSpecialCharsVisible() {
 }
 
 void MainWindow::SwitchExplorerWindowVisible() {
-    if (editView() == nullptr) {
-        return;
-    }
     explorerVisible_ = !explorerVisible_;
-    if (IsExplorerDockViewShowing() == explorerVisible_) {
-        return;
-    }
-
-    if (explorerVisible_) {
-        ShowExplorerDockView();
-        MainWindow::Instance().SetExplorerDockViewPosition(editView()->filePath());
-    } else {
-        HideExplorerDockView();
+    if (IsExplorerDockViewShowing() != explorerVisible_) {
+        if (explorerVisible_) {
+            ShowExplorerDockView();
+            if (editView() != nullptr) {
+                MainWindow::Instance().SetExplorerDockViewPosition(editView()->filePath());
+            }
+        } else {
+            HideExplorerDockView();
+        }
     }
 
     Settings().Set("view", "explorervisible", explorerVisible_);
 }
 
 void MainWindow::SwitchOutlineWindowVisible() {
-    if (editView() == nullptr) {
-        return;
-    }
     outlineVisible_ = !outlineVisible_;
-    if (IsOutlineDockViewShowing() == outlineVisible_) {
-        return;
-    }
-
-    if (outlineVisible_) {
-        ShowOutlineDockView();
-        editView()->TrigerParser();
-    } else {
-        HideOutlineDockView();
+    if (IsOutlineDockViewShowing() != outlineVisible_) {
+        if (outlineVisible_) {
+            ShowOutlineDockView();
+            if (editView() != nullptr) {
+                editView()->TrigerParser();
+            }
+        } else {
+            HideOutlineDockView();
+        }
     }
 
     Settings().Set("view", "outlinevisible", outlineVisible_);
 }
 
 void MainWindow::SwitchHierarchyWindowVisible() {
-    if (editView() == nullptr) {
-        return;
-    }
     hierarchyVisible_ = !hierarchyVisible_;
-    if (IsHierarchyDockViewShowing() == hierarchyVisible_) {
-        return;
-    }
-
-    if (hierarchyVisible_) {
-        ShowHierarchyDockView();
-        editView()->TrigerParser();
-    } else {
-        HideHierarchyDockView();
+    if (IsHierarchyDockViewShowing() != hierarchyVisible_) {
+        if (hierarchyVisible_) {
+            ShowHierarchyDockView();
+            if (editView() != nullptr) {
+                editView()->TrigerParser();
+            }
+        } else {
+            HideHierarchyDockView();
+        }
     }
 
     Settings().Set("view", "hierarchyvisible", hierarchyVisible_);

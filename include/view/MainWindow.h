@@ -153,6 +153,12 @@ class MainWindow : public QMainWindow {
 
     Searcher *GetSearcher();
 
+    bool explorerVisible() const;
+
+    bool outlineVisible() const;
+
+    bool hierarchyVisible() const;
+
    public slots:
     bool Find();
     bool FindNext();

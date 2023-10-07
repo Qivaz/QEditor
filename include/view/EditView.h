@@ -260,7 +260,7 @@ class EditView : public QPlainTextEdit {
     FileEncoding fileEncoding_ /*{106}*/;
 
     IParser *parser_{nullptr};
-    OutlineList *overviewList_{nullptr};
+    OutlineList *outlineList_{nullptr};
     FunctionHierarchy *hierarchy_{nullptr};
 
     int lastPos_{-1};

@@ -27,15 +27,19 @@ DockView::DockView(QWidget *parent) : QDockWidget(parent) {
 //    setAutoFillBackground(true);
 //    setPalette(pal);
 
-    SetDockQss(this, "9pt", "lightGray", "rgb(35, 35, 35)", "2px", "5px");
+    SetDockQss(this, "9pt", "lightGray", "rgb(68,68,68)", "rgb(35, 35, 35)", "2px", "5px");
 }
 
 void DockView::SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
-                          const QString &backColor, const QString &leftPadding, const QString &topPadding) {
+                          const QString &floatingBackColor, const QString &titleBackColor, const QString &leftPadding,
+                          const QString &topPadding) {
     QStringList qss;
-    qss.append(QString("QDockWidget{border: 10px solid red; font-size:%1; color:%2;}").arg(fontSize).arg(textColor));
+    qss.append(QString("QDockWidget{border: 10px solid red; font-size:%1; color:%2; background-color:%3;}")
+                   .arg(fontSize)
+                   .arg(textColor)
+                   .arg(floatingBackColor));
     qss.append(QString("QDockWidget::title{background:%1; padding-left:%2; padding-top:%3;}")
-                   .arg(backColor)
+                   .arg(titleBackColor)
                    .arg(leftPadding)
                    .arg(topPadding));
     qss.append(QString("QDockWidget::close-button,QDockWidget::float-button{border-image:url(:/images/x.svg);}"));

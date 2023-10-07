@@ -26,8 +26,9 @@ class DockView : public QDockWidget {
     DockView(QWidget *parent = nullptr);
     ~DockView() { setWidget(nullptr); }
 
-    void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor, const QString &backColor,
-                    const QString &leftPadding, const QString &topPadding);
+    void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
+                    const QString &floatingBackColor, const QString &titleBackColor, const QString &leftPadding,
+                    const QString &topPadding);
 
     int savedMaxWidth() const { return savedMaxWidth_; }
     void setSavedMaxWidth(int savedMaxWidth) {

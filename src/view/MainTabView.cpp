@@ -85,11 +85,13 @@ void TabView::UpdateWindowTitle(int index) {
         editView = GetEditView(index);
     }
     QString title;
+    QString path;
     if (editView != nullptr) {
         title = editView->fileName();
         if (editView->ShouldSave()) {
             title = "* " + title;
         }
+        path = editView->filePath();
     } else {
         if (index == -1) {
             title = tabText(currentIndex());
@@ -98,7 +100,13 @@ void TabView::UpdateWindowTitle(int index) {
         }
     }
 
-    title += " - " + QCoreApplication::applicationName();
+    if (!title.isEmpty()) {
+        title += " - ";
+    }
+    title += QCoreApplication::applicationName();
+    if (!path.isEmpty()) {
+        title += " (" + path + ")";
+    }
     MainWindow *win = (MainWindow *)(this->parent());
     win->setWindowTitle(title);
 }

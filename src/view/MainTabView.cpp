@@ -32,6 +32,7 @@
 #include <QProcess>
 #include <QStatusBar>
 #include <QTabBar>
+#include <QTimer>
 #include <QToolButton>
 
 namespace QEditor {
@@ -128,7 +129,10 @@ void TabView::HandleCurrentIndexChanged(int index) {
         return;
     }
     editView->UpdateStatusBarWithCursor();
-    editView->TrigerParser();
+    // Defer parse to avoid tabbar concealing some tabs.
+    QTimer::singleShot(500, [editView]() {
+        editView->TrigerParser();
+    });
     if (editView->fileLoaded()) {
         RecordStep(editView, editView->textCursor().position());
     }

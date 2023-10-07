@@ -26,6 +26,7 @@
 #include <QScrollBar>
 #include <QStandardItemModel>
 #include <QTreeView>
+#include <QTimer>
 
 namespace QEditor {
 ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath)
@@ -127,7 +128,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(QDir::toNativeSeparators(filePath));
     });
-    //    menu_->popup(QCursor::pos());
+    // menu_->popup(QCursor::pos());
 
     auto fileName = fileInfo.fileName();
     QAction *copyNameAction = new QAction(tr("Copy File Name"));
@@ -136,7 +137,7 @@ void ExplorerTreeView::HandleIndexPress(const QModelIndex &index) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(fileName);
     });
-    //    menu_->popup(QCursor::pos());
+    // menu_->popup(QCursor::pos());
 
     menu_->addSeparator();
 
@@ -196,18 +197,19 @@ void ExplorerTreeView::HandleDirLoaded(const QString &path) {
 void ExplorerTreeView::timerEvent(QTimerEvent *event) {
     if (gotoForLoaded_) {
         gotoForLoaded_ = false;
-
-        QModelIndex modelIndex = proxyModel_->mapFromSource(model_->index(gotoPath_, 0));
-        qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << modelIndex.data().toString()
-                 << modelIndex.parent().data().toString() << model_->rowCount(modelIndex);
-        scrollTo(modelIndex);
+        QTimer::singleShot(100, [this]() {
+            QModelIndex modelIndex = proxyModel_->mapFromSource(model_->index(gotoPath_, 0));
+            qDebug() << "modelIndex: " << modelIndex.row() << modelIndex.column() << modelIndex.data().toString()
+                     << modelIndex.parent().data().toString() << model_->rowCount(modelIndex);
+            scrollTo(modelIndex);
+        });
     }
     QTreeView::timerEvent(event);
 }
 
 void ExplorerTreeView::GotoPathPosition(const QString &path) {
     gotoPath_ = path;
-    gotoDir_ = path.section(QDir::separator(), 0, -2);
+    gotoDir_ = path.section('/', 0, -2);
 
     QModelIndex modelIndex = proxyModel_->mapFromSource(model_->index(gotoPath_, 0));
     setCurrentIndex(modelIndex);

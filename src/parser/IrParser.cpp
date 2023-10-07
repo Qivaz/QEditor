@@ -70,7 +70,8 @@ void IrParser::ParseFuncGraph() {
         const QRegularExpression subGraphDefName = QRegularExpression(kSubGraphDefNameRe);
         auto subgraphDefNameCursor = editView_->document()->find(subGraphDefName, funcStartCursor);
         auto subgraphName = subgraphDefNameCursor.selectedText();
-        auto subgraphSimpleName = subgraphName.section('.', 0, 0);
+        auto subgraphSimpleName = subgraphName.section(' ', 0, 0);
+        subgraphSimpleName = subgraphSimpleName.section('.', 0, 0);
 
         // Match subgraph Return node.
         auto returnStartCursor = editView_->document()->find(kSubGraphReturnStart, subgraphDefNameCursor);
@@ -321,7 +322,8 @@ void IrParser::ParseFuncGraph() {
 }
 
 FuncGraphInfo IrParser::GetFuncGraphInfo(const QString &funcName) const {
-    const auto &simpleFuncName = funcName.section('.', 0, 0);
+    auto simpleFuncName = funcName.section(' ', 0, 0);
+    simpleFuncName = simpleFuncName.section('.', 0, 0);
     return funcGraphNameInfoMap_.value(simpleFuncName);
 }
 
@@ -400,29 +402,9 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 continue;
             }
             auto opStart = assignOperationPos + assignOperationLen;
-            auto callEnd = startBlockText.lastIndexOf(")");
-            auto callEndCursor = editView_->textCursor();
-            callEndCursor.setPosition(startBlock.position() + callEnd + 1, QTextCursor::MoveAnchor);
-            auto callEndPair = editView_->FindPairingBracketCursor(callEndCursor, QTextCursor::Left, ')', '(');
-            auto opEnd = -1;
-            if (callEndPair.second) {
-                const auto &opEndCursor = callEndPair.first;
-                opEnd = opEndCursor.position() - startBlock.position();
-            } else {
-                opEnd = startBlockText.lastIndexOf("(", opStart);
-            }
-            if (opEnd == -1) {
-                startBlock = startBlock.next();
-                continue;
-            }
-            // Ignore "$(".
-            qDebug() << "startBlockText.at(opEnd - 1): " << startBlockText.at(opEnd - 1);
-            if (startBlockText.at(opEnd - 1) == '$') {
+            auto opEnd = startBlockText.indexOf("(", opStart);
+            if (startBlockText.at(opStart) == '$') {  // Handle free variable call.
                 opEnd = startBlockText.indexOf("(", opEnd + 1);
-                if (opEnd == -1) {
-                    startBlock = startBlock.next();
-                    continue;
-                }
             }
             auto opName = startBlockText.mid(opStart, opEnd - opStart);
             qDebug() << "opName: " << opName;
@@ -432,15 +414,8 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 auto opInput = opName.mid(1, opName.indexOf("[") - 1);
                 inputs.push_back(opInput);
             }
-
-            constexpr auto argumentsStartStr = "(";
-            auto argumentsStart = startBlockText.indexOf(argumentsStartStr, opEnd);
-            if (argumentsStart == -1) {
-                startBlock = startBlock.next();
-                continue;
-            }
             auto cursor = editView_->textCursor();
-            cursor.setPosition(startBlock.position() + argumentsStart, QTextCursor::MoveAnchor);
+            cursor.setPosition(startBlock.position() + opEnd, QTextCursor::MoveAnchor);
             auto res = editView_->FindPairingBracketCursor(cursor, QTextCursor::Right, '(', ')');
             auto pairingCursor = res.first;
             auto success = res.second;
@@ -448,7 +423,6 @@ const QMap<QString, NodeInfo> &IrParser::ParseNodes(const QString &funcName) {
                 while (cursor.position() < pairingCursor.position()) {
                     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
                 }
-
                 auto argumentsStr = cursor.selectedText();
                 argumentsStr = argumentsStr.mid(1, argumentsStr.length() - 2);  // Remove start '(' and end ')'.
                 qDebug() << "argumentsStr: " << argumentsStr;

@@ -61,7 +61,7 @@ class IrParser : public IParser {
    private:
     const QMap<QString, NodeInfo> &ParseNodes(const FuncGraphInfo &);
 
-    constexpr static auto kIrEntry = "#IR entry      : ";
+    constexpr static auto kIrEntry = "# IR entry: ";
     constexpr static auto kSubGraph = "subgraph";
     constexpr static auto kSubGraphDefinePreciseNameRe = "(?<=subgraph @).*(?=\\()";
     constexpr static auto kSubGraphAttrStart = "subgraph attr:";

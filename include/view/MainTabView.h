@@ -172,6 +172,8 @@ class TabView : public QTabWidget {
     Diff diff_;
 
     QString formerDiffStr_{""};
+
+    bool windowTitleShowFilePath_{false};
 };
 }  // namespace QEditor
 

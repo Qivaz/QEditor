@@ -36,12 +36,12 @@
 namespace QEditor {
 MainWindow::MainWindow() : tabView_(new TabView(this)) {
     auto settings = Settings();
-    toolBarVisible_ = settings.Get("view", "toolbarvisible", true).toBool();
-    shouldWrapText_ = settings.Get("view", "wraptext", true).toBool();
-    specialCharsVisible_ = settings.Get("view", "allcharsvisible", false).toBool();
-    explorerVisible_ = settings.Get("view", "explorervisible", true).toBool();
-    outlineVisible_ = settings.Get("view", "outlinevisible", true).toBool();
-    hierarchyVisible_ = settings.Get("view", "hierarchyvisible", true).toBool();
+    toolBarVisible_ = settings.Get("view", "toolbar_visible", true).toBool();
+    shouldWrapText_ = settings.Get("view", "wrap_text", true).toBool();
+    specialCharsVisible_ = settings.Get("view", "all_chars_visible", false).toBool();
+    explorerVisible_ = settings.Get("view", "explorer_visible", true).toBool();
+    outlineVisible_ = settings.Get("view", "outline_visible", true).toBool();
+    hierarchyVisible_ = settings.Get("view", "hierarchy_visible", true).toBool();
     qreal opa = settings.Get("window", "opacity", 1).toDouble();
 
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -376,7 +376,7 @@ void MainWindow::CreateActions() {
             }
         }
 
-        Settings().Set("view", "toolbarvisible", toolBarVisible_);
+        Settings().Set("view", "toolbar_visible", toolBarVisible_);
     });
     showToolBar->setCheckable(true);
     if (toolBarVisible_) {
@@ -590,10 +590,11 @@ void MainWindow::SetOutlineDockViewPosition(int cursorPos) {
 }
 
 void MainWindow::UpdateOutlineDockView(OutlineList *list) {
-    if (!IsOutlineDockViewShowing()) {
-        return;
+    if (outlineDockView_ == nullptr) {
+        CreateOutlineDockView();
     }
     outlineDockView_->setWidget(list);
+    ShowOutlineDockView();
 }
 
 void MainWindow::ShowOutlineDockView() {
@@ -1129,7 +1130,7 @@ void MainWindow::SwitchWrapText() {
     shouldWrapText_ = !shouldWrapText_;
     SyncWrapTextState();
 
-    Settings().Set("view", "wraptext", shouldWrapText_);
+    Settings().Set("view", "wrap_text", shouldWrapText_);
 }
 
 void MainWindow::SyncShowSpecialCharsVisible(bool shouldShow) {
@@ -1154,7 +1155,7 @@ void MainWindow::SwitchSpecialCharsVisible() {
     specialCharsVisible_ = !specialCharsVisible_;
     SyncShowSpecialCharsVisible(specialCharsVisible_);
 
-    Settings().Set("view", "allcharsvisible", specialCharsVisible_);
+    Settings().Set("view", "all_chars_visible", specialCharsVisible_);
 }
 
 void MainWindow::SwitchExplorerWindowVisible() {
@@ -1170,7 +1171,7 @@ void MainWindow::SwitchExplorerWindowVisible() {
         }
     }
 
-    Settings().Set("view", "explorervisible", explorerVisible_);
+    Settings().Set("view", "explorer_visible", explorerVisible_);
 }
 
 void MainWindow::SwitchOutlineWindowVisible() {
@@ -1186,7 +1187,7 @@ void MainWindow::SwitchOutlineWindowVisible() {
         }
     }
 
-    Settings().Set("view", "outlinevisible", outlineVisible_);
+    Settings().Set("view", "outline_visible", outlineVisible_);
 }
 
 void MainWindow::SwitchHierarchyWindowVisible() {
@@ -1202,7 +1203,7 @@ void MainWindow::SwitchHierarchyWindowVisible() {
         }
     }
 
-    Settings().Set("view", "hierarchyvisible", hierarchyVisible_);
+    Settings().Set("view", "hierarchy_visible", hierarchyVisible_);
 }
 
 void MainWindow::Copy() {

@@ -20,6 +20,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 #include "RecentFiles.h"
+#include "Settings.h"
 #include "Toast.h"
 #include <QAbstractButton>
 #include <QApplication>
@@ -35,6 +36,8 @@
 
 namespace QEditor {
 TabView::TabView(QWidget *parent) : QTabWidget(parent), menu_(new QMenu(parent)) {
+    auto settings = Settings();
+    windowTitleShowFilePath_ = settings.Get("window", "title_show_filepath", true).toBool();
     setAttribute(Qt::WA_StyledBackground);
     setMovable(true);
     setTabsClosable(true);
@@ -104,8 +107,8 @@ void TabView::UpdateWindowTitle(int index) {
         title += " - ";
     }
     title += QCoreApplication::applicationName();
-    if (!path.isEmpty()) {
-        title += " (" + path + ")";
+    if (windowTitleShowFilePath_ && !path.isEmpty()) {
+        title += "  [" + path + "]";
     }
     MainWindow *win = (MainWindow *)(this->parent());
     win->setWindowTitle(title);

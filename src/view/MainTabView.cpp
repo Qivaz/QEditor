@@ -129,10 +129,7 @@ void TabView::HandleCurrentIndexChanged(int index) {
         return;
     }
     editView->UpdateStatusBarWithCursor();
-    // Defer parse to avoid tabbar concealing some tabs.
-    QTimer::singleShot(500, [editView]() {
-        editView->TrigerParser();
-    });
+    editView->TrigerParser();
     if (editView->fileLoaded()) {
         RecordStep(editView, editView->textCursor().position());
     }

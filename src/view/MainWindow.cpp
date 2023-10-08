@@ -619,7 +619,7 @@ DockView *MainWindow::CreateOutlineDockView() {
         outlineDockView_->setMinimumWidth(0);
     }
     outlineDockView_->setWindowTitle(tr("OUTLINE"));
-    //    overviewDockView_->setFont(QFont("Consolas", 11));
+    // overviewDockView_->setFont(QFont("Consolas", 11));
     outlineDockView_->setFeatures(
         /*QDockWidget::DockWidgetClosable | */ QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, outlineDockView_);

@@ -770,7 +770,10 @@ void EditView::TrigerParser() {
                 delete hierarchy_;
             }
             hierarchy_ = new FunctionHierarchy(parser_);
-            MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
+            // Defer parse to avoid tabbar concealing some tabs.
+            QTimer::singleShot(500, [this]() {
+                MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
+            });
         }
     } else {
         MainWindow::Instance().HideOutlineDockView();

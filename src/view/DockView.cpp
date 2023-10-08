@@ -15,9 +15,11 @@
  */
 
 #include "DockView.h"
+#include "MainWindow.h"
 #include "Logger.h"
 #include <QEvent>
 #include <QResizeEvent>
+#include <QTimer>
 #include <QWidget>
 
 namespace QEditor {
@@ -28,6 +30,11 @@ DockView::DockView(QWidget *parent) : QDockWidget(parent) {
 //    setPalette(pal);
 
     SetDockQss(this, "9pt", "lightGray", "rgb(68,68,68)", "rgb(35, 35, 35)", "2px", "5px");
+
+    QTimer::singleShot(10, [this]() {
+        MainWindow::Instance().resizeDocks({this}, {500}, Qt::Vertical);
+        MainWindow::Instance().resizeDocks({this}, {300}, Qt::Horizontal);
+    });
 }
 
 void DockView::SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,

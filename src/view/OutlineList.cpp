@@ -42,7 +42,7 @@ OutlineList::OutlineList(IParser *parser) : parser_(parser) {
         auto resizeFont = font();
         resizeFont.setPointSize(10);
         top->setFont(0, resizeFont);
-        //        top->setFont(0, QFont("Consolas", 10));
+        // top->setFont(0, QFont("Consolas", 10));
         top->setIcon(0, QIcon(":/images/function.svg"));
         top->setText(0, info.name_ + "() -> " + info.returnValue_);
         addTopLevelItem(top);

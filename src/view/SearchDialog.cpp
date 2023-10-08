@@ -688,21 +688,21 @@ bool Searcher::_Find(const T &target, const QTextCursor &startCursor, QTextCurso
 }
 
 static void HandleEscapeChars(QString &text) {
-    //    text.replace("\\a", "\a");  // 0x07, Alert bell
-    //    text.replace("\\b", "\b");  // 0x08, Backspace
-    //    text.replace("\\e", "\e");  // 0x1B, Escape char
-    //    text.replace("\\f", "\f");  // 0x0C, Formfeed Page Break
-    //    text.replace("\\n", "\n");  // 0x0A, Line Feed
-    //    text.replace("\\r", "\r");  // 0x0D, Carriage Return
-    //    text.replace("\\t", "\t");  // 0x09, Horizontal Tab
-    //    text.replace("\\v", "\v");  // 0x0B, Vertical Tab
-    //    text.replace("\\", "\u005c");  // 0x5C, Backslash
-    //    text.replace("\\'", "\'");  // 0x27, Single quotation mark
-    //    text.replace("\\"", "\"");  // 0x22, Double quotation mark
-    //    text.replace("\\?", "\?");  // 0x3F, Question mark
-    //    text.replace("\\ddd", "d");  // Octal interpreted.
-    //    text.replace("\\xxx", "xxx");  // Hexadecimal interpreted.
-    //    text.replace("\\uhhhh", "hhhh");  // Unicode code.
+    // text.replace("\\a", "\a");  // 0x07, Alert bell
+    // text.replace("\\b", "\b");  // 0x08, Backspace
+    // text.replace("\\e", "\e");  // 0x1B, Escape char
+    // text.replace("\\f", "\f");  // 0x0C, Formfeed Page Break
+    // text.replace("\\n", "\n");  // 0x0A, Line Feed
+    // text.replace("\\r", "\r");  // 0x0D, Carriage Return
+    // text.replace("\\t", "\t");  // 0x09, Horizontal Tab
+    // text.replace("\\v", "\v");  // 0x0B, Vertical Tab
+    // text.replace("\\", "\u005c");  // 0x5C, Backslash
+    // text.replace("\\'", "\'");  // 0x27, Single quotation mark
+    // text.replace("\\"", "\"");  // 0x22, Double quotation mark
+    // text.replace("\\?", "\?");  // 0x3F, Question mark
+    // text.replace("\\ddd", "d");  // Octal interpreted.
+    // text.replace("\\xxx", "xxx");  // Hexadecimal interpreted.
+    // text.replace("\\uhhhh", "hhhh");  // Unicode code.
 
     text.replace("\\r\\n", "\n");
     text.replace("\\r", "\n");

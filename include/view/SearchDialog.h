@@ -191,7 +191,7 @@ class LambdaEventFilter : public QObject {
 
        private:
         LAMBDA lambda_;
-        //        std::tuple<ARGS...> args_;
+        // std::tuple<ARGS...> args_;
     };
 
     AbstractLambdaContainer *lambdaContainer;

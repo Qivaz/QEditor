@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
     }
 
     QEditor::MainWindow::Instance().setWindowIcon(QIcon(":/images/QEditorIcon.webp"));
-    //    QEditor::MainWindow::Instance().show();
+    // QEditor::MainWindow::Instance().show();
     QEditor::MainWindow::Instance().showMaximized();
-    //    app.setQuitOnLastWindowClosed(false);
+    // app.setQuitOnLastWindowClosed(false);
     return app.exec();
 }

@@ -66,8 +66,8 @@ ExplorerTreeView::ExplorerTreeView(QWidget *parent, const QString &rootPath)
     model_->setOption(QFileSystemModel::DontUseCustomDirectoryIcons);
     model_->setOption(QFileSystemModel::DontWatchForChanges);
     model_->setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    //    model_->setNameFilters(QStringList({"*.txt", "*.ir", "*.dat", "*.h", "*.cpp", "*.cc", "*.py",}));
-    //    model_->setNameFilters(QStringList({"*.txt"}));
+    // model_->setNameFilters(QStringList({"*.txt", "*.ir", "*.dat", "*.h", "*.cpp", "*.cc", "*.py",}));
+    // model_->setNameFilters(QStringList({"*.txt"}));
     proxyModel_ = new CustSortFilterProxyModel();
     proxyModel_->setSourceModel(model_);
     proxyModel_->sort(0, Qt::AscendingOrder);

@@ -23,8 +23,8 @@ namespace QEditor {
 class DockView : public QDockWidget {
     Q_OBJECT
    public:
-    DockView(QWidget *parent = nullptr);
-    ~DockView() { setWidget(nullptr); }
+    DockView(QWidget *parent = nullptr, int width = 300, int height = 500);
+    ~DockView() = default;
 
     void SetDockQss(QDockWidget *dockView, const QString &fontSize, const QString &textColor,
                     const QString &floatingBackColor, const QString &titleBackColor, const QString &leftPadding,

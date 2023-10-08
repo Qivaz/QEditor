@@ -23,17 +23,17 @@
 #include <QWidget>
 
 namespace QEditor {
-DockView::DockView(QWidget *parent) : QDockWidget(parent) {
-//    QPalette pal;
-//    pal.setColor(QPalette::Window, QColor(28, 28, 28));
-//    setAutoFillBackground(true);
-//    setPalette(pal);
+DockView::DockView(QWidget *parent, int width, int height) : QDockWidget(parent) {
+    // QPalette pal;
+    // pal.setColor(QPalette::Window, QColor(28, 28, 28));
+    // setAutoFillBackground(true);
+    // setPalette(pal);
 
     SetDockQss(this, "9pt", "lightGray", "rgb(68,68,68)", "rgb(35, 35, 35)", "2px", "5px");
 
-    QTimer::singleShot(10, [this]() {
-        MainWindow::Instance().resizeDocks({this}, {500}, Qt::Vertical);
-        MainWindow::Instance().resizeDocks({this}, {300}, Qt::Horizontal);
+    QTimer::singleShot(10, [this, width, height]() {
+        MainWindow::Instance().resizeDocks({this}, {width}, Qt::Horizontal);
+        MainWindow::Instance().resizeDocks({this}, {height}, Qt::Vertical);
     });
 }
 

@@ -149,9 +149,9 @@ class EditView : public QPlainTextEdit {
 
     qreal LineSpacing() {
         QFont currentFont = font();
-        //        currentFont.setPointSize(fontSize_ * fontZoom_ / 100);
+        // currentFont.setPointSize(fontSize_ * fontZoom_ / 100);
         qreal spacing = QFontMetricsF(currentFont).lineSpacing();
-        //        if (lineSpacing_ != 100) spacing *= qreal(lineSpacing_) / 100;
+        // if (lineSpacing_ != 100) spacing *= qreal(lineSpacing_) / 100;
         return spacing;
     }
 

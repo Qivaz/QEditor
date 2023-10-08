@@ -126,7 +126,7 @@ void EditView::Init() {
     HandleBlockCountChanged(0);
     UnderpaintCurrentBlock();
 
-    //    UpdateStatusBarWithCursor();
+    // UpdateStatusBarWithCursor();
 
     setFocus();
 }
@@ -219,9 +219,9 @@ int EditView::GotoBlock(int blockNumber) {
 // Select the lines of current block.
 void EditView::SelectBlocks(int startBlockNumber, int endBlockNumber) {
     qDebug() << startBlockNumber << endBlockNumber;
-    //    if (endBlockNumber == startBlockNumber) {
-    //        return;
-    //    }
+    // if (endBlockNumber == startBlockNumber) {
+    //     return;
+    // }
     QTextCursor cursor = textCursor();
     QTextBlock block = document()->findBlockByNumber(startBlockNumber);
     cursor.setPosition(block.position());
@@ -763,6 +763,8 @@ void EditView::TrigerParser() {
             }
             outlineList_ = new OutlineList(parser_);
             MainWindow::Instance().UpdateOutlineDockView(outlineList_);
+        } else {
+            MainWindow::Instance().HideOutlineDockView();
         }
 
         if (MainWindow::Instance().hierarchyVisible()) {
@@ -770,10 +772,9 @@ void EditView::TrigerParser() {
                 delete hierarchy_;
             }
             hierarchy_ = new FunctionHierarchy(parser_);
-            // Defer parse to avoid tabbar concealing some tabs.
-            QTimer::singleShot(500, [this]() {
-                MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
-            });
+            MainWindow::Instance().UpdateHierarchyDockView(hierarchy_);
+        } else {
+            MainWindow::Instance().HideHierarchyDockView();
         }
     } else {
         MainWindow::Instance().HideOutlineDockView();

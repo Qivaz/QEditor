@@ -135,7 +135,7 @@ INCLUDEPATH += \
 
 #INCLUDEPATH += $$PWD/third_party/pybind11/pybind11-v2.10.4/include/pybind11
 
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 QMAKE_TARGET_PRODUCT = "QEditor"
 QMAKE_TARGET_COMPANY = "Q"
 QMAKE_TARGET_DESCRIPTION = "QEditor"

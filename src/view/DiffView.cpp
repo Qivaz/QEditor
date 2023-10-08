@@ -68,7 +68,7 @@ void DiffHtmlView::ZoomOut() {
 
 DiffTextView::DiffTextView(QWidget *parent) : EditView(parent) {
     setFont(QFont("Consolas", 11));
-    //    setReadOnly(true);
-    //    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    // setReadOnly(true);
+    // setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 }
 }  // namespace QEditor

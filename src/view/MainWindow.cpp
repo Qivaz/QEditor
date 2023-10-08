@@ -56,6 +56,22 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
     //     "background:rgb(68,68,68); selection-color:lightGray; selection-background-color:rgb(9,71,113); border:1px,solid,rgb(255,0,0);");
     setStyleSheet("QMainWindow{background:rgb(68,68,68);} QMainWindow::separator{background:rgb(54,54,54); width: 1px; height: 0px; margin: 0px; padding: 0px;}");
 
+    if (explorerVisible_) {
+        ShowExplorerDockView();
+    } else {
+        HideExplorerDockView();
+    }
+    if (outlineVisible_) {
+        ShowOutlineDockView();
+    } else {
+        HideOutlineDockView();
+    }
+    if (hierarchyVisible_) {
+        ShowHierarchyDockView();
+    } else {
+        HideHierarchyDockView();
+    }
+
     setCentralWidget(tabView_);
 
     CreateActions();
@@ -93,24 +109,8 @@ MainWindow::MainWindow() : tabView_(new TabView(this)) {
 
     installEventFilter(this);
 
-    if (explorerVisible_) {
-        ShowExplorerDockView();
-    } else {
-        HideExplorerDockView();
-    }
-    if (outlineVisible_) {
-        ShowOutlineDockView();
-    } else {
-        HideOutlineDockView();
-    }
-    if (hierarchyVisible_) {
-        ShowHierarchyDockView();
-    } else {
-        HideHierarchyDockView();
-    }
-
     QPalette pal = QPalette();
-    //    pal.setColor(QPalette::ToolTipBase, QColor(0, 0, 255));
+    // pal.setColor(QPalette::ToolTipBase, QColor(0, 0, 255));
     pal.setColor(QPalette::ToolTipText, Qt::lightGray);
     QToolTip::setPalette(pal);
 }
@@ -139,7 +139,7 @@ void MainWindow::CreateActions() {
     // Use addPixmap() set on/off icons.
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/file.svg"));
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
-    //    newAct->setShortcuts(QKeySequence::New);
+    // newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, &QAction::triggered, this, &MainWindow::NewFile);
     fileMenu->addAction(newAct);
@@ -492,10 +492,10 @@ void MainWindow::ShowSearchDockView() {
 
 DockView *MainWindow::CreateSearchDockView() {
     if (searchDockView_ == nullptr) {
-        searchDockView_ = new DockView(this);
+        searchDockView_ = new DockView(this, 1000, 300);
     }
     searchDockView_->setWindowTitle(tr("Search result:"));
-    //    searchDockView_->setFont(QFont("Consolas", 11));
+    // searchDockView_->setFont(QFont("Consolas", 11));
     searchDockView_->setFeatures(QDockWidget::DockWidgetClosable |
                                  QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::BottomDockWidgetArea, searchDockView_);
@@ -547,7 +547,7 @@ DockView *MainWindow::CreateExplorerDockView() {
         explorerDockView_->setMinimumWidth(0);
     }
     explorerDockView_->setWindowTitle(tr("EXPLORER"));
-    //    explorerDockView_->setFont(QFont("Consolas", 11));
+    // explorerDockView_->setFont(QFont("Consolas", 11));
     explorerDockView_->setFeatures(
         /*QDockWidget::DockWidgetClosable | */ QDockWidget::DockWidgetMovable /* | QDockWidget::DockWidgetFloatable*/);
     addDockWidget(Qt::LeftDockWidgetArea, explorerDockView_);
@@ -657,7 +657,7 @@ void MainWindow::HideHierarchyDockView() {
 
 DockView *MainWindow::CreateHierarchyDockView() {
     if (hierarchyDockView_ == nullptr) {
-        hierarchyDockView_ = new DockView(this);
+        hierarchyDockView_ = new DockView(this, 500, 500);
         hierarchyDockView_->setSavedMaxWidth(hierarchyDockView_->maximumWidth());
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         hierarchyDockView_->setMinimumWidth(0);
@@ -703,7 +703,7 @@ void MainWindow::HideNodeHierarchyDockView() {
 
 DockView *MainWindow::CreateNodeHierarchyDockView() {
     if (nodeHierarchyDockView_ == nullptr) {
-        nodeHierarchyDockView_ = new DockView(this);
+        nodeHierarchyDockView_ = new DockView(this, 500, 500);
         nodeHierarchyDockView_->setSavedMaxWidth(nodeHierarchyDockView_->maximumWidth());
         // We must set both minimum and maximum width to 0 to hide widget. Here set minimum firstly.
         nodeHierarchyDockView_->setMinimumWidth(0);
@@ -733,11 +733,14 @@ void MainWindow::showEvent(QShowEvent *event) {
     QMainWindow::showEvent(event);
     if (!init_) {
         init_ = true;
-        (void)tabView_->AutoLoad();
-        auto ev = editView();
-        if (ev != nullptr) {
-            ev->setFocus();
-        }
+        // Defer parse to avoid tabbar concealing some tabs.
+        QTimer::singleShot(100, [this]() {
+            (void)tabView_->AutoLoad();
+            auto ev = editView();
+            if (ev != nullptr) {
+                ev->setFocus();
+            }
+        });
     }
 }
 
@@ -775,7 +778,7 @@ SearchResultList *MainWindow::GetSearchResultList() {
         searchResultList_ = new SearchResultList(tabView());
         auto dockView = MainWindow::Instance().CreateSearchDockView();
         dockView->setWidget(searchResultList_);
-        //        searchResultList_->setParent(dockView);
+        // searchResultList_->setParent(dockView);
         searchResultList_->setFont(QFont("Consolas", 11));
     }
     return searchResultList_;
@@ -1360,9 +1363,9 @@ void MainWindow::CreateStatusBar() {
 
     statusBar()->showMessage(tr("Ready"));
     statusBar()->setStyleSheet(qss);
-    //    statusBar()->setStyleSheet("color: lightGray;" "background-color: black; border-color: rgb(0, 0, 0);
-    //    border:1px solid lightGray;");
-    //                               "QStatusBar::item{border: 0px}");
+    // statusBar()->setStyleSheet("color: lightGray;" "background-color: black; border-color: rgb(0, 0, 0);
+    // border:1px solid lightGray;");
+    //                            "QStatusBar::item{border: 0px}");
 }
 
 void MainWindow::HandleNewLineCharChanged(int index) {

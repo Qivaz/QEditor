@@ -500,7 +500,7 @@ bool TabView::AutoLoad() {
         } else {
             const auto &text = fileRecorder.GetText(i);
             int mibEnum = fileRecorder.GetMibEnum(i);
-            //            qDebug() << "load plain text: " << text << ", mibEnum: " << mibEnum << ", for tab " << i;
+            // qDebug() << "load plain text: " << text << ", mibEnum: " << mibEnum << ", for tab " << i;
             editView->setFileEncoding(FileEncoding(mibEnum));
             editView->setPlainText(text);
             editView->setFileLoaded(true);
@@ -577,7 +577,7 @@ void TabView::ViewDiff(DiffView *diffView, const QList<FormattedText> &formatted
 
     if (diffView->AllowHighlightScrollbar()) {
         diffView->HandleLineOffset();
-        //        cursor = diffView->textCursor();
+        // cursor = diffView->textCursor();
         int lastLine = -1;
         std::vector<int> lines;
         for (const auto &pos : diffPosList) {
@@ -832,10 +832,10 @@ void TabView::tabInserted(int index) {
     }
     qDebug() << "index: " << index << ", widget: " << editView->fileName();
     ChangeTabCloseButtonToolTip(index, tr("Double click to force close."));
-    //    UpdateWindowTitle(index);
-    //    GetEditView(index)->TrigerParser();
+    // UpdateWindowTitle(index);
+    // GetEditView(index)->TrigerParser();
 
-    //    ApplyWrapTextState(index);  // TODO: Cause transparent window...
+    // ApplyWrapTextState(index);  // TODO: Cause transparent window...
 
     AutoStore();
 }

@@ -51,7 +51,6 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
 
     QPen arrayPen = pen();
     arrayPen.setColor(lineColor_);
-    qreal arrowSize = 20;
     painter->setPen(arrayPen);
     painter->setBrush(lineColor_);
 
@@ -63,7 +62,9 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
         QPointF p2 = endPolygon.at(i) + endNode_->pos();
         QLineF polyLine = QLineF(p1, p2);
         QLineF::IntersectionType intersectionType = polyLine.intersects(centerLine, &intersectPoint);
-        if (intersectionType == QLineF::BoundedIntersection) break;
+        if (intersectionType == QLineF::BoundedIntersection) {
+            break;
+        }
         p1 = p2;
     }
 
@@ -71,9 +72,9 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
 
     double angle = std::atan2(-line().dy(), line().dx());
 
-    QPointF arrowP1 = line().p1() + QPointF(sin(angle + M_PI / 3) * arrowSize, cos(angle + M_PI / 3) * arrowSize);
+    QPointF arrowP1 = line().p1() + QPointF(sin(angle + M_PI / 3) * arrowSize_, cos(angle + M_PI / 3) * arrowSize_);
     QPointF arrowP2 =
-        line().p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize, cos(angle + M_PI - M_PI / 3) * arrowSize);
+        line().p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize_, cos(angle + M_PI - M_PI / 3) * arrowSize_);
 
     arrowPolygon_.clear();
     arrowPolygon_ << line().p1() << arrowP1 << arrowP2;

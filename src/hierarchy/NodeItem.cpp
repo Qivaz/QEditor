@@ -24,14 +24,14 @@
 #include <QPainter>
 
 namespace QEditor {
-NodeItem::NodeItem(const QString &name, const QColor &color, NodeType nodeType, QMenu *contextMenu,
+NodeItem::NodeItem(const QString &name, const QColor &textColor, NodeType nodeType, QMenu *contextMenu,
                    QGraphicsItem *parent)
     : QGraphicsPolygonItem(parent), name_(name), nodeType_(nodeType), contextMenu_(contextMenu) {
     textItem_ = new QGraphicsTextItem(name, this);
     auto rect = textItem_->boundingRect();
     rect.moveCenter(boundingRect().center());
     textItem_->setPos(rect.topLeft());
-    textItem_->setDefaultTextColor(color);
+    textItem_->setDefaultTextColor(textColor);
     qDebug() << rect << rect.height() << rect.width();
 
     switch (nodeType_) {
@@ -53,7 +53,7 @@ NodeItem::NodeItem(const QString &name, const QColor &color, NodeType nodeType, 
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
-    //    setOpacity(0.8);
+    // setOpacity(0.8);
 }
 
 void NodeItem::removeArrow(Arrow *arrow) { arrows_.removeAll(arrow); }
@@ -79,7 +79,6 @@ QPixmap NodeItem::image() const {
     painter.setPen(QPen(Qt::black, 8));
     painter.translate(125, 125);
     painter.drawPolyline(polygon_);
-
     return pixmap;
 }
 
@@ -95,7 +94,6 @@ QVariant NodeItem::itemChange(GraphicsItemChange change, const QVariant &value) 
     if (change == QGraphicsItem::ItemPositionChange) {
         for (Arrow *arrow : qAsConst(arrows_)) arrow->updatePosition();
     }
-
     return value;
 }
 }  // namespace QEditor

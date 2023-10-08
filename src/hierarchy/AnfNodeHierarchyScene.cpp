@@ -30,8 +30,10 @@ AnfNodeHierarchyScene::AnfNodeHierarchyScene(const QString &funcName, IParser *p
     mode_ = MoveItem;
     itemType_ = AnfNodeItem::Process;
     line_ = nullptr;
-    itemColor_ = QColor(106, 106, 106);
-    lineColor_ = QColor(0, 122, 204);
+    itemFillColor_ = QColor(28, 28, 28);
+    itemLineColor_ = QColor(Qt::darkGray);
+    itemTextColor_ = QColor(67, 201, 176);
+    arrowColor_ = QColor(Qt::gray);
 
     const auto &funcGraphInfo = parser_->GetFuncGraphInfo(funcName);
     const auto &nodesMap = parser_->ParseNodes(funcName);
@@ -94,7 +96,7 @@ std::pair<int, int> AnfNodeHierarchyScene::PaintNodeCalls(const QString &nodeNam
         AnfNodeItem *startItem = qgraphicsitem_cast<AnfNodeItem *>(startNode);
         AnfNodeItem *endItem = qgraphicsitem_cast<AnfNodeItem *>(endNode);
         Arrow *arrow = new Arrow(startItem, endItem);
-        arrow->setColor(lineColor_);
+        arrow->setColor(arrowColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
         arrow->setZValue(-1000.0);

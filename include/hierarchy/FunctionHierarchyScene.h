@@ -36,8 +36,9 @@ class FunctionHierarchyScene : public HierarchyScene {
         bool exist;
         auto iter = nodes_.find(funcName);
         if (iter == nodes_.end()) {
-            startNode = new FunctionItem(funcName, parser_, itemType_, itemMenu_);
-            startNode->setBrush(itemColor_);
+            startNode = new FunctionItem(funcName, itemTextColor_, parser_, itemType_, itemMenu_);
+            startNode->setBrush(itemFillColor_);
+            startNode->setPen(itemLineColor_);
             addItem(startNode);
 
             nodes_.insert(funcName, startNode);

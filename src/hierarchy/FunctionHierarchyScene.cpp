@@ -30,8 +30,10 @@ FunctionHierarchyScene::FunctionHierarchyScene(IParser *parser, QMenu *itemMenu,
     mode_ = MoveItem;
     itemType_ = FunctionItem::Process;
     line_ = nullptr;
-    itemColor_ = QColor(106, 106, 106);
-    lineColor_ = QColor(0, 122, 204);
+    itemFillColor_ = QColor(28, 28, 28);
+    itemLineColor_ = QColor(Qt::darkGray);
+    itemTextColor_ = QColor(86, 156, 202);
+    arrowColor_ = QColor(Qt::gray);
 
     const auto &entryName = parser_->GetEntry();
     constexpr auto startY = 100;
@@ -74,7 +76,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &fu
         FunctionItem *startItem = qgraphicsitem_cast<FunctionItem *>(startNode);
         FunctionItem *endItem = qgraphicsitem_cast<FunctionItem *>(endNode);
         Arrow *arrow = new Arrow(startItem, endItem);
-        arrow->setColor(lineColor_);
+        arrow->setColor(arrowColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
         arrow->setZValue(-1000.0);
@@ -136,7 +138,7 @@ std::pair<int, int> FunctionHierarchyScene::PaintFunctionCalls(const QString &fu
         FunctionItem *startItem = qgraphicsitem_cast<FunctionItem *>(startNode);
         FunctionItem *endItem = qgraphicsitem_cast<FunctionItem *>(endNode);
         Arrow *arrow = new Arrow(startItem, endItem);
-        arrow->setColor(lineColor_);
+        arrow->setColor(arrowColor_);
         startItem->addArrow(arrow);
         endItem->addArrow(arrow);
         arrow->setZValue(-1000.0);

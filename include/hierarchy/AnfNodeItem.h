@@ -34,8 +34,8 @@ class Arrow;
 
 class AnfNodeItem : public NodeItem {
    public:
-    AnfNodeItem(const QString &name, const NodeInfo &info, NodeType diagramType, QMenu *contextMenu,
-                QGraphicsItem *parent = nullptr);
+    AnfNodeItem(const QString &name, const QColor &textColor, const NodeInfo &info, NodeType diagramType,
+                QMenu *contextMenu, QGraphicsItem *parent = nullptr);
 
    protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;

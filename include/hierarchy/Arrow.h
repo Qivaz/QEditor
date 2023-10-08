@@ -44,7 +44,8 @@ class Arrow : public QGraphicsLineItem {
     NodeItem *startNode_;
     NodeItem *endNode_;
     QPolygonF arrowPolygon_;
-    QColor lineColor_ = Qt::blue;
+    QColor lineColor_ = Qt::red;
+    const qreal arrowSize_ = 5;
 };
 }  // namespace QEditor
 

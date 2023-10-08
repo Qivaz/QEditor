@@ -35,7 +35,7 @@ class NodeItem : public QGraphicsPolygonItem {
     enum { Type = UserType + 15 };
     enum NodeType { Process, Conditional, Io };
 
-    NodeItem(const QString &name, const QColor &color, NodeType diagramType, QMenu *contextMenu,
+    NodeItem(const QString &name, const QColor &textColor, NodeType diagramType, QMenu *contextMenu,
              QGraphicsItem *parent = nullptr);
 
     void removeArrow(Arrow *arrow);

@@ -25,21 +25,37 @@
 namespace QEditor {
 HierarchyScene::HierarchyScene(QMenu *itemMenu, QObject *parent) : QGraphicsScene(parent) { itemMenu_ = itemMenu; }
 
-void HierarchyScene::setLineColor(const QColor &color) {
-    lineColor_ = color;
+void HierarchyScene::setArrowColor(const QColor &color) {
+    arrowColor_ = color;
     if (ItemChanged(Arrow::Type)) {
         Arrow *item = qgraphicsitem_cast<Arrow *>(selectedItems().first());
-        item->setColor(lineColor_);
+        item->setColor(arrowColor_);
         update();
     }
 }
 
-void HierarchyScene::setItemColor(const QColor &color) {
-    itemColor_ = color;
+void HierarchyScene::setItemFillColor(const QColor &color) {
+    itemFillColor_ = color;
     if (ItemChanged(AnfNodeItem::Type)) {
         AnfNodeItem *item = qgraphicsitem_cast<AnfNodeItem *>(selectedItems().first());
-        item->setBrush(itemColor_);
+        item->setBrush(itemFillColor_);
+        item->setPen(itemLineColor_);
     }
+}
+
+void HierarchyScene::setItemLineColor(const QColor &newItemLineColor)
+{
+    itemLineColor_ = newItemLineColor;
+    if (ItemChanged(AnfNodeItem::Type)) {
+        AnfNodeItem *item = qgraphicsitem_cast<AnfNodeItem *>(selectedItems().first());
+        item->setBrush(itemFillColor_);
+        item->setPen(itemLineColor_);
+    }
+}
+
+void HierarchyScene::setItemTextColor(const QColor &newItemTextColor)
+{
+    itemTextColor_ = newItemTextColor;
 }
 
 void HierarchyScene::setMode(Mode mode) { mode_ = mode; }
@@ -52,8 +68,9 @@ void HierarchyScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     AnfNodeItem *item;
     switch (mode_) {
         case InsertItem:
-            item = new AnfNodeItem("Dummy", NodeInfo(), itemType_, itemMenu_);
-            item->setBrush(itemColor_);
+            item = new AnfNodeItem("Dummy", itemTextColor_, NodeInfo(), itemType_, itemMenu_);
+            item->setBrush(itemFillColor_);
+            item->setPen(itemLineColor_);
             addItem(item);
             qWarning() << "scenePos: " << mouseEvent->scenePos();
             item->setPos(mouseEvent->scenePos());
@@ -62,7 +79,7 @@ void HierarchyScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
         case InsertLine:
             line_ = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
-            line_->setPen(QPen(lineColor_, 2));
+            line_->setPen(QPen(arrowColor_, 2));
             addItem(line_);
             break;
 
@@ -96,7 +113,7 @@ void HierarchyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
             AnfNodeItem *startItem = qgraphicsitem_cast<AnfNodeItem *>(startItems.first());
             AnfNodeItem *endItem = qgraphicsitem_cast<AnfNodeItem *>(endItems.first());
             Arrow *arrow = new Arrow(startItem, endItem);
-            arrow->setColor(lineColor_);
+            arrow->setColor(arrowColor_);
             startItem->addArrow(arrow);
             endItem->addArrow(arrow);
             arrow->setZValue(-1000.0);

@@ -38,10 +38,18 @@ class HierarchyScene : public QGraphicsScene {
     enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
 
     explicit HierarchyScene(QMenu *itemMenu, QObject *parent = nullptr);
-    QColor itemColor() const { return itemColor_; }
-    QColor lineColor() const { return lineColor_; }
-    void setLineColor(const QColor &color);
-    void setItemColor(const QColor &color);
+
+    QColor arrowColor() const { return arrowColor_; }
+    void setArrowColor(const QColor &color);
+
+    QColor itemFillColor() const { return itemFillColor_; }
+    void setItemFillColor(const QColor &newItemFillColor);
+
+    QColor itemLineColor() const { return itemLineColor_; }
+    void setItemLineColor(const QColor &newItemLineColor);
+
+    QColor itemTextColor() const { return itemTextColor_; }
+    void setItemTextColor(const QColor &newItemTextColor);
 
    public slots:
     void setMode(Mode mode);
@@ -64,8 +72,10 @@ class HierarchyScene : public QGraphicsScene {
     bool leftButtonDown_;
     QPointF startPoint_;
     QGraphicsLineItem *line_;
-    QColor itemColor_;
-    QColor lineColor_;
+    QColor itemFillColor_;
+    QColor itemLineColor_;
+    QColor itemTextColor_;
+    QColor arrowColor_;
     QVector<int> xPos_;
 };
 }  // namespace QEditor

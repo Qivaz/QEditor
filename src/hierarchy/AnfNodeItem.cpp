@@ -24,9 +24,9 @@
 #include <QPainter>
 
 namespace QEditor {
-AnfNodeItem::AnfNodeItem(const QString &name, const NodeInfo &info, NodeType nodeType, QMenu *contextMenu,
-                         QGraphicsItem *parent)
-    : NodeItem(name, QColor(Qt::white), nodeType, contextMenu, parent), nodeInfo_(info) {}
+AnfNodeItem::AnfNodeItem(const QString &name, const QColor &textColor, const NodeInfo &info, NodeType nodeType,
+                         QMenu *contextMenu, QGraphicsItem *parent)
+    : NodeItem(name, textColor, nodeType, contextMenu, parent), nodeInfo_(info) {}
 
 void AnfNodeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     auto editView = MainWindow::Instance().editView();

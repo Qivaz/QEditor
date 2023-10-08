@@ -62,7 +62,7 @@ OutlineList::OutlineList(IParser *parser) : parser_(parser) {
         "QTreeView::branch:has-children:!has-siblings:closed,QTreeView::branch:closed:has-children:has-siblings{border-image:none;image:none;}"
         "QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings{border-image:none;image:none;}"
         "QTreeView::item{background:rgb(28,28,28);}"
-        "QTreeView::item:selected{color: rgb(0, 215, 210); background:rgb(9,71,113);}"
+        "QTreeView::item:selected{color: rgb(0,215,210); background:rgb(9,71,113);}"
         "QTreeView::item:hover{background:rgb(54,54,54);}");
 
     connect(this, &QTreeWidget::itemClicked, this, &OutlineList::HandleItemClicked);

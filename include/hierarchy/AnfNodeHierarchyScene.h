@@ -38,8 +38,9 @@ class AnfNodeHierarchyScene : public HierarchyScene {
         bool exist;
         auto iter = nodes_.find(nodeName);
         if (iter == nodes_.end()) {
-            startNode = new AnfNodeItem(nodeName, info, itemType_, itemMenu_);
-            startNode->setBrush(itemColor_);
+            startNode = new AnfNodeItem(nodeName, itemTextColor_, info, itemType_, itemMenu_);
+            startNode->setBrush(itemFillColor_);
+            startNode->setPen(itemLineColor_);
             addItem(startNode);
 
             nodes_.insert(nodeName, startNode);

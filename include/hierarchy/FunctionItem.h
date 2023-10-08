@@ -34,8 +34,8 @@ class IParser;
 
 class FunctionItem : public NodeItem {
    public:
-    FunctionItem(const QString &name, IParser *parser, NodeType diagramType, QMenu *contextMenu,
-                 QGraphicsItem *parent = nullptr);
+    FunctionItem(const QString &name, const QColor &textColor, IParser *parser, NodeType diagramType,
+                 QMenu *contextMenu, QGraphicsItem *parent = nullptr);
 
    protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
